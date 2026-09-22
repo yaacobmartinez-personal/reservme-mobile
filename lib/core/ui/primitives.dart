@@ -88,7 +88,7 @@ class KpiTile extends StatelessWidget {
           FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
-            child: Text(value, style: AppType.numeral.copyWith(color: fg, fontSize: dark ? 22 : 24)),
+            child: Text(value, style: AppType.displayAt(dark ? 22 : 24).copyWith(color: fg)),
           ),
           const SizedBox(height: 4),
           Text(label, style: AppType.captionStrong.copyWith(color: sub, fontWeight: FontWeight.w400)),
@@ -163,7 +163,7 @@ class BigHeader extends StatelessWidget {
               children: [
                 Text(eyebrow, style: AppType.caption.copyWith(color: p.ink3)),
                 const SizedBox(height: 2),
-                Text(title, style: AppType.displayL.copyWith(color: p.ink, fontSize: 28)),
+                Text(title, style: AppType.displayAt(28).copyWith(color: p.ink)),
               ],
             ),
           ),

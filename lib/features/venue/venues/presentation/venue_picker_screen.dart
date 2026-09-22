@@ -110,7 +110,7 @@ class _VenueTile extends StatelessWidget {
             alignment: Alignment.center,
             child: Text(
               venue.name.characters.first.toUpperCase(),
-              style: AppType.displayS.copyWith(color: p.pineLine, fontSize: 22),
+              style: AppType.displayAt(22).copyWith(color: p.pineLine),
             ),
           ),
           const SizedBox(width: Spacing.x3),

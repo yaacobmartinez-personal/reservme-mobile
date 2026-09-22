@@ -129,7 +129,7 @@ class _WaitlistSheetState extends ConsumerState<_WaitlistSheet> {
           children: [
             Text(
               'Join the waitlist',
-              style: AppType.displayM.copyWith(color: p.ink, fontSize: 22),
+              style: AppType.displayAt(22).copyWith(color: p.ink),
             ),
             const SizedBox(height: 4),
             Text(

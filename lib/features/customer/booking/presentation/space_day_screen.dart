@@ -94,7 +94,7 @@ class _BodyState extends ConsumerState<_Body> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(widget.space.name, style: AppType.displayS.copyWith(color: p.ink, fontSize: 20)),
+            Text(widget.space.name, style: AppType.displayAt(20).copyWith(color: p.ink)),
             Text(
               '${widget.venue.name} · ${zone.replaceAll('_', ' ')}',
               style: AppType.caption.copyWith(color: p.ink3),
@@ -150,7 +150,7 @@ class _BodyState extends ConsumerState<_Body> {
                         ),
                         Text(
                           Money.format(_selected!.priceCents, currency: widget.venue.currency),
-                          style: AppType.displayM.copyWith(color: p.ink, fontSize: 22),
+                          style: AppType.displayAt(22).copyWith(color: p.ink),
                         ),
                       ],
                     ),

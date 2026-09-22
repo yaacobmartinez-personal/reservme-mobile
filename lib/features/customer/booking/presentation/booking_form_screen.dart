@@ -318,7 +318,7 @@ class _Summary extends StatelessWidget {
                   children: [
                     Text(
                       venue.name,
-                      style: AppType.displayS.copyWith(color: p.bandInk, fontSize: 20),
+                      style: AppType.displayAt(20).copyWith(color: p.bandInk),
                     ),
                     const SizedBox(height: 2),
                     Text(

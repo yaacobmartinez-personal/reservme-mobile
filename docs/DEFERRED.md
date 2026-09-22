@@ -7,13 +7,13 @@ pick it up. **Reviewed at the start of Phase 3** (and again before release).
 
 | # | Item | Why it was deferred | Where |
 |---|---|---|---|
-| D1 | **Bundle the fonts.** Fraunces, Instrument Sans and JetBrains Mono variable TTFs (OFL, Google Fonts) into `assets/fonts/`, then uncomment the `fonts:` block in `pubspec.yaml`. The app currently falls back to the platform faces, so nothing looks like the design canvas. | Needed a download decision | `pubspec.yaml`, `lib/core/theme/typography.dart` |
 | D2 | **Onboarding photos.** The five images live as canvas assets only; the app needs them in `assets/photos/` (court, owner, studio, padel, qr). They are AI-generated placeholders — replace with licensed or real venue photography before store submission. | Phase 3b builds the screens that use them | `assets/photos/`, canvas row "Onboarding" |
 | D3 | **Remove the fake-mode demo sign-in** from the Account screen once the real login lands. | Needed a way into the venue shell before Phase 2 | `features/customer/account/presentation/account_screen.dart`, `AuthController.devSignInAsDemo` |
 | D5 | **Venue avatar inverts in dark mode** (light mint square, dark letter) because it uses `pineInk` as a fill. Give it a fixed strong fill, or use the venue logo once uploads exist. | Cosmetic; the real avatar is a logo in Phase 3c | `venue_picker_screen.dart`, `more_screen.dart` |
 
 ## Closed
 
+- **D1 fonts** — Fraunces, Instrument Sans and JetBrains Mono variable TTFs are bundled in `assets/fonts/` with their OFL licences. `typography.dart` pins the axes per style (Fraunces ships defaulting to weight 900 with `WONK` on, so every serif style sets wght 400, SOFT 0, WONK 0 and tracks `opsz` to the font size). Resize a display style with `AppType.displayAt(size)`, never `copyWith(fontSize:)`, or the optical size goes stale.
 - **D4 `SegmentedButton` tint** — fixed in Phase 1 with a `segmentedButtonTheme` on `AppTheme`.
 
 ## Carry into later phases

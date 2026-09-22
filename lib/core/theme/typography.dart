@@ -1,36 +1,54 @@
 import 'package:flutter/material.dart';
 
 /// The type scale from the design canvas (Foundations · Typography):
-/// Fraunces for display (upright, weight 400 — never italic), Instrument Sans
-/// for everything else, JetBrains Mono for references and codes. All three
-/// ship as variable fonts, so styles carry the `wght` axis as well as
-/// [FontWeight].
+/// Fraunces for display, Instrument Sans for everything else, JetBrains Mono
+/// for references and codes. All three ship as variable fonts in
+/// `assets/fonts/` (OFL, Google Fonts), so every style pins the axes it
+/// needs rather than relying on the file's defaults — Fraunces in particular
+/// defaults to weight 900 with its "wonk" alternates switched on.
 abstract final class AppType {
   static const display = 'Fraunces';
   static const family = 'Instrument Sans';
   static const mono = 'JetBrains Mono';
+
+  /// Instrument Sans carries weights 400–700.
+  static const _sansMin = 400;
+  static const _sansMax = 700;
+
+  /// Fraunces' optical-size axis, which we track to the font size.
+  static const _opszMin = 9.0;
+  static const _opszMax = 144.0;
 
   static TextStyle _sans(
     double size,
     int weight, {
     double? spacing,
     double? height,
-  }) =>
-      TextStyle(
-        fontFamily: family,
-        fontSize: size,
-        fontWeight: FontWeight.values[(weight ~/ 100) - 1],
-        fontVariations: [FontVariation.weight(weight.toDouble())],
-        letterSpacing: spacing,
-        height: height,
-      );
+  }) {
+    final w = weight.clamp(_sansMin, _sansMax);
+    return TextStyle(
+      fontFamily: family,
+      fontSize: size,
+      fontWeight: FontWeight.values[(w ~/ 100) - 1],
+      fontVariations: [FontVariation.weight(w.toDouble())],
+      letterSpacing: spacing,
+      height: height,
+    );
+  }
 
-  static TextStyle _serif(double size, {double? spacing, double height = 1.05}) =>
-      TextStyle(
+  /// Fraunces at weight 400, upright and un-wonky, with the optical size
+  /// following the type size the way the variable font intends.
+  static TextStyle _serif(double size, {double? spacing, double height = 1.05}) => TextStyle(
         fontFamily: display,
         fontSize: size,
         fontWeight: FontWeight.w400,
-        fontVariations: const [FontVariation.weight(400), FontVariation('opsz', 96)],
+        fontVariations: [
+          const FontVariation.weight(400),
+          FontVariation('opsz', size.clamp(_opszMin, _opszMax)),
+          // SOFT 0 = the crisper terminals; WONK 0 = no quirky alternates.
+          const FontVariation('SOFT', 0),
+          const FontVariation('WONK', 0),
+        ],
         letterSpacing: spacing,
         height: height,
       );
@@ -91,9 +109,9 @@ abstract final class AppType {
         displayLarge: displayXl.copyWith(color: ink),
         displayMedium: displayL.copyWith(color: ink),
         displaySmall: displayM.copyWith(color: ink),
-        headlineLarge: displayL.copyWith(color: ink, fontSize: 28),
+        headlineLarge: _serif(28, spacing: -0.5).copyWith(color: ink),
         headlineMedium: displayM.copyWith(color: ink),
-        headlineSmall: displayS.copyWith(color: ink, fontSize: 20),
+        headlineSmall: _serif(20).copyWith(color: ink),
         titleLarge: displayS.copyWith(color: ink),
         titleMedium: bodyStrong.copyWith(color: ink),
         titleSmall: label.copyWith(color: ink),
@@ -104,4 +122,10 @@ abstract final class AppType {
         labelMedium: caption.copyWith(color: muted),
         labelSmall: eyebrow.copyWith(color: muted),
       );
+
+  /// A display style at an arbitrary size, with the optical size tracked.
+  /// Use this instead of `displayL.copyWith(fontSize: …)`, which would leave
+  /// `opsz` at the original size.
+  static TextStyle displayAt(double size, {double? spacing, double height = 1.05}) =>
+      _serif(size, spacing: spacing, height: height);
 }

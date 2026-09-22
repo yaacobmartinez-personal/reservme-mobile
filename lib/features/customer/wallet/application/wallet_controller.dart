@@ -30,14 +30,16 @@ class BookingDetail extends _$BookingDetail {
       await store.saveBooking(fresh, now: ref.read(clockProvider)());
       return BookingView(booking: fresh, stale: false);
     } on ApiError catch (e) {
-      // A 404 is real: the token was rotated or the booking erased. Anything
-      // else (offline, server down) falls back to what we have.
-      if (e.isNotFound && saved == null) rethrow;
-      if (e.isNotFound) rethrow;
+      // Without a saved copy there is nothing to show but the error.
       if (saved == null) rethrow;
+      // With one, show it rather than hiding a booking the customer may be
+      // about to present at the desk — flagged so the screen can say why it
+      // could not be confirmed: a 404 means the venue no longer recognises
+      // the link, anything else means we simply could not reach them.
       return BookingView(
         booking: saved,
         stale: true,
+        missing: e.isNotFound,
         lastSyncedAt: await store.lastSyncedAt(venueSlug, token),
       );
     }
@@ -68,12 +70,22 @@ class BookingDetail extends _$BookingDetail {
 
 /// A booking plus how fresh it is.
 class BookingView {
-  const BookingView({required this.booking, required this.stale, this.lastSyncedAt});
+  const BookingView({
+    required this.booking,
+    required this.stale,
+    this.missing = false,
+    this.lastSyncedAt,
+  });
 
   final Booking booking;
 
   /// True when this came from the phone rather than the server just now.
   final bool stale;
+
+  /// The venue returned 404 for this token: cancelled, erased, or the link
+  /// was rotated. The saved copy is shown, but it cannot be trusted or acted
+  /// on any more.
+  final bool missing;
   final DateTime? lastSyncedAt;
 }
 

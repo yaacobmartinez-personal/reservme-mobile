@@ -94,7 +94,7 @@ abstract final class AppTheme {
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: false,
-        titleTextStyle: AppType.displayS.copyWith(color: p.ink, fontSize: 20),
+        titleTextStyle: AppType.displayAt(20).copyWith(color: p.ink),
         iconTheme: IconThemeData(color: p.ink),
       ),
       cardTheme: CardThemeData(
@@ -215,7 +215,7 @@ abstract final class AppTheme {
         backgroundColor: p.paper,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Radii.xl)),
-        titleTextStyle: AppType.displayM.copyWith(color: p.ink, fontSize: 22),
+        titleTextStyle: AppType.displayAt(22).copyWith(color: p.ink),
         contentTextStyle: AppType.body.copyWith(color: p.ink2),
       ),
       bottomSheetTheme: BottomSheetThemeData(

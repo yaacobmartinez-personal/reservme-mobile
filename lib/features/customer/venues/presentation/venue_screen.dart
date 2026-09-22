@@ -195,7 +195,7 @@ class _Cover extends StatelessWidget {
                 const SizedBox(height: Spacing.x3),
                 Text(
                   venue.name,
-                  style: AppType.displayL.copyWith(color: p.bandInk, fontSize: 32),
+                  style: AppType.displayAt(32).copyWith(color: p.bandInk),
                 ),
                 if (venue.tagline != null) ...[
                   const SizedBox(height: 6),

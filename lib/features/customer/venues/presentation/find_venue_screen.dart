@@ -62,7 +62,7 @@ class _FindVenueScreenState extends ConsumerState<FindVenueScreen> {
           children: [
             Text(
               'Where are you playing?',
-              style: AppType.displayL.copyWith(color: p.ink, fontSize: 34),
+              style: AppType.displayAt(34).copyWith(color: p.ink),
             ),
             const SizedBox(height: 6),
             Text(
@@ -187,7 +187,7 @@ class _RecentVenueCard extends ConsumerWidget {
             alignment: Alignment.center,
             child: Text(
               row.name.characters.first.toUpperCase(),
-              style: AppType.displayS.copyWith(color: p.pineLine, fontSize: 24),
+              style: AppType.displayAt(24).copyWith(color: p.pineLine),
             ),
           ),
           const SizedBox(width: Spacing.x3),
@@ -199,7 +199,7 @@ class _RecentVenueCard extends ConsumerWidget {
                   row.name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: AppType.displayS.copyWith(color: p.ink, fontSize: 18),
+                  style: AppType.displayAt(18).copyWith(color: p.ink),
                 ),
                 if (row.tagline != null) ...[
                   const SizedBox(height: 2),

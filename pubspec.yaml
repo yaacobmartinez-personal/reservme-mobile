@@ -56,16 +56,16 @@ flutter:
     - assets/brand/
     - assets/photos/
 
-  # Fonts: Fraunces, Instrument Sans and JetBrains Mono variable TTFs go in
-  # assets/fonts/ (OFL, from Google Fonts). Until they are added the theme
-  # falls back to the platform sans/serif. See docs/ARCHITECTURE.md.
-  # fonts:
-  #   - family: Fraunces
-  #     fonts:
-  #       - asset: assets/fonts/Fraunces-Variable.ttf
-  #   - family: Instrument Sans
-  #     fonts:
-  #       - asset: assets/fonts/InstrumentSans-Variable.ttf
-  #   - family: JetBrains Mono
-  #     fonts:
-  #       - asset: assets/fonts/JetBrainsMono-Variable.ttf
+  # Variable fonts (OFL, Google Fonts). Each family's OFL.txt ships beside
+  # it in assets/fonts/. Weight, optical size and Fraunces' SOFT/WONK axes
+  # are set per style in lib/core/theme/typography.dart.
+  fonts:
+    - family: Fraunces
+      fonts:
+        - asset: assets/fonts/Fraunces-Variable.ttf
+    - family: Instrument Sans
+      fonts:
+        - asset: assets/fonts/InstrumentSans-Variable.ttf
+    - family: JetBrains Mono
+      fonts:
+        - asset: assets/fonts/JetBrainsMono-Variable.ttf

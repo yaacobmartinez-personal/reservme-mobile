@@ -153,7 +153,7 @@ class _WalletRow extends StatelessWidget {
             alignment: Alignment.center,
             child: Text(
               booking.venue.name.characters.first.toUpperCase(),
-              style: AppType.displayS.copyWith(color: p.pineLine, fontSize: 20),
+              style: AppType.displayAt(20).copyWith(color: p.pineLine),
             ),
           ),
           const SizedBox(width: Spacing.x3),

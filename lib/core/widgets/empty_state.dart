@@ -59,7 +59,7 @@ class EmptyState extends ConsumerWidget {
             Text(
               title,
               textAlign: TextAlign.center,
-              style: AppType.displayS.copyWith(color: p.ink, fontSize: 20),
+              style: AppType.displayAt(20).copyWith(color: p.ink),
             ),
             if (hint != null) ...[
               const SizedBox(height: Spacing.x2),

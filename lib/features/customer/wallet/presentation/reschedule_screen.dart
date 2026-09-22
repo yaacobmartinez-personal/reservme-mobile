@@ -97,7 +97,7 @@ class _RescheduleScreenState extends ConsumerState<RescheduleScreen> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Reschedule', style: AppType.displayS.copyWith(color: p.ink, fontSize: 20)),
+            Text('Reschedule', style: AppType.displayAt(20).copyWith(color: p.ink)),
             Text(
               '${booking.reference} · ${booking.space.name}',
               style: AppType.caption.copyWith(color: p.ink3),

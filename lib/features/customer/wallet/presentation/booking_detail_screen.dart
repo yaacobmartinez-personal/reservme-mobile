@@ -165,7 +165,15 @@ class _BodyState extends ConsumerState<_Body> {
               ),
               const SizedBox(height: Spacing.x4),
             ],
-            if (widget.view.stale) ...[
+            if (widget.view.missing) ...[
+              const AppBanner(
+                kind: BannerKind.error,
+                title: 'The venue no longer recognises this booking',
+                body: 'It may have been cancelled, or the link rotated. This is the '
+                    'copy saved on your phone — check with the venue before turning up.',
+              ),
+              const SizedBox(height: Spacing.x4),
+            ] else if (widget.view.stale) ...[
               AppBanner(
                 kind: BannerKind.offline,
                 title: "You're offline",
@@ -180,7 +188,7 @@ class _BodyState extends ConsumerState<_Body> {
             ],
             _Ticket(booking: booking),
             const SizedBox(height: Spacing.x4),
-            if (!booking.isCancelled)
+            if (!booking.isCancelled && !widget.view.missing)
               Row(
                 children: [
                   Expanded(
@@ -221,8 +229,10 @@ class _BodyState extends ConsumerState<_Body> {
             Text(
               // The server owns the policy, so its refusal is shown verbatim
               // and the app never invents a deadline of its own.
-              booking.cancellation.reason ??
-                  'You can cancel or move this booking online.',
+              widget.view.missing
+                  ? 'Contact the venue with reference ${booking.reference}.'
+                  : booking.cancellation.reason ??
+                      'You can cancel or move this booking online.',
               textAlign: TextAlign.center,
               style: AppType.caption.copyWith(color: p.ink3),
             ),
@@ -328,11 +338,11 @@ class _Ticket extends StatelessWidget {
                 const SizedBox(height: Spacing.x3),
                 Text(
                   AppTime.formatDay(booking.startsAt, zone),
-                  style: AppType.displayM.copyWith(color: p.paper, fontSize: 26),
+                  style: AppType.displayAt(26).copyWith(color: p.paper),
                 ),
                 Text(
                   '${AppTime.formatTime(booking.startsAt, zone)} – ${AppTime.formatTime(booking.endsAt, zone)}',
-                  style: AppType.displayM.copyWith(color: p.paper, fontSize: 26),
+                  style: AppType.displayAt(26).copyWith(color: p.paper),
                 ),
                 const SizedBox(height: Spacing.x2),
                 Text(

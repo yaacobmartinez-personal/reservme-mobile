@@ -35,7 +35,7 @@ class PlaceholderScreen extends StatelessWidget {
             if (!showBack)
               Padding(
                 padding: const EdgeInsets.fromLTRB(Spacing.gutter, Spacing.x2, Spacing.gutter, 0),
-                child: Text(title, style: AppType.displayL.copyWith(color: p.ink, fontSize: 28)),
+                child: Text(title, style: AppType.displayAt(28).copyWith(color: p.ink)),
               ),
             Expanded(
               child: EmptyState(

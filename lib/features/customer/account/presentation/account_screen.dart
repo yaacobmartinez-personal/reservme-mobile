@@ -267,7 +267,7 @@ class _ContactSheetState extends State<_ContactSheet> {
             children: [
               Text(
                 'Your details',
-                style: AppType.displayM.copyWith(color: p.ink, fontSize: 22),
+                style: AppType.displayAt(22).copyWith(color: p.ink),
               ),
               const SizedBox(height: Spacing.x4),
               TextField(
