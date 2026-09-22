@@ -168,7 +168,7 @@ void seedFakeStore(FakeStore store, DateTime now) {
     }
   }
 
-  final court1 = addSpace(katipunan, 'Court 1', order: 1, image: 'asset:court');
+  final court1 = addSpace(katipunan, 'Court 1', order: 1);
   final court2 = addSpace(katipunan, 'Court 2', order: 2);
   final court3 = addSpace(katipunan, 'Court 3', order: 3);
   final court4 = addSpace(katipunan, 'Court 4', order: 4, price: 30000);

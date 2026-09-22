@@ -1,0 +1,37 @@
+import 'availability.dart';
+import 'booking.dart';
+
+/// Availability + creating a booking (API-CONTRACT #2–#4, #9).
+abstract class BookingRepository {
+  /// Slots and sessions for one space on one venue-local date.
+  Future<DayAvailability> availability({
+    required String venueSlug,
+    required String spaceId,
+    required String date,
+  });
+
+  /// Book a slot. Never throws for an expected outcome — a taken slot, a
+  /// closed venue and a rate limit all come back as a [BookOutcome].
+  Future<BookOutcome> book({required String venueSlug, required BookingInput input});
+
+  /// Claim seats in a shared session.
+  Future<BookOutcome> bookSession({
+    required String venueSlug,
+    required String sessionId,
+    required int spots,
+    required String name,
+    required String email,
+    String? phone,
+  });
+
+  /// Ask to be told if a taken slot frees up.
+  Future<void> joinWaitlist({
+    required String venueSlug,
+    required String spaceId,
+    required DateTime startsAt,
+    required DateTime endsAt,
+    required String name,
+    required String email,
+    String? phone,
+  });
+}

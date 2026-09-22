@@ -181,6 +181,20 @@ abstract final class AppTheme {
           (s) => s.contains(WidgetState.selected) ? p.pine : p.ruleStrong,
         ),
       ),
+      segmentedButtonTheme: SegmentedButtonThemeData(
+        style: ButtonStyle(
+          // Material defaults the selected fill to secondaryContainer (clay);
+          // the design calls for pine-soft.
+          backgroundColor: WidgetStateProperty.resolveWith(
+            (s) => s.contains(WidgetState.selected) ? p.pineSoft : p.card,
+          ),
+          foregroundColor: WidgetStateProperty.resolveWith(
+            (s) => s.contains(WidgetState.selected) ? p.pineInk : p.ink2,
+          ),
+          side: WidgetStateProperty.all(BorderSide(color: p.rule)),
+          textStyle: WidgetStateProperty.all(AppType.buttonS),
+        ),
+      ),
       chipTheme: ChipThemeData(
         backgroundColor: p.paper2,
         selectedColor: p.ink,

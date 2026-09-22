@@ -12,11 +12,14 @@ import 'package:reservme/core/fake/fake_store.dart';
 import 'package:reservme/core/fake/seed.dart';
 import 'package:reservme/core/network/retry_policy.dart';
 import 'package:reservme/core/storage/boot_data.dart';
+import 'package:reservme/core/storage/local_store.dart';
 import 'package:reservme/core/storage/prefs.dart';
 import 'package:reservme/core/storage/secure_store.dart';
 import 'package:reservme/core/theme/motion.dart';
 import 'package:reservme/core/time/app_time.dart';
 import 'package:reservme/core/time/clock.dart';
+
+import 'memory_local_store.dart';
 
 /// Secure storage that never touches the platform.
 class InMemorySecureStore extends SecureStore {
@@ -77,6 +80,7 @@ class TestWorld {
         secure = InMemorySecureStore(),
         prefs = InMemoryPrefs(),
         store = FakeStore(),
+        local = MemoryLocalStore(),
         connectivity = StreamController<bool>.broadcast() {
     TestWidgetsFlutterBinding.ensureInitialized();
     AppTime.ensureInitialized();
@@ -91,6 +95,7 @@ class TestWorld {
       clockProvider.overrideWithValue(() => this.now),
       fakeLatencyProvider.overrideWithValue(latency),
       fakeStoreProvider.overrideWithValue(store),
+      localStoreProvider.overrideWithValue(local),
       secureStoreProvider.overrideWithValue(secure),
       prefsProvider.overrideWithValue(prefs),
       bootDataProvider.overrideWithValue(boot),
@@ -108,6 +113,9 @@ class TestWorld {
   final InMemoryPrefs prefs;
   final FakeStore store;
 
+  /// The phone's wallet and recents, in memory — no SQLite in tests.
+  final MemoryLocalStore local;
+
   /// Push true/false to simulate the network coming and going.
   final StreamController<bool> connectivity;
   bool _online = true;
@@ -123,6 +131,7 @@ class TestWorld {
     addTearDown(() async {
       c.dispose();
       await connectivity.close();
+      await local.dispose();
     });
     return c;
   }

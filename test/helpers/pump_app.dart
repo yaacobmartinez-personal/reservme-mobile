@@ -38,6 +38,7 @@ Future<ProviderContainer> pumpApp(
   addTearDown(() async {
     container.dispose();
     await world.connectivity.close();
+    await world.local.dispose();
   });
   if (setup != null) await setup(container);
   await tester.pumpWidget(

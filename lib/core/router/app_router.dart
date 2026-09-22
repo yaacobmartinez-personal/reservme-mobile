@@ -4,6 +4,15 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../features/auth/application/auth_controller.dart';
 import '../../features/customer/account/presentation/account_screen.dart';
+import '../../features/customer/booking/presentation/booking_form_screen.dart';
+import '../../features/customer/booking/presentation/space_day_screen.dart';
+import '../../features/customer/venues/presentation/find_venue_screen.dart';
+import '../../features/customer/venues/presentation/scan_screen.dart';
+import '../../features/customer/venues/presentation/venue_screen.dart';
+import '../../features/customer/wallet/presentation/booking_detail_screen.dart';
+import '../../features/customer/wallet/presentation/bookings_screen.dart';
+import '../../features/customer/wallet/presentation/import_booking_screen.dart';
+import '../../features/customer/wallet/presentation/reschedule_screen.dart';
 import '../../features/shell/application/app_mode_controller.dart';
 import '../../features/shell/presentation/animated_branches.dart';
 import '../../features/shell/presentation/customer_shell.dart';
@@ -103,44 +112,34 @@ GoRouter appRouter(Ref ref) {
             routes: [
               GoRoute(
                 path: Routes.customerFind,
-                builder: (context, state) =>
-                    const PlaceholderScreen(title: 'Find a venue', board: 'C1 · Find'),
+                builder: (context, state) => const FindVenueScreen(),
                 routes: [
                   GoRoute(
                     path: 'scan',
                     parentNavigatorKey: rootNavigatorKey,
-                    pageBuilder: (context, state) => slideUpPage(
-                      state: state,
-                      child: const PlaceholderScreen(
-                        title: 'Scan a venue QR',
-                        board: 'C2 · Scan',
-                        showBack: true,
-                      ),
-                    ),
+                    pageBuilder: (context, state) =>
+                        slideUpPage(state: state, child: const ScanScreen()),
                   ),
                   GoRoute(
                     path: 'venues/:slug',
-                    builder: (context, state) => PlaceholderScreen(
-                      title: state.pathParameters['slug']!,
-                      board: 'C3 · Venue page',
-                      showBack: true,
-                    ),
+                    builder: (context, state) =>
+                        VenueScreen(slug: state.pathParameters['slug']!),
                     routes: [
                       GoRoute(
                         path: 'spaces/:space',
-                        builder: (context, state) => PlaceholderScreen(
-                          title: 'Pick a slot',
-                          board: 'C4 · Pick a slot',
-                          subtitle: 'date=${state.uri.queryParameters['date'] ?? 'today'}',
-                          showBack: true,
+                        builder: (context, state) => SpaceDayScreen(
+                          slug: state.pathParameters['slug']!,
+                          spaceId: state.pathParameters['space']!,
+                          initialDate: state.uri.queryParameters['date'],
                         ),
                       ),
                       GoRoute(
                         path: 'book',
-                        builder: (context, state) => const PlaceholderScreen(
-                          title: 'Your booking',
-                          board: 'C6 · Your details',
-                          showBack: true,
+                        builder: (context, state) => BookingFormScreen(
+                          slug: state.pathParameters['slug']!,
+                          draft: state.extra is BookingDraft
+                              ? state.extra! as BookingDraft
+                              : null,
                         ),
                       ),
                     ],
@@ -153,32 +152,31 @@ GoRouter appRouter(Ref ref) {
             routes: [
               GoRoute(
                 path: Routes.customerBookings,
-                builder: (context, state) =>
-                    const PlaceholderScreen(title: 'Bookings', board: 'C9 · My bookings'),
+                builder: (context, state) => const BookingsScreen(),
                 routes: [
                   // Literal before the parameters so "import" is never a slug.
                   GoRoute(
                     path: 'import',
-                    builder: (context, state) => const PlaceholderScreen(
-                      title: 'Booking',
-                      board: 'C11 · Import / invalid link',
-                      showBack: true,
+                    builder: (context, state) => ImportBookingScreen(
+                      slug: state.uri.queryParameters['slug'],
+                      token: state.uri.queryParameters['token'],
                     ),
                   ),
                   GoRoute(
                     path: ':slug/:token',
-                    builder: (context, state) => const PlaceholderScreen(
-                      title: 'Booking',
-                      board: 'C8 · Booked',
-                      showBack: true,
+                    builder: (context, state) => BookingDetailScreen(
+                      slug: state.pathParameters['slug']!,
+                      token: state.pathParameters['token']!,
+                      arrival: state.extra is BookingArrival
+                          ? state.extra! as BookingArrival
+                          : null,
                     ),
                     routes: [
                       GoRoute(
                         path: 'reschedule',
-                        builder: (context, state) => const PlaceholderScreen(
-                          title: 'Reschedule',
-                          board: 'C10 · Reschedule',
-                          showBack: true,
+                        builder: (context, state) => RescheduleScreen(
+                          slug: state.pathParameters['slug']!,
+                          token: state.pathParameters['token']!,
                         ),
                       ),
                     ],
