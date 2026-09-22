@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../features/auth/application/auth_controller.dart';
+import '../../features/auth/presentation/forgot_password_screen.dart';
+import '../../features/auth/presentation/login_screen.dart';
 import '../../features/customer/account/presentation/account_screen.dart';
 import '../../features/customer/booking/presentation/booking_form_screen.dart';
 import '../../features/customer/booking/presentation/space_day_screen.dart';
@@ -19,6 +21,7 @@ import '../../features/shell/presentation/customer_shell.dart';
 import '../../features/shell/presentation/placeholder_screen.dart';
 import '../../features/shell/presentation/venue_shell.dart';
 import '../../features/venue/more/presentation/more_screen.dart';
+import '../../features/venue/today/presentation/today_screen.dart';
 import '../../features/venue/venues/application/selected_venue_controller.dart';
 import '../../features/venue/venues/presentation/venue_picker_screen.dart';
 import 'guards.dart';
@@ -62,16 +65,12 @@ GoRouter appRouter(Ref ref) {
         path: Routes.login,
         pageBuilder: (context, state) => sharedAxisPage(
           state: state,
-          child: const PlaceholderScreen(title: 'Sign in', board: 'V1 · Staff sign in', showBack: true),
+          child: LoginScreen(from: state.uri.queryParameters['from']),
         ),
       ),
       GoRoute(
         path: Routes.forgot,
-        builder: (context, state) => const PlaceholderScreen(
-          title: 'Reset password',
-          board: 'V2 · Forgot password',
-          showBack: true,
-        ),
+        builder: (context, state) => const ForgotPasswordScreen(),
       ),
 
       // ---- onboarding -------------------------------------------------------
@@ -214,8 +213,7 @@ GoRouter appRouter(Ref ref) {
             routes: [
               GoRoute(
                 path: Routes.venueToday,
-                builder: (context, state) =>
-                    const PlaceholderScreen(title: 'Today', board: 'V4 · Today'),
+                builder: (context, state) => const TodayScreen(),
               ),
             ],
           ),

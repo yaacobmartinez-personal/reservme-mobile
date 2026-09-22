@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:reservme/core/connectivity/connectivity_provider.dart';
 import 'package:reservme/core/fake/seed.dart';
 import 'package:reservme/core/model/enums.dart';
 import 'package:reservme/core/network/api_error.dart';
@@ -283,12 +282,8 @@ void main() {
     });
 
     test('offline surfaces as a transport error, not an outcome', () async {
-      // `isOnline` is optimistic until the connectivity stream delivers, so
-      // the test pins it rather than racing the stream.
       final offline = TestWorld(online: false);
-      final container = ProviderContainer(
-        overrides: [...offline.overrides, isOnlineProvider.overrideWithValue(false)],
-      );
+      final container = ProviderContainer(overrides: offline.overrides);
       addTearDown(container.dispose);
       final repo = container.read(bookingRepositoryProvider);
       await expectLater(

@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:reservme/core/connectivity/connectivity_provider.dart';
 import 'package:reservme/core/fake/seed.dart';
 import 'package:reservme/core/network/api_error.dart';
 import 'package:reservme/core/storage/local_store.dart';
@@ -48,13 +47,11 @@ void main() {
     expect(fresh.stale, isFalse);
     expect(fresh.missing, isFalse);
 
-    // Offline: the saved copy, flagged stale but not missing. `isOnline` is
-    // optimistic until the connectivity stream delivers, so it is pinned here
-    // rather than raced. The world's local store is shared, so the booking
-    // saved above is still on the "phone".
-    final offlineContainer = ProviderContainer(
-      overrides: [...world.overrides, isOnlineProvider.overrideWithValue(false)],
-    );
+    // Offline: the saved copy, flagged stale but not missing. The world's
+    // local store is shared, so the booking saved above is still on the
+    // "phone".
+    world.setOnline(false);
+    final offlineContainer = ProviderContainer(overrides: world.overrides);
     addTearDown(offlineContainer.dispose);
     final offline = await offlineContainer
         .read(bookingDetailProvider(venue.slug, booking.manageToken!).future);

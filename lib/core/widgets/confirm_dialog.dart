@@ -21,25 +21,31 @@ Future<bool> showConfirmDialog(
       title: Text(title),
       content: Text(message),
       actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      // One Row, not two OverflowBar children: the buttons share the width
+      // evenly and never wrap onto separate lines.
       actions: [
-        Expanded(
-          child: OutlinedButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(cancelLabel),
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: destructive
-                ? FilledButton.styleFrom(
-                    backgroundColor: p.danger,
-                    foregroundColor: p.isDark ? p.onPine : Colors.white,
-                  )
-                : null,
-            child: Text(confirmLabel, style: AppType.button),
-          ),
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text(cancelLabel),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: FilledButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                style: destructive
+                    ? FilledButton.styleFrom(
+                        backgroundColor: p.danger,
+                        foregroundColor: p.isDark ? p.onPine : Colors.white,
+                      )
+                    : null,
+                child: Text(confirmLabel, style: AppType.button),
+              ),
+            ),
+          ],
         ),
       ],
     ),

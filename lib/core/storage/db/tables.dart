@@ -48,3 +48,21 @@ class RecentVenues extends Table {
   @override
   Set<Column<Object>> get primaryKey => {slug};
 }
+
+/// A venue screen's last successful response, so staff still see the run
+/// sheet when the desk's wifi drops. Disposable: wiped on sign-out and on a
+/// venue switch, and dropped outright on a schema bump.
+@DataClassName('VenueCacheRow')
+class VenueCache extends Table {
+  TextColumn get venueSlug => text()();
+
+  /// Which screen: "today", later `calendar:<date>`, "customers".
+  TextColumn get key => text()();
+
+  /// The response as JSON, exactly as the screen would have rendered it.
+  TextColumn get payload => text()();
+  DateTimeColumn get fetchedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {venueSlug, key};
+}

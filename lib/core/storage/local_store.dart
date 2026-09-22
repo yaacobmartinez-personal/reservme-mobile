@@ -38,8 +38,32 @@ abstract class LocalStore {
   Future<void> touchVenue(RecentVenue venue);
   Future<void> markVenueBooked(String slug, DateTime at);
 
+  // ---- venue read cache ---------------------------------------------------
+
+  /// The last successful response for a venue screen, with the time it was
+  /// fetched, or null when there is nothing cached.
+  Future<CachedPayload?> readVenueCache(String venueSlug, String key);
+
+  Future<void> saveVenueCache(
+    String venueSlug,
+    String key,
+    Map<String, dynamic> payload, {
+    required DateTime now,
+  });
+
+  /// Dropped on sign-out and on a venue switch: it is someone's customer data.
+  Future<void> clearVenueCache([String? venueSlug]);
+
   /// "Delete everything on this phone".
   Future<void> wipe();
+}
+
+/// A cached response plus when it was taken, so a screen can say how stale it is.
+class CachedPayload {
+  const CachedPayload({required this.payload, required this.fetchedAt});
+
+  final Map<String, dynamic> payload;
+  final DateTime fetchedAt;
 }
 
 /// The drift-backed implementation used by the app.
@@ -125,6 +149,38 @@ class DriftLocalStore implements LocalStore {
   @override
   Future<void> markVenueBooked(String slug, DateTime at) =>
       _db.markVenueBooked(slug, at);
+
+  @override
+  Future<CachedPayload?> readVenueCache(String venueSlug, String key) async {
+    final row = await _db.readVenueCache(venueSlug, key);
+    if (row == null) return null;
+    try {
+      final json = jsonDecode(row.payload);
+      if (json is! Map<String, dynamic>) return null;
+      return CachedPayload(payload: json, fetchedAt: row.fetchedAt);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  @override
+  Future<void> saveVenueCache(
+    String venueSlug,
+    String key,
+    Map<String, dynamic> payload, {
+    required DateTime now,
+  }) =>
+      _db.saveVenueCache(
+        VenueCacheCompanion.insert(
+          venueSlug: venueSlug,
+          key: key,
+          payload: jsonEncode(payload),
+          fetchedAt: now,
+        ),
+      );
+
+  @override
+  Future<void> clearVenueCache([String? venueSlug]) => _db.clearVenueCache(venueSlug);
 
   @override
   Future<void> wipe() => _db.wipe();

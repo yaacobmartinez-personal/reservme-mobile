@@ -103,7 +103,7 @@ final class BookingDetailProvider
   }
 }
 
-String _$bookingDetailHash() => r'770baf01f9bd8870bc5b597607e1f934cf9328a3';
+String _$bookingDetailHash() => r'8b1b89024e8c5a0b8686204c7aeccfcfa51f19ef';
 
 /// One booking. The saved snapshot renders immediately; a refresh from the
 /// server follows and updates the row. Offline, the snapshot is all there is

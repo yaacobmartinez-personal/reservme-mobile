@@ -154,17 +154,6 @@ class AccountScreen extends ConsumerWidget {
                         trailing: const Icon(Icons.chevron_right_rounded),
                         onTap: () => context.push(Routes.login),
                       ),
-                    if (apiMode == ApiMode.fake && !auth.hasVenueAccess)
-                      ListTile(
-                        leading: Icon(Icons.science_outlined, color: p.clayInk),
-                        title: const Text('Demo: sign in as the venue owner'),
-                        subtitle: const Text('Fake mode only — Katipunan Courts'),
-                        onTap: () async {
-                          await ref.read(authControllerProvider.notifier).devSignInAsDemo();
-                          ref.read(appModeControllerProvider.notifier).set(AppMode.venue);
-                          if (context.mounted) context.go(AppMode.venue.home);
-                        },
-                      ),
                   ]),
                   const SizedBox(height: Spacing.x5),
                   const Eyebrow('Data'),
@@ -199,6 +188,8 @@ class AccountScreen extends ConsumerWidget {
   Future<void> _editContact(BuildContext context, WidgetRef ref, Contact current) async {
     final result = await showModalBottomSheet<Contact>(
       context: context,
+      // On the root navigator, or the shell's bottom nav sits on top of it.
+      useRootNavigator: true,
       isScrollControlled: true,
       builder: (_) => _ContactSheet(contact: current),
     );

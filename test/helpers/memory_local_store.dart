@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:reservme/core/storage/local_store.dart';
 import 'package:reservme/features/customer/booking/domain/booking.dart';
@@ -12,6 +13,7 @@ class MemoryLocalStore implements LocalStore {
   final _bookings = <String, Booking>{};
   final _syncedAt = <String, DateTime>{};
   final _venues = <String, RecentVenue>{};
+  final _cache = <String, CachedPayload>{};
 
   final _walletChanges = StreamController<void>.broadcast();
   final _venueChanges = StreamController<void>.broadcast();
@@ -105,10 +107,39 @@ class MemoryLocalStore implements LocalStore {
   }
 
   @override
+  Future<CachedPayload?> readVenueCache(String venueSlug, String key) async =>
+      _cache['$venueSlug/$key'];
+
+  @override
+  Future<void> saveVenueCache(
+    String venueSlug,
+    String key,
+    Map<String, dynamic> payload, {
+    required DateTime now,
+  }) async {
+    // Round-trip through JSON the way drift does, so a payload whose toJson
+    // leaves nested objects for jsonEncode fails here too, not only on device.
+    _cache['$venueSlug/$key'] = CachedPayload(
+      payload: jsonDecode(jsonEncode(payload)) as Map<String, dynamic>,
+      fetchedAt: now,
+    );
+  }
+
+  @override
+  Future<void> clearVenueCache([String? venueSlug]) async {
+    if (venueSlug == null) {
+      _cache.clear();
+    } else {
+      _cache.removeWhere((k, _) => k.startsWith('$venueSlug/'));
+    }
+  }
+
+  @override
   Future<void> wipe() async {
     _bookings.clear();
     _syncedAt.clear();
     _venues.clear();
+    _cache.clear();
     _walletChanges.add(null);
     _venueChanges.add(null);
   }

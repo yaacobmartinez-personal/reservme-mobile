@@ -1278,11 +1278,329 @@ class RecentVenuesCompanion extends UpdateCompanion<RecentVenueRow> {
   }
 }
 
+class $VenueCacheTable extends VenueCache
+    with TableInfo<$VenueCacheTable, VenueCacheRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $VenueCacheTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _venueSlugMeta = const VerificationMeta(
+    'venueSlug',
+  );
+  @override
+  late final GeneratedColumn<String> venueSlug = GeneratedColumn<String>(
+    'venue_slug',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _keyMeta = const VerificationMeta('key');
+  @override
+  late final GeneratedColumn<String> key = GeneratedColumn<String>(
+    'key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _payloadMeta = const VerificationMeta(
+    'payload',
+  );
+  @override
+  late final GeneratedColumn<String> payload = GeneratedColumn<String>(
+    'payload',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _fetchedAtMeta = const VerificationMeta(
+    'fetchedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> fetchedAt = GeneratedColumn<DateTime>(
+    'fetched_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [venueSlug, key, payload, fetchedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'venue_cache';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<VenueCacheRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('venue_slug')) {
+      context.handle(
+        _venueSlugMeta,
+        venueSlug.isAcceptableOrUnknown(data['venue_slug']!, _venueSlugMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_venueSlugMeta);
+    }
+    if (data.containsKey('key')) {
+      context.handle(
+        _keyMeta,
+        key.isAcceptableOrUnknown(data['key']!, _keyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_keyMeta);
+    }
+    if (data.containsKey('payload')) {
+      context.handle(
+        _payloadMeta,
+        payload.isAcceptableOrUnknown(data['payload']!, _payloadMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_payloadMeta);
+    }
+    if (data.containsKey('fetched_at')) {
+      context.handle(
+        _fetchedAtMeta,
+        fetchedAt.isAcceptableOrUnknown(data['fetched_at']!, _fetchedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_fetchedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {venueSlug, key};
+  @override
+  VenueCacheRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return VenueCacheRow(
+      venueSlug: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}venue_slug'],
+      )!,
+      key: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}key'],
+      )!,
+      payload: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payload'],
+      )!,
+      fetchedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}fetched_at'],
+      )!,
+    );
+  }
+
+  @override
+  $VenueCacheTable createAlias(String alias) {
+    return $VenueCacheTable(attachedDatabase, alias);
+  }
+}
+
+class VenueCacheRow extends DataClass implements Insertable<VenueCacheRow> {
+  final String venueSlug;
+
+  /// Which screen: "today", later "calendar:<date>", "customers".
+  final String key;
+
+  /// The response as JSON, exactly as the screen would have rendered it.
+  final String payload;
+  final DateTime fetchedAt;
+  const VenueCacheRow({
+    required this.venueSlug,
+    required this.key,
+    required this.payload,
+    required this.fetchedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['venue_slug'] = Variable<String>(venueSlug);
+    map['key'] = Variable<String>(key);
+    map['payload'] = Variable<String>(payload);
+    map['fetched_at'] = Variable<DateTime>(fetchedAt);
+    return map;
+  }
+
+  VenueCacheCompanion toCompanion(bool nullToAbsent) {
+    return VenueCacheCompanion(
+      venueSlug: Value(venueSlug),
+      key: Value(key),
+      payload: Value(payload),
+      fetchedAt: Value(fetchedAt),
+    );
+  }
+
+  factory VenueCacheRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return VenueCacheRow(
+      venueSlug: serializer.fromJson<String>(json['venueSlug']),
+      key: serializer.fromJson<String>(json['key']),
+      payload: serializer.fromJson<String>(json['payload']),
+      fetchedAt: serializer.fromJson<DateTime>(json['fetchedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'venueSlug': serializer.toJson<String>(venueSlug),
+      'key': serializer.toJson<String>(key),
+      'payload': serializer.toJson<String>(payload),
+      'fetchedAt': serializer.toJson<DateTime>(fetchedAt),
+    };
+  }
+
+  VenueCacheRow copyWith({
+    String? venueSlug,
+    String? key,
+    String? payload,
+    DateTime? fetchedAt,
+  }) => VenueCacheRow(
+    venueSlug: venueSlug ?? this.venueSlug,
+    key: key ?? this.key,
+    payload: payload ?? this.payload,
+    fetchedAt: fetchedAt ?? this.fetchedAt,
+  );
+  VenueCacheRow copyWithCompanion(VenueCacheCompanion data) {
+    return VenueCacheRow(
+      venueSlug: data.venueSlug.present ? data.venueSlug.value : this.venueSlug,
+      key: data.key.present ? data.key.value : this.key,
+      payload: data.payload.present ? data.payload.value : this.payload,
+      fetchedAt: data.fetchedAt.present ? data.fetchedAt.value : this.fetchedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('VenueCacheRow(')
+          ..write('venueSlug: $venueSlug, ')
+          ..write('key: $key, ')
+          ..write('payload: $payload, ')
+          ..write('fetchedAt: $fetchedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(venueSlug, key, payload, fetchedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is VenueCacheRow &&
+          other.venueSlug == this.venueSlug &&
+          other.key == this.key &&
+          other.payload == this.payload &&
+          other.fetchedAt == this.fetchedAt);
+}
+
+class VenueCacheCompanion extends UpdateCompanion<VenueCacheRow> {
+  final Value<String> venueSlug;
+  final Value<String> key;
+  final Value<String> payload;
+  final Value<DateTime> fetchedAt;
+  final Value<int> rowid;
+  const VenueCacheCompanion({
+    this.venueSlug = const Value.absent(),
+    this.key = const Value.absent(),
+    this.payload = const Value.absent(),
+    this.fetchedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  VenueCacheCompanion.insert({
+    required String venueSlug,
+    required String key,
+    required String payload,
+    required DateTime fetchedAt,
+    this.rowid = const Value.absent(),
+  }) : venueSlug = Value(venueSlug),
+       key = Value(key),
+       payload = Value(payload),
+       fetchedAt = Value(fetchedAt);
+  static Insertable<VenueCacheRow> custom({
+    Expression<String>? venueSlug,
+    Expression<String>? key,
+    Expression<String>? payload,
+    Expression<DateTime>? fetchedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (venueSlug != null) 'venue_slug': venueSlug,
+      if (key != null) 'key': key,
+      if (payload != null) 'payload': payload,
+      if (fetchedAt != null) 'fetched_at': fetchedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  VenueCacheCompanion copyWith({
+    Value<String>? venueSlug,
+    Value<String>? key,
+    Value<String>? payload,
+    Value<DateTime>? fetchedAt,
+    Value<int>? rowid,
+  }) {
+    return VenueCacheCompanion(
+      venueSlug: venueSlug ?? this.venueSlug,
+      key: key ?? this.key,
+      payload: payload ?? this.payload,
+      fetchedAt: fetchedAt ?? this.fetchedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (venueSlug.present) {
+      map['venue_slug'] = Variable<String>(venueSlug.value);
+    }
+    if (key.present) {
+      map['key'] = Variable<String>(key.value);
+    }
+    if (payload.present) {
+      map['payload'] = Variable<String>(payload.value);
+    }
+    if (fetchedAt.present) {
+      map['fetched_at'] = Variable<DateTime>(fetchedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('VenueCacheCompanion(')
+          ..write('venueSlug: $venueSlug, ')
+          ..write('key: $key, ')
+          ..write('payload: $payload, ')
+          ..write('fetchedAt: $fetchedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $WalletBookingsTable walletBookings = $WalletBookingsTable(this);
   late final $RecentVenuesTable recentVenues = $RecentVenuesTable(this);
+  late final $VenueCacheTable venueCache = $VenueCacheTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1290,6 +1608,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     walletBookings,
     recentVenues,
+    venueCache,
   ];
 }
 
@@ -1932,6 +2251,194 @@ typedef $$RecentVenuesTableProcessedTableManager =
       RecentVenueRow,
       PrefetchHooks Function()
     >;
+typedef $$VenueCacheTableCreateCompanionBuilder = VenueCacheCompanion Function({
+  required String venueSlug,
+  required String key,
+  required String payload,
+  required DateTime fetchedAt,
+  Value<int> rowid,
+});
+typedef $$VenueCacheTableUpdateCompanionBuilder = VenueCacheCompanion Function({
+  Value<String> venueSlug,
+  Value<String> key,
+  Value<String> payload,
+  Value<DateTime> fetchedAt,
+  Value<int> rowid,
+});
+
+class $$VenueCacheTableFilterComposer
+    extends Composer<_$AppDatabase, $VenueCacheTable> {
+  $$VenueCacheTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get venueSlug => $composableBuilder(
+    column: $table.venueSlug,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get key => $composableBuilder(
+    column: $table.key,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get fetchedAt => $composableBuilder(
+    column: $table.fetchedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$VenueCacheTableOrderingComposer
+    extends Composer<_$AppDatabase, $VenueCacheTable> {
+  $$VenueCacheTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get venueSlug => $composableBuilder(
+    column: $table.venueSlug,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get key => $composableBuilder(
+    column: $table.key,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get fetchedAt => $composableBuilder(
+    column: $table.fetchedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$VenueCacheTableAnnotationComposer
+    extends Composer<_$AppDatabase, $VenueCacheTable> {
+  $$VenueCacheTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get venueSlug =>
+      $composableBuilder(column: $table.venueSlug, builder: (column) => column);
+
+  GeneratedColumn<String> get key =>
+      $composableBuilder(column: $table.key, builder: (column) => column);
+
+  GeneratedColumn<String> get payload =>
+      $composableBuilder(column: $table.payload, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get fetchedAt =>
+      $composableBuilder(column: $table.fetchedAt, builder: (column) => column);
+}
+
+class $$VenueCacheTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $VenueCacheTable,
+          VenueCacheRow,
+          $$VenueCacheTableFilterComposer,
+          $$VenueCacheTableOrderingComposer,
+          $$VenueCacheTableAnnotationComposer,
+          $$VenueCacheTableCreateCompanionBuilder,
+          $$VenueCacheTableUpdateCompanionBuilder,
+          (
+            VenueCacheRow,
+            BaseReferences<_$AppDatabase, $VenueCacheTable, VenueCacheRow>,
+          ),
+          VenueCacheRow,
+          PrefetchHooks Function()
+        > {
+  $$VenueCacheTableTableManager(_$AppDatabase db, $VenueCacheTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$VenueCacheTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$VenueCacheTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$VenueCacheTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> venueSlug = const Value.absent(),
+                Value<String> key = const Value.absent(),
+                Value<String> payload = const Value.absent(),
+                Value<DateTime> fetchedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => VenueCacheCompanion(
+                venueSlug: venueSlug,
+                key: key,
+                payload: payload,
+                fetchedAt: fetchedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String venueSlug,
+                required String key,
+                required String payload,
+                required DateTime fetchedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => VenueCacheCompanion.insert(
+                venueSlug: venueSlug,
+                key: key,
+                payload: payload,
+                fetchedAt: fetchedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$VenueCacheTable, VenueCacheRow>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $VenueCacheTable,
+                    VenueCacheRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$VenueCacheTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $VenueCacheTable,
+      VenueCacheRow,
+      $$VenueCacheTableFilterComposer,
+      $$VenueCacheTableOrderingComposer,
+      $$VenueCacheTableAnnotationComposer,
+      $$VenueCacheTableCreateCompanionBuilder,
+      $$VenueCacheTableUpdateCompanionBuilder,
+      (
+        VenueCacheRow,
+        BaseReferences<_$AppDatabase, $VenueCacheTable, VenueCacheRow>,
+      ),
+      VenueCacheRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -1940,6 +2447,8 @@ class $AppDatabaseManager {
       $$WalletBookingsTableTableManager(_db, _db.walletBookings);
   $$RecentVenuesTableTableManager get recentVenues =>
       $$RecentVenuesTableTableManager(_db, _db.recentVenues);
+  $$VenueCacheTableTableManager get venueCache =>
+      $$VenueCacheTableTableManager(_db, _db.venueCache);
 }
 
 // **************************************************************************

@@ -87,10 +87,19 @@ class TestWorld {
     seedFakeStore(store, this.now);
     _online = online;
     overrides = [
-      connectivityProvider.overrideWith((ref) async* {
-        yield _online;
-        yield* connectivity.stream;
-      }),
+      // Stream.multi rather than an async* generator: a generator parks on
+      // its first yield until something listens, so a later setOnline never
+      // reaches a provider that was only ever `read`.
+      connectivityProvider.overrideWith((ref) => Stream<bool>.multi((out) {
+            out.add(_online);
+            final sub = connectivity.stream.listen(out.add);
+            out.onCancel = sub.cancel;
+          })),
+      // The app is optimistic until the first reading arrives; a test that
+      // boots offline means it, so fall back to the world's own answer.
+      isOnlineProvider.overrideWith(
+        (ref) => ref.watch(connectivityProvider).value ?? _online,
+      ),
       apiModeProvider.overrideWithValue(apiMode),
       clockProvider.overrideWithValue(() => this.now),
       fakeLatencyProvider.overrideWithValue(latency),

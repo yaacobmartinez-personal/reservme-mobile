@@ -8,21 +8,27 @@ part of 'auth_controller.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// The venue-staff session. Phase 0 restores a persisted session and signs
-/// out; sign-in, `/me` refresh and expiry timers arrive with Phase 2 (the
-/// login flow) — the shape is fixed here so the router and shells are final.
+/// The venue-staff session.
+///
+/// Boot restores a persisted session optimistically — the cached user and
+/// venue list are enough to draw the shell — then confirms it with `/me`. An
+/// expired token, a 401 from anywhere, or a deliberate sign-out ends it.
 
 @ProviderFor(AuthController)
 final authControllerProvider = AuthControllerProvider._();
 
-/// The venue-staff session. Phase 0 restores a persisted session and signs
-/// out; sign-in, `/me` refresh and expiry timers arrive with Phase 2 (the
-/// login flow) — the shape is fixed here so the router and shells are final.
+/// The venue-staff session.
+///
+/// Boot restores a persisted session optimistically — the cached user and
+/// venue list are enough to draw the shell — then confirms it with `/me`. An
+/// expired token, a 401 from anywhere, or a deliberate sign-out ends it.
 final class AuthControllerProvider
     extends $NotifierProvider<AuthController, AuthState> {
-  /// The venue-staff session. Phase 0 restores a persisted session and signs
-  /// out; sign-in, `/me` refresh and expiry timers arrive with Phase 2 (the
-  /// login flow) — the shape is fixed here so the router and shells are final.
+  /// The venue-staff session.
+  ///
+  /// Boot restores a persisted session optimistically — the cached user and
+  /// venue list are enough to draw the shell — then confirms it with `/me`. An
+  /// expired token, a 401 from anywhere, or a deliberate sign-out ends it.
   AuthControllerProvider._()
     : super(
         from: null,
@@ -50,11 +56,13 @@ final class AuthControllerProvider
   }
 }
 
-String _$authControllerHash() => r'8f9cfe095e9a64d4b5acd888e97dd79d67aedd94';
+String _$authControllerHash() => r'16a0555b42b401962644e854e6bcdb968b4b1607';
 
-/// The venue-staff session. Phase 0 restores a persisted session and signs
-/// out; sign-in, `/me` refresh and expiry timers arrive with Phase 2 (the
-/// login flow) — the shape is fixed here so the router and shells are final.
+/// The venue-staff session.
+///
+/// Boot restores a persisted session optimistically — the cached user and
+/// venue list are enough to draw the shell — then confirms it with `/me`. An
+/// expired token, a 401 from anywhere, or a deliberate sign-out ends it.
 
 abstract class _$AuthController extends $Notifier<AuthState> {
   AuthState build();

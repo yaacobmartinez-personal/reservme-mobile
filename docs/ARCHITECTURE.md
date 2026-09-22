@@ -104,11 +104,29 @@ only retries transport failures.
   appearance, remembered booking contact.
 - `BootData.load` reads all of it once in `main()` and is injected through
   `bootDataProvider`, so there is no splash screen.
-- Drift (Phase 1+): the customer wallet and the venue read cache.
+- Drift, behind the `LocalStore` interface: the customer wallet
+  (`wallet_bookings`, `recent_venues`) and the venue read cache
+  (`venue_cache`). Nothing outside `core/storage` imports a drift type, and
+  tests use an in-memory implementation instead of SQLite.
+
+## Cached reads, online writes
+
+Venue screens keep the last good response and show it when the network goes,
+so a desk can still read the day's bookings on bad wifi. The shape (see
+`Today`):
+
+1. fetch → `saveVenueCache(venueSlug, key, json)` → render fresh;
+2. on `ApiError.isNetwork` or a 5xx → `readVenueCache` → render with
+   `stale: true`, and the screen says how old the copy is;
+3. on 403/404 → **rethrow**. A revoked membership or a deleted venue must not
+   be papered over with yesterday's sheet.
+
+Writes need a connection: while offline the actions render disabled rather
+than disappearing, and nothing is queued. The cache is wiped on sign-out.
 
 ## Fake-mode demo
 
-Account → "Demo: sign in as the venue owner" establishes a session for the
-seeded owner (`owner@reservme.test`) without the login screen, so the venue
-shell can be exercised before the auth flow ships. It is compiled out of real
-mode.
+The login screen shows the seeded accounts (`owner@reservme.test`,
+`staff@reservme.test`, password `password123`) as one-tap chips in fake mode,
+so the demo path goes through exactly the same sign-in code as a real one.
+The chips are compiled out of real mode.

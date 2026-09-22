@@ -22,6 +22,8 @@ Future<void> showWaitlistSheet(
 }) =>
     showModalBottomSheet<void>(
       context: context,
+      // On the root navigator, or the shell's bottom nav sits on top of it.
+      useRootNavigator: true,
       isScrollControlled: true,
       builder: (_) => Padding(
         padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),

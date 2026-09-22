@@ -37,16 +37,22 @@ void main() {
     expect(container.read(appRouterProvider).state.uri.path, '/c/bookings');
   });
 
-  testWidgets('demo sign-in unlocks the venue shell and the picker', (tester) async {
+  testWidgets('signing in unlocks the venue shell and the picker', (tester) async {
     final world = TestWorld();
     final container = await boot(tester, world);
 
     await tester.tap(find.text('Account'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Demo: sign in as the venue owner'));
+    await tester.tap(find.text('Sign in to venue mode'));
     await tester.pumpAndSettle();
 
-    // The owner has three venues, so the picker appears first.
+    // The demo chip fills the seeded owner's credentials.
+    await tester.tap(find.text('Owner'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Sign in'));
+    await tester.pumpAndSettle();
+
+    // The owner has more than one venue, so the picker appears first.
     expect(container.read(authControllerProvider).hasVenueAccess, isTrue);
     expect(container.read(appRouterProvider).state.uri.path, '/v/venues');
     expect(find.text('Katipunan Courts'), findsOneWidget);
