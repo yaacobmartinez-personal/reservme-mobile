@@ -1,0 +1,54 @@
+/// Route paths. Kept as constants so screens, guards, and the deep-link
+/// handler never disagree about where things live. Mirrors the design canvas:
+/// customer boards C1–C12 under `/c`, venue boards V1–V14 + Manage under `/v`,
+/// onboarding O0–O7 under `/onboarding`.
+abstract final class Routes {
+  // ---- auth ----------------------------------------------------------------
+  static const login = '/auth/login';
+  static const forgot = '/auth/forgot';
+
+  // ---- onboarding (venue owners) ------------------------------------------
+  static const welcome = '/onboarding';
+  static const signup = '/onboarding/signup';
+  static const verify = '/onboarding/verify';
+  static const createVenue = '/onboarding/venue';
+  static const firstSpace = '/onboarding/space';
+  static const hours = '/onboarding/hours';
+  static const policy = '/onboarding/policy';
+  static const live = '/onboarding/live';
+
+  // ---- customer shell ------------------------------------------------------
+  static const customerFind = '/c/find';
+  static const customerBookings = '/c/bookings';
+  static const customerAccount = '/c/account';
+
+  /// Public venue pages nest under Find so a declarative `go` (deep links)
+  /// builds the full back stack.
+  static const scan = '/c/find/scan';
+  static String venue(String slug) => '$customerFind/venues/$slug';
+  static String space(String slug, String spaceId, {String? date}) =>
+      '$customerFind/venues/$slug/spaces/$spaceId${date == null ? '' : '?date=$date'}';
+  static String book(String slug) => '$customerFind/venues/$slug/book';
+  static String booking(String slug, String token) => '$customerBookings/$slug/$token';
+  static String reschedule(String slug, String token) =>
+      '$customerBookings/$slug/$token/reschedule';
+  static String importBooking(String slug, String token) =>
+      '$customerBookings/import?slug=$slug&token=$token';
+
+  // ---- venue shell ---------------------------------------------------------
+  static const venueToday = '/v/today';
+  static const venueCalendar = '/v/calendar';
+  static const venueCustomers = '/v/customers';
+  static const venueMore = '/v/more';
+
+  static const venuePicker = '/v/venues';
+  static String customer(String id) => '$venueCustomers/$id';
+  static const venueWaitlist = '/v/more/waitlist';
+  static const venueSpaces = '/v/more/spaces';
+  static String spaceEdit(String id) => '/v/more/spaces/$id';
+  static const venueSettings = '/v/more/settings';
+  static const venueTeam = '/v/more/team';
+  static const venueBilling = '/v/more/billing';
+  static const venueInsights = '/v/more/insights';
+  static const ownerAccount = '/v/more/account';
+}
