@@ -1409,7 +1409,7 @@ class $VenueCacheTable extends VenueCache
 class VenueCacheRow extends DataClass implements Insertable<VenueCacheRow> {
   final String venueSlug;
 
-  /// Which screen: "today", later "calendar:<date>", "customers".
+  /// Which screen: "today", later `calendar:<date>`, "customers".
   final String key;
 
   /// The response as JSON, exactly as the screen would have rendered it.

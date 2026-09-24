@@ -67,7 +67,7 @@ final class TodayProvider extends $AsyncNotifierProvider<Today, TodayState> {
   }
 }
 
-String _$todayHash() => r'1b66d155da1e31e9e500e24d7d984bca238dba18';
+String _$todayHash() => r'7879271176a118b3683a558ad7cf9acc6f6e3ade';
 
 /// V4 · Today. Fetches the run sheet, caches it, and falls back to that cache
 /// when the desk's connection drops — a venue must still be able to read the
