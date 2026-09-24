@@ -73,4 +73,25 @@ void main() {
     expect(safeFrom('/auth/login'), isNull);
     expect(safeFrom(null), isNull);
   });
+
+  group('the reset screen', () {
+    String? go(String location, AuthState auth) => computeRedirect(
+          uri: Uri.parse(location),
+          auth: auth,
+          mode: AppMode.venue,
+          selectedVenueSlug: katipunan.slug,
+        );
+
+    test('is reachable while signed in, unlike the rest of /auth', () {
+      // Changing your password from the account screen goes here with a
+      // session in hand; bouncing it would make that button do nothing.
+      expect(go('/auth/reset?email=a%40b.co', oneVenue), isNull);
+      expect(go('/auth/login', oneVenue), isNotNull);
+      expect(go('/auth/forgot', oneVenue), isNotNull);
+    });
+
+    test('is reachable signed out too, which is where a reset starts', () {
+      expect(go('/auth/reset?email=a%40b.co', const AuthState.signedOut()), isNull);
+    });
+  });
 }

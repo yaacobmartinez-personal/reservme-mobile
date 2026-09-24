@@ -88,7 +88,7 @@ GoRouter appRouter(Ref ref) {
         ),
       ),
       GoRoute(
-        path: '/auth/reset',
+        path: Routes.resetPasswordPath,
         builder: (context, state) => ResetPasswordScreen(
           email: state.uri.queryParameters['email'] ?? '',
         ),

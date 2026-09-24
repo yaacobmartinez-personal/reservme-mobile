@@ -126,6 +126,11 @@ abstract class ClosureView with _$ClosureView {
       _$ClosureViewFromJson(json);
 
   bool get isWholeVenue => spaceId == null;
+
+  /// True when the window starts and ends at local midnight, so it covers
+  /// whole days rather than a slice of one.
+  bool coversWholeDays(String Function(DateTime) timeOf) =>
+      timeOf(startsAt) == '00:00' && timeOf(endsAt) == '00:00';
 }
 
 @freezed

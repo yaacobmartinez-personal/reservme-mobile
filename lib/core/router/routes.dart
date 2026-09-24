@@ -7,10 +7,13 @@ abstract final class Routes {
   static const login = '/auth/login';
   static const forgot = '/auth/forgot';
 
+  /// The reset screen's path on its own, for the redirect rules.
+  static const resetPasswordPath = '/auth/reset';
+
   /// The address travels with the code: a reset for an address you did not
   /// type is not a reset.
   static String resetPassword(String email) =>
-      '/auth/reset?email=${Uri.encodeQueryComponent(email)}';
+      '$resetPasswordPath?email=${Uri.encodeQueryComponent(email)}';
 
   // ---- onboarding (venue owners) ------------------------------------------
   static const welcome = '/onboarding';

@@ -4,6 +4,7 @@ import 'package:reservme/core/fake/seed.dart';
 import 'package:reservme/core/model/enums.dart';
 import 'package:reservme/core/model/opening_hours.dart';
 import 'package:reservme/core/network/api_error.dart';
+import 'package:reservme/core/time/app_time.dart';
 import 'package:reservme/features/auth/application/auth_controller.dart';
 import 'package:reservme/features/venue/spaces/application/space_editor_controller.dart';
 import 'package:reservme/features/venue/spaces/application/spaces_controller.dart';
@@ -300,6 +301,36 @@ void main() {
 
       expect(first.slug, 'pitch');
       expect(second.slug, 'pitch-2');
+    });
+
+    test('an all-day closure is stated as whole days, not 00:00-00:00',
+        () async {
+      final world = TestWorld();
+      final container = world.container();
+      await signIn(container, FakeAccounts.ownerEmail);
+      final id = await firstSpaceId(container);
+
+      await container.read(spaceEditorProvider(slug, id).notifier).addClosure(
+            const ClosureInput(
+              fromDate: '2027-03-05',
+              fromTime: '00:00',
+              toDate: '2027-03-06',
+              toTime: '00:00',
+              reason: 'Resurfacing',
+            ),
+          );
+
+      final closure = container
+          .read(spaceEditorProvider(slug, id))
+          .value!
+          .closures
+          .firstWhere((c) => c.reason == 'Resurfacing');
+
+      // Rendering it as a time range would read as covering no time at all.
+      expect(
+        closure.coversWholeDays((i) => AppTime.formatTime(i, 'Asia/Manila')),
+        isTrue,
+      );
     });
   });
 }
