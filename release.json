@@ -1,0 +1,6 @@
+{
+  "API_MODE": "real",
+  "SERVER_URL": "https://app.reservme.pro",
+  "PUBLIC_ORIGIN": "https://reservme.pro",
+  "APP_ORIGIN": "https://app.reservme.pro"
+}
