@@ -33,6 +33,30 @@ class RealAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<void> resetPassword({
+    required String email,
+    required String code,
+    required String password,
+  }) async {
+    // The in-app reset belongs to the sign-up feature's endpoints (#26),
+    // not to login, so it is gated with them.
+    if (!isAvailable(Feature.signup, _mode)) throw ApiError.notAvailable();
+    await _api.post('/mobile/auth/reset-password', body: {
+      'email': email.trim().toLowerCase(),
+      'code': code.trim(),
+      'password': password,
+    });
+  }
+
+  @override
+  Future<void> deleteAccount() async {
+    if (!isAvailable(Feature.deleteAccount, _mode)) {
+      throw ApiError.notAvailable();
+    }
+    await _api.delete('/mobile/me');
+  }
+
+  @override
   Future<Me> me() async {
     if (!isAvailable(Feature.venueLogin, _mode)) throw ApiError.notAvailable();
     final json = await _api.get('/mobile/me');

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../core/router/routes.dart';
 
 import '../../../core/theme/palette.dart';
 import '../../../core/theme/spacing.dart';
@@ -90,6 +93,17 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               title: 'Check your inbox',
               body: 'If that address has an account, a code is on its way. '
                   'It expires in an hour.',
+            ),
+            const SizedBox(height: Spacing.x4),
+            // The reset finishes here now rather than on the website (D14):
+            // a staff member with only a phone could not do it otherwise.
+            FilledButton(
+              onPressed: () =>
+                  context.push(Routes.resetPassword(_email.text.trim())),
+              style: FilledButton.styleFrom(
+                minimumSize: const Size.fromHeight(54),
+              ),
+              child: const Text('I have the code'),
             ),
           ] else ...[
             const SizedBox(height: Spacing.x5),

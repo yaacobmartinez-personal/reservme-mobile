@@ -5,6 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../features/auth/application/auth_controller.dart';
 import '../../features/auth/presentation/forgot_password_screen.dart';
 import '../../features/auth/presentation/login_screen.dart';
+import '../../features/auth/presentation/reset_password_screen.dart';
 import '../../features/customer/account/presentation/account_screen.dart';
 import '../../features/customer/booking/presentation/booking_form_screen.dart';
 import '../../features/customer/booking/presentation/space_day_screen.dart';
@@ -26,8 +27,8 @@ import '../../features/onboarding/presentation/welcome_screen.dart';
 import '../../features/shell/application/app_mode_controller.dart';
 import '../../features/shell/presentation/animated_branches.dart';
 import '../../features/shell/presentation/customer_shell.dart';
-import '../../features/shell/presentation/placeholder_screen.dart';
 import '../../features/shell/presentation/venue_shell.dart';
+import '../../features/venue/account/presentation/owner_account_screen.dart';
 import '../../features/venue/billing/presentation/billing_screen.dart';
 import '../../features/venue/calendar/presentation/calendar_screen.dart';
 import '../../features/venue/customers/presentation/customer_detail_screen.dart';
@@ -84,6 +85,12 @@ GoRouter appRouter(Ref ref) {
         pageBuilder: (context, state) => sharedAxisPage(
           state: state,
           child: LoginScreen(from: state.uri.queryParameters['from']),
+        ),
+      ),
+      GoRoute(
+        path: '/auth/reset',
+        builder: (context, state) => ResetPasswordScreen(
+          email: state.uri.queryParameters['email'] ?? '',
         ),
       ),
       GoRoute(
@@ -283,14 +290,10 @@ GoRouter appRouter(Ref ref) {
                     path: 'insights',
                     builder: (context, state) => const InsightsScreen(),
                   ),
-                  for (final (segment, title, board) in const [
-                    ('account', 'Your account', 'G7 · Owner account'),
-                  ])
-                    GoRoute(
-                      path: segment,
-                      builder: (context, state) =>
-                          PlaceholderScreen(title: title, board: board, showBack: true),
-                    ),
+                  GoRoute(
+                    path: 'account',
+                    builder: (context, state) => const OwnerAccountScreen(),
+                  ),
                   GoRoute(
                     path: 'spaces',
                     builder: (context, state) => const SpacesScreen(),

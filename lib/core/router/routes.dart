@@ -7,6 +7,11 @@ abstract final class Routes {
   static const login = '/auth/login';
   static const forgot = '/auth/forgot';
 
+  /// The address travels with the code: a reset for an address you did not
+  /// type is not a reset.
+  static String resetPassword(String email) =>
+      '/auth/reset?email=${Uri.encodeQueryComponent(email)}';
+
   // ---- onboarding (venue owners) ------------------------------------------
   static const welcome = '/onboarding';
   static const signup = '/onboarding/signup';
