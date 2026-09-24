@@ -33,9 +33,9 @@ jobs:
       # Mac never needs build_runner just to run. Fail if it has gone stale.
       - name: Regenerate and check nothing changed
         run: |
-          dart run build_runner build --delete-conflicting-outputs
+          dart run build_runner build
           git diff --exit-code -- . ':!pubspec.lock' \
-            || { echo '::error::Generated files are out of date. Run: dart run build_runner build -d'; exit 1; }
+            || { echo '::error::Generated files are out of date. Run: dart run build_runner build'; exit 1; }
 
       - run: flutter analyze
 
