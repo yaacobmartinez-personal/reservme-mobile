@@ -17,6 +17,9 @@ import 'calendar/domain/calendar_repository.dart';
 import 'customers/data/fake_customers_repository.dart';
 import 'customers/data/real_customers_repository.dart';
 import 'customers/domain/customers_repository.dart';
+import 'insights/data/fake_insights_repository.dart';
+import 'insights/data/real_insights_repository.dart';
+import 'insights/domain/insights.dart';
 import 'settings/data/fake_settings_repository.dart';
 import 'settings/data/real_settings_repository.dart';
 import 'settings/domain/venue_settings.dart';
@@ -145,5 +148,18 @@ BillingRepository billingRepository(Ref ref) =>
         ref.watch(clockProvider),
         () => !ref.mounted || !ref.read(isOnlineProvider),
         _roleLookup(ref),
+      ),
+    };
+
+@Riverpod(keepAlive: true)
+InsightsRepository insightsRepository(Ref ref) =>
+    switch (ref.watch(apiModeProvider)) {
+      ApiMode.real =>
+        RealInsightsRepository(ref.watch(apiClientProvider), ApiMode.real),
+      ApiMode.fake => FakeInsightsRepository(
+        ref.watch(fakeStoreProvider),
+        ref.watch(fakeLatencyProvider),
+        ref.watch(clockProvider),
+        () => !ref.mounted || !ref.read(isOnlineProvider),
       ),
     };

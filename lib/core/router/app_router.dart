@@ -32,6 +32,7 @@ import '../../features/venue/billing/presentation/billing_screen.dart';
 import '../../features/venue/calendar/presentation/calendar_screen.dart';
 import '../../features/venue/customers/presentation/customer_detail_screen.dart';
 import '../../features/venue/customers/presentation/customers_screen.dart';
+import '../../features/venue/insights/presentation/insights_screen.dart';
 import '../../features/venue/more/presentation/more_screen.dart';
 import '../../features/venue/settings/presentation/venue_settings_screen.dart';
 import '../../features/venue/spaces/presentation/space_editor_screen.dart';
@@ -278,8 +279,11 @@ GoRouter appRouter(Ref ref) {
                     path: 'billing',
                     builder: (context, state) => const BillingScreen(),
                   ),
+                  GoRoute(
+                    path: 'insights',
+                    builder: (context, state) => const InsightsScreen(),
+                  ),
                   for (final (segment, title, board) in const [
-                    ('insights', 'Insights', 'G5 · Insights'),
                     ('account', 'Your account', 'G7 · Owner account'),
                   ])
                     GoRoute(
