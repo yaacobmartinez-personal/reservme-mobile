@@ -359,7 +359,9 @@ class FakeBillingPayment {
     required this.venueId,
     required this.amountCents,
     required this.reference,
+    required this.paidAt,
     this.status = 'submitted',
+    this.note,
     required this.createdAt,
   });
 
@@ -367,7 +369,15 @@ class FakeBillingPayment {
   final String venueId;
   final int amountCents;
   final String reference;
+
+  /// The venue-local date the owner says they transferred, "YYYY-MM-DD".
+  final String paidAt;
+
+  /// submitted | approved | rejected.
   String status;
+
+  /// Why it was rejected, when it was.
+  String? note;
   final DateTime createdAt;
 }
 
@@ -484,6 +494,12 @@ class FakeStore {
 
   FakeSubscription? subscriptionOf(String venueId) =>
       subscriptions.where((s) => s.venueId == venueId).firstOrNull;
+
+  /// Newest first, the way the owner's billing page lists them.
+  Iterable<FakeBillingPayment> paymentsOf(String venueId) =>
+      (billingPayments.where((p) => p.venueId == venueId).toList()
+            ..sort((a, b) => b.createdAt.compareTo(a.createdAt)))
+          .cast<FakeBillingPayment>();
 }
 
 /// A message the fake server "sent". Codes surface here so fake mode can

@@ -20,6 +20,10 @@ abstract final class FakeAccounts {
 abstract final class FakeVenues {
   static const katipunan = 'katipunan';
   static const studioNorte = 'studio-norte';
+
+  /// Suspended for non-payment, so the billing and settings screens have a
+  /// venue that is actually switched off to render.
+  static const marikinaFutsal = 'marikina-futsal';
 }
 
 const _firstNames = [
@@ -100,12 +104,14 @@ void seedFakeStore(FakeStore store, DateTime now) {
   );
   final marikina = FakeVenue(
     id: store.nextId('v'),
-    slug: 'marikina-futsal',
+    slug: FakeVenues.marikinaFutsal,
     name: 'Marikina Futsal',
     timezone: 'Asia/Manila',
     theme: VenueTheme.ocean,
     suspendedAt: now.subtract(const Duration(days: 3)),
-    suspendedReason: 'billing_overdue',
+    // The exact string billing keys off: paying lifts a suspension with
+    // this reason and no other.
+    suspendedReason: BillingPolicy.suspendReason,
     createdAt: t0.subtract(const Duration(days: 60)),
   );
   store.venues.addAll([katipunan, norte, marikina]);
@@ -119,6 +125,10 @@ void seedFakeStore(FakeStore store, DateTime now) {
           : v.createdAt.add(const Duration(days: 30)).isAfter(now)
               ? v.createdAt.add(const Duration(days: 30))
               : now.add(const Duration(days: 20)),
+      // A past-due venue must have a lapsed paid period, or billing's own
+      // rule (`status IN ('active','past_due') AND paid_until < now`) never
+      // fires and a suspended venue reads as owing nothing.
+      paidUntil: v == marikina ? now.subtract(const Duration(days: 13)) : null,
     ));
   }
 

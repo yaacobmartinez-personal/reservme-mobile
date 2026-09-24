@@ -28,6 +28,7 @@ import '../../features/shell/presentation/animated_branches.dart';
 import '../../features/shell/presentation/customer_shell.dart';
 import '../../features/shell/presentation/placeholder_screen.dart';
 import '../../features/shell/presentation/venue_shell.dart';
+import '../../features/venue/billing/presentation/billing_screen.dart';
 import '../../features/venue/calendar/presentation/calendar_screen.dart';
 import '../../features/venue/customers/presentation/customer_detail_screen.dart';
 import '../../features/venue/customers/presentation/customers_screen.dart';
@@ -273,8 +274,11 @@ GoRouter appRouter(Ref ref) {
                     path: 'team',
                     builder: (context, state) => const TeamScreen(),
                   ),
+                  GoRoute(
+                    path: 'billing',
+                    builder: (context, state) => const BillingScreen(),
+                  ),
                   for (final (segment, title, board) in const [
-                    ('billing', 'Billing', 'G4 · Billing'),
                     ('insights', 'Insights', 'G5 · Insights'),
                     ('account', 'Your account', 'G7 · Owner account'),
                   ])

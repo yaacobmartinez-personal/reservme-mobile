@@ -8,6 +8,9 @@ import '../../core/model/enums.dart';
 import '../../core/network/api_client.dart';
 import '../../core/time/clock.dart';
 import '../auth/application/auth_controller.dart';
+import 'billing/data/fake_billing_repository.dart';
+import 'billing/data/real_billing_repository.dart';
+import 'billing/domain/billing.dart';
 import 'calendar/data/fake_calendar_repository.dart';
 import 'calendar/data/real_calendar_repository.dart';
 import 'calendar/domain/calendar_repository.dart';
@@ -130,3 +133,17 @@ TeamRepository teamRepository(Ref ref) => switch (ref.watch(apiModeProvider)) {
     () => !ref.mounted ? null : ref.read(authControllerProvider).userOrNull?.id,
   ),
 };
+
+@Riverpod(keepAlive: true)
+BillingRepository billingRepository(Ref ref) =>
+    switch (ref.watch(apiModeProvider)) {
+      ApiMode.real =>
+        RealBillingRepository(ref.watch(apiClientProvider), ApiMode.real),
+      ApiMode.fake => FakeBillingRepository(
+        ref.watch(fakeStoreProvider),
+        ref.watch(fakeLatencyProvider),
+        ref.watch(clockProvider),
+        () => !ref.mounted || !ref.read(isOnlineProvider),
+        _roleLookup(ref),
+      ),
+    };

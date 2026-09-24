@@ -333,3 +333,50 @@ final class TeamRepositoryProvider
 }
 
 String _$teamRepositoryHash() => r'49931905b0c2c036754953c9b1a3077392e99d6c';
+
+@ProviderFor(billingRepository)
+final billingRepositoryProvider = BillingRepositoryProvider._();
+
+final class BillingRepositoryProvider
+    extends
+        $FunctionalProvider<
+          BillingRepository,
+          BillingRepository,
+          BillingRepository
+        >
+    with $Provider<BillingRepository> {
+  BillingRepositoryProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'billingRepositoryProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$billingRepositoryHash();
+
+  @$internal
+  @override
+  $ProviderElement<BillingRepository> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  BillingRepository create(Ref ref) {
+    return billingRepository(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(BillingRepository value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<BillingRepository>(value),
+    );
+  }
+}
+
+String _$billingRepositoryHash() => r'1d606ca4f5c49b73c05b7c7df348b1f3a00eb0d5';
