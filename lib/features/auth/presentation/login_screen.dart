@@ -149,6 +149,30 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: const Text('Forgot password?'),
             ),
           ),
+          const SizedBox(height: Spacing.x2),
+          // The way in for a venue that has not signed up yet. Without this
+          // the onboarding flow exists but nothing reaches it.
+          Center(
+            child: Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                Text(
+                  'New to ReservMe? ',
+                  style: AppType.bodyS.copyWith(color: p.ink3),
+                ),
+                GestureDetector(
+                  onTap: () => context.push(Routes.welcome),
+                  child: Text(
+                    'Set up your venue →',
+                    style: AppType.bodyS.copyWith(
+                      color: p.pineInk,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           if (apiMode == ApiMode.fake) ...[
             const SizedBox(height: Spacing.x4),
             _DemoAccounts(

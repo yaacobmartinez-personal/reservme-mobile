@@ -14,6 +14,7 @@ import '../../../core/time/clock.dart';
 import '../../shell/application/app_mode_controller.dart';
 import '../../venue/venues/domain/venue_membership.dart';
 import '../auth_providers.dart';
+import '../domain/auth_repository.dart';
 import '../domain/user.dart';
 import 'auth_state.dart';
 
@@ -70,6 +71,14 @@ class AuthController extends _$AuthController {
           email: email,
           password: password,
         );
+    await _establish(result.user, result.token, const []);
+    await refreshVenues();
+  }
+
+  /// Take a session that was established elsewhere — signup, which creates
+  /// the account and signs it in as one step. Same effect as [signIn], minus
+  /// the credentials round trip.
+  Future<void> adopt(AuthResult result) async {
     await _establish(result.user, result.token, const []);
     await refreshVenues();
   }

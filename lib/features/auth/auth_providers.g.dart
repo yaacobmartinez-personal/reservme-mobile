@@ -8,13 +8,26 @@ part of 'auth_providers.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// Reading through a captured [Ref] after its provider is gone throws, and
+/// these closures outlive a request: an in-flight `/me` can land after the
+/// container is torn down. A disposed ref reads as "no token" and "offline",
+/// which the repositories already handle, rather than crashing.
 
 @ProviderFor(authRepository)
 final authRepositoryProvider = AuthRepositoryProvider._();
 
+/// Reading through a captured [Ref] after its provider is gone throws, and
+/// these closures outlive a request: an in-flight `/me` can land after the
+/// container is torn down. A disposed ref reads as "no token" and "offline",
+/// which the repositories already handle, rather than crashing.
+
 final class AuthRepositoryProvider
     extends $FunctionalProvider<AuthRepository, AuthRepository, AuthRepository>
     with $Provider<AuthRepository> {
+  /// Reading through a captured [Ref] after its provider is gone throws, and
+  /// these closures outlive a request: an in-flight `/me` can land after the
+  /// container is torn down. A disposed ref reads as "no token" and "offline",
+  /// which the repositories already handle, rather than crashing.
   AuthRepositoryProvider._()
     : super(
         from: null,
@@ -48,4 +61,4 @@ final class AuthRepositoryProvider
   }
 }
 
-String _$authRepositoryHash() => r'bec1e25c24563fe4113f53f0cd157f8587e20b77';
+String _$authRepositoryHash() => r'b6f6533bea364ce4fe2feffb6b5f805682539a2c';

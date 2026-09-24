@@ -7,6 +7,7 @@ pick it up. Reviewed at the start of each phase, and again before release.
 
 | # | Item | Phase |
 |---|---|---|
+| D18 | **Verify onboarding on a device.** The flow is built and unit- and widget-tested, but the emulator stopped rendering any build mid-session (including one verified working an hour earlier), so O0–O7 have not been walked on hardware. Boot now survives a hung platform channel (`main.dart` deadline), which was one real bug found on the way; the render failure itself is unexplained. | before merging 3b |
 | D2b | **The onboarding photos are AI-generated placeholders.** They are bundled and named now, but they are not real venue photography and should not ship as-is. The Welcome hero matters most — it is the first thing an owner sees. | before store submission |
 
 ## Closed

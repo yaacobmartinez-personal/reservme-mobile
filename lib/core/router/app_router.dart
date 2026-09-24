@@ -15,6 +15,14 @@ import '../../features/customer/wallet/presentation/booking_detail_screen.dart';
 import '../../features/customer/wallet/presentation/bookings_screen.dart';
 import '../../features/customer/wallet/presentation/import_booking_screen.dart';
 import '../../features/customer/wallet/presentation/reschedule_screen.dart';
+import '../../features/onboarding/presentation/create_venue_screen.dart';
+import '../../features/onboarding/presentation/first_space_screen.dart';
+import '../../features/onboarding/presentation/hours_screen.dart';
+import '../../features/onboarding/presentation/live_screen.dart';
+import '../../features/onboarding/presentation/policy_screen.dart';
+import '../../features/onboarding/presentation/signup_screen.dart';
+import '../../features/onboarding/presentation/verify_screen.dart';
+import '../../features/onboarding/presentation/welcome_screen.dart';
 import '../../features/shell/application/app_mode_controller.dart';
 import '../../features/shell/presentation/animated_branches.dart';
 import '../../features/shell/presentation/customer_shell.dart';
@@ -81,26 +89,22 @@ GoRouter appRouter(Ref ref) {
       // ---- onboarding -------------------------------------------------------
       GoRoute(
         path: Routes.welcome,
-        pageBuilder: (context, state) => fadeThroughPage(
-          state: state,
-          child: const PlaceholderScreen(title: 'Welcome', board: 'O0 · Welcome', showBack: true),
-        ),
+        pageBuilder: (context, state) =>
+            fadeThroughPage(state: state, child: const WelcomeScreen()),
         routes: [
-          for (final (segment, title, board) in const [
-            ('signup', 'Create your owner account', 'O1 · Sign up'),
-            ('verify', 'Check your email', 'O2 · Verify email'),
-            ('venue', 'Name your venue', 'O3 · Create venue'),
-            ('space', 'Add your first space', 'O4 · First space'),
-            ('hours', 'Opening hours', 'O5 · Opening hours'),
-            ('policy', 'Booking rules', 'O6 · Booking policy'),
-            ('live', "You're live", 'O7 · Live'),
+          for (final (segment, screen) in <(String, Widget)>[
+            ('signup', const SignupScreen()),
+            ('verify', const VerifyScreen()),
+            ('venue', const CreateVenueScreen()),
+            ('space', const FirstSpaceScreen()),
+            ('hours', const HoursScreen()),
+            ('policy', const PolicyScreen()),
+            ('live', const LiveScreen()),
           ])
             GoRoute(
               path: segment,
-              pageBuilder: (context, state) => sharedAxisPage(
-                state: state,
-                child: PlaceholderScreen(title: title, board: board, showBack: true),
-              ),
+              pageBuilder: (context, state) =>
+                  sharedAxisPage(state: state, child: screen),
             ),
         ],
       ),
