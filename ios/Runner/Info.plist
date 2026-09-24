@@ -66,7 +66,32 @@
 			<string>UIInterfaceOrientationLandscapeLeft</string>
 			<string>UIInterfaceOrientationLandscapeRight</string>
 		</array>
-		<key>UIStatusBarHidden</key>
+		<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>pro.reservme.app</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>reservme</string>
+			</array>
+		</dict>
+	</array>
+	<!-- app_links owns link handling; with Flutter's built-in deep linking
+	     on as well, the router and the plugin act on the same link. -->
+	<key>FlutterDeepLinkingEnabled</key>
+	<false/>
+	<!-- url_launcher checks these before handing a link to the browser. -->
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>https</string>
+		<string>http</string>
+		<string>tel</string>
+		<string>mailto</string>
+	</array>
+	<key>UIStatusBarHidden</key>
 		<false/>
 	</dict>
 </plist>

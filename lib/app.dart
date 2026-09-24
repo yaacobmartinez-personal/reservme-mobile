@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/config/app_config.dart';
 import 'core/connectivity/connectivity_provider.dart';
 import 'core/router/app_router.dart';
+import 'core/router/deep_link_handler.dart';
 import 'core/theme/app_theme.dart';
 import 'features/settings/application/appearance_controller.dart';
 
@@ -15,6 +16,9 @@ class ReservMeApp extends ConsumerWidget {
     // Start the connectivity stream now so the first offline decision is
     // based on a real reading rather than the optimistic default.
     ref.watch(connectivityProvider);
+    // And start listening for links, so a cold start from a booking link
+    // lands somewhere rather than on the Find tab.
+    ref.watch(deepLinksProvider);
     final router = ref.watch(appRouterProvider);
     return MaterialApp.router(
       title: AppConfig.appName,

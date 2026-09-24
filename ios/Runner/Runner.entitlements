@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Universal Links for the public booking host. Apple fetches
+	     https://reservme.pro/.well-known/apple-app-site-association, which the
+	     marketing site has to serve since it owns the apex — see
+	     docs/API-CONTRACT.md. Add this file to the Runner target in Xcode
+	     (Signing & Capabilities → Associated Domains) on the Mac; adding it
+	     here does not wire it into the project on its own. -->
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:reservme.pro</string>
+		<string>applinks:www.reservme.pro</string>
+	</array>
+</dict>
+</plist>
