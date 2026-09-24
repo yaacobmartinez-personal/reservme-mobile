@@ -9,6 +9,7 @@ import '../../../../../core/theme/typography.dart';
 import '../../../../../core/time/app_time.dart';
 import '../../../../../core/ui/app_banner.dart';
 import '../../../../../core/widgets/async_view.dart';
+import '../../../../../core/widgets/wall_clock_field.dart';
 import '../../application/calendar_commands.dart';
 import '../../domain/calendar_day.dart';
 import '../../domain/calendar_repository.dart';
@@ -201,14 +202,10 @@ class _ManualBookingSheetState extends ConsumerState<_ManualBookingSheet> {
                 ),
                 const SizedBox(width: Spacing.x3),
                 Expanded(
-                  child: _Field(
+                  child: TimeField(
                     label: 'Time',
-                    child: TextFormField(
-                      initialValue: _time,
-                      keyboardType: TextInputType.datetime,
-                      onChanged: (v) => _time = v.trim(),
-                      decoration: const InputDecoration(hintText: 'HH:MM'),
-                    ),
+                    value: _time,
+                    onChanged: (v) => setState(() => _time = v),
                   ),
                 ),
               ],

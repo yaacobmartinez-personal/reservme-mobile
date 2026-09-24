@@ -7,6 +7,7 @@ import '../../../../../core/theme/typography.dart';
 import '../../../../../core/time/app_time.dart';
 import '../../../../../core/ui/app_banner.dart';
 import '../../../../../core/widgets/async_view.dart';
+import '../../../../../core/widgets/wall_clock_field.dart';
 import '../../application/calendar_commands.dart';
 import '../../domain/calendar_day.dart';
 import '../../domain/manual_booking_input.dart';
@@ -183,34 +184,28 @@ class _BlockSheetState extends ConsumerState<_BlockSheet> {
             Row(
               children: [
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('From', style: AppType.caption.copyWith(color: p.ink3)),
-                      const SizedBox(height: 6),
-                      TextFormField(
-                        initialValue: _from,
-                        keyboardType: TextInputType.datetime,
-                        onChanged: (v) => setState(() => _from = v.trim()),
-                        decoration: const InputDecoration(hintText: 'HH:MM'),
-                      ),
-                    ],
+                  child: TimeField(
+                    label: 'From',
+                    value: _from,
+                    onChanged: (v) => setState(() {
+                      // Keep the window's length when the start moves, so a
+                      // two-hour block stays two hours.
+                      final was = AppTime.minutesOfDay(_from);
+                      final end = AppTime.minutesOfDay(_to);
+                      final now = AppTime.minutesOfDay(v);
+                      _from = v;
+                      if (was != null && end != null && now != null && end > was) {
+                        _to = AppTime.addMinutesToTime(v, end - was);
+                      }
+                    }),
                   ),
                 ),
                 const SizedBox(width: Spacing.x3),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('To', style: AppType.caption.copyWith(color: p.ink3)),
-                      const SizedBox(height: 6),
-                      TextFormField(
-                        initialValue: _to,
-                        keyboardType: TextInputType.datetime,
-                        onChanged: (v) => setState(() => _to = v.trim()),
-                        decoration: const InputDecoration(hintText: 'HH:MM'),
-                      ),
-                    ],
+                  child: TimeField(
+                    label: 'To',
+                    value: _to,
+                    onChanged: (v) => setState(() => _to = v),
                   ),
                 ),
               ],

@@ -13,6 +13,7 @@ import '../../../auth/application/auth_controller.dart';
 import '../../../shell/application/app_mode_controller.dart';
 import '../application/selected_venue_controller.dart';
 import '../domain/venue_membership.dart';
+import 'widgets/venue_avatar.dart';
 
 /// V3 · Venue picker: shown when the signed-in user belongs to more than one
 /// venue, and reachable from the venue switcher.
@@ -100,19 +101,7 @@ class _VenueTile extends StatelessWidget {
       borderColor: selected ? p.pine : null,
       child: Row(
         children: [
-          Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              color: p.pineInk,
-              borderRadius: BorderRadius.circular(Spacing.x3),
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              venue.name.characters.first.toUpperCase(),
-              style: AppType.displayAt(22).copyWith(color: p.pineLine),
-            ),
-          ),
+          VenueAvatar(name: venue.name),
           const SizedBox(width: Spacing.x3),
           Expanded(
             child: Column(

@@ -7,6 +7,7 @@ import '../../../../../core/theme/typography.dart';
 import '../../../../../core/time/app_time.dart';
 import '../../../../../core/ui/app_banner.dart';
 import '../../../../../core/widgets/async_view.dart';
+import '../../../../../core/widgets/wall_clock_field.dart';
 import '../../application/calendar_commands.dart';
 import '../../domain/calendar_day.dart';
 
@@ -144,33 +145,19 @@ class _MoveSheetState extends ConsumerState<_MoveSheet> {
             Row(
               children: [
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Date', style: AppType.caption.copyWith(color: p.ink3)),
-                      const SizedBox(height: 6),
-                      TextFormField(
-                        initialValue: _date,
-                        onChanged: (v) => _date = v.trim(),
-                        decoration: const InputDecoration(hintText: 'YYYY-MM-DD'),
-                      ),
-                    ],
+                  child: DateField(
+                    label: 'Date',
+                    value: _date,
+                    timezone: widget.timezone,
+                    onChanged: (v) => setState(() => _date = v),
                   ),
                 ),
                 const SizedBox(width: Spacing.x3),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Time', style: AppType.caption.copyWith(color: p.ink3)),
-                      const SizedBox(height: 6),
-                      TextFormField(
-                        initialValue: _time,
-                        keyboardType: TextInputType.datetime,
-                        onChanged: (v) => _time = v.trim(),
-                        decoration: const InputDecoration(hintText: 'HH:MM'),
-                      ),
-                    ],
+                  child: TimeField(
+                    label: 'Time',
+                    value: _time,
+                    onChanged: (v) => setState(() => _time = v),
                   ),
                 ),
               ],

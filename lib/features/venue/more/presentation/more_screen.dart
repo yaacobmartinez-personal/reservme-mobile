@@ -14,6 +14,7 @@ import '../../../auth/application/auth_controller.dart';
 import '../../../shell/application/app_mode_controller.dart';
 import '../../venues/application/selected_venue_controller.dart';
 import '../../venues/presentation/venue_switcher_button.dart';
+import '../../venues/presentation/widgets/venue_avatar.dart';
 
 /// V12 · More: the venue card, the Manage entries, app settings, sign out.
 /// Every destination is wired; the screens behind them fill in over
@@ -63,19 +64,7 @@ class MoreScreen extends ConsumerWidget {
                     AppCard(
                       child: Row(
                         children: [
-                          Container(
-                            width: 48,
-                            height: 48,
-                            decoration: BoxDecoration(
-                              color: p.pineInk,
-                              borderRadius: BorderRadius.circular(Spacing.x3),
-                            ),
-                            alignment: Alignment.center,
-                            child: Text(
-                              venue.name.characters.first.toUpperCase(),
-                              style: AppType.displayS.copyWith(color: p.pineLine),
-                            ),
-                          ),
+                          VenueAvatar(name: venue.name, size: 48),
                           const SizedBox(width: Spacing.x3),
                           Expanded(
                             child: Column(

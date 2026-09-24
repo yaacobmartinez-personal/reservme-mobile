@@ -7,8 +7,7 @@ pick it up. Reviewed at the start of each phase, and again before release.
 
 | # | Item | Phase |
 |---|---|---|
-| D2 | **Onboarding photos.** The five images live as canvas assets only; the app needs them in `assets/photos/` (court, owner, studio, padel, qr). They are AI-generated placeholders — replace with licensed or real venue photography before store submission. | 3b (builds the screens that use them) |
-| D5 | **Venue avatar inverts in dark mode** (light mint square, dark letter) because it uses `pineInk` as a fill. Give it a fixed strong fill, or use the venue logo once uploads exist. | 3c (the real avatar is a logo) |
+| D2b | **The onboarding photos are AI-generated placeholders.** They are bundled and named now, but they are not real venue photography and should not ship as-is. The Welcome hero matters most — it is the first thing an owner sees. | before store submission |
 
 ## Closed
 
@@ -17,6 +16,10 @@ pick it up. Reviewed at the start of each phase, and again before release.
 - **D4 `SegmentedButton` tint** — fixed in Phase 1 with a `segmentedButtonTheme` on `AppTheme`.
 - **D8 venue read cache** — Today in Phase 2, Calendar in Phase 3 (`venue_cache` table behind `LocalStore.readVenueCache` / `saveVenueCache`, wiped on sign-out). The Calendar keys per date (`calendar:<date>`), so yesterday's grid is never served for today. Customers is deliberately **not** cached: at the counter you want the truth, and the screen has a good empty state.
 - **D15 move a booking** — the calendar's move sheet does it, and the engine refuses a move onto a taken slot rather than forcing it.
+- **D2 onboarding photos bundled** — the five images are in `assets/photos/` and named in `lib/core/ui/photos.dart`, so Phase 3b's screens have them. They are still placeholders: see **D2b** above.
+- **D5 venue avatar** — one `VenueAvatar` widget now, used by the picker and More. It uses the accent pair (`pine` / `onPine`) rather than `pineInk` / `pineLine`: those two swap roles between the themes, which is exactly why the tile inverted in dark mode.
+- **D9 icon and splash** — a Fraunces "R" on pine, generated into `assets/brand/` and wired through `flutter_launcher_icons` and `flutter_native_splash` (both configured in `pubspec.yaml`, with a dark variant). Regenerate with `dart run flutter_launcher_icons` and `dart run flutter_native_splash:create`.
+- **D16 typed times** — `core/widgets/wall_clock_field.dart` gives the calendar sheets a real date and time picker. Both still deal in venue-local wall clock (`YYYY-MM-DD`, `HH:MM`), never instants, because that is what the server turns into a timestamp in the venue's own zone.
 
 ## Carry into later phases
 
@@ -24,12 +27,10 @@ pick it up. Reviewed at the start of each phase, and again before release.
 |---|---|---|
 | D6 | Real repositories for every contract row, against a mocked `HttpClientAdapter`; flip `Feature` flags as the backend ships. | 4 |
 | D7 | Deep-link **handler** (parser is done): `app_links` wiring, Android intent filters, iOS entitlements, and the well-known files hosted by the marketing site. | 4 |
-| D9 | App icon and splash — `assets/brand/` is empty, so both are still the Flutter defaults. | 4 |
 | D10 | Store listing, screenshots, data-safety answers, signing keystore. | 4 |
 | D11 | **Account deletion** is a store requirement now that sign-up is in-app (contract #34). | 3c |
 | D12 | Platform admin console — still undecided whether it moves into the app or stays web/CLI. **Decision needed.** | — |
 | D13 | Backend plan: none of the 34 endpoints exist. The app ships demoable in fake mode; `real` mode does nothing until they land. | separate plan |
-| D16 | **The calendar's time fields are typed, not picked.** New booking, move and block take "HH:MM" and "YYYY-MM-DD" as text. It validates, but a real date and time picker is the right control. | 3c (polish pass) |
 | D17 | **Sessions are read-only on the calendar.** Tapping open play explains itself rather than offering create/cancel (`session-actions.ts`), which is parked for v1.1 with memberships and promos. | v1.1 |
 | D14 | **Password reset finishes on the web.** `POST /mobile/auth/forgot-password` sends the email and the app says "check your email"; the in-app code entry (contract #26) is not built, so a staff member with no web access cannot actually reset. | 3b (with the signup/verify screens, which share the code field) |
 
