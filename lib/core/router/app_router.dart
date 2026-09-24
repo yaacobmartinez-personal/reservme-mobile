@@ -32,6 +32,7 @@ import '../../features/venue/calendar/presentation/calendar_screen.dart';
 import '../../features/venue/customers/presentation/customer_detail_screen.dart';
 import '../../features/venue/customers/presentation/customers_screen.dart';
 import '../../features/venue/more/presentation/more_screen.dart';
+import '../../features/venue/spaces/presentation/space_editor_screen.dart';
 import '../../features/venue/spaces/presentation/spaces_screen.dart';
 import '../../features/venue/today/presentation/today_screen.dart';
 import '../../features/venue/venues/application/selected_venue_controller.dart';
@@ -280,10 +281,8 @@ GoRouter appRouter(Ref ref) {
                     routes: [
                       GoRoute(
                         path: ':id',
-                        builder: (context, state) => const PlaceholderScreen(
-                          title: 'Space',
-                          board: 'G1 · Space editor',
-                          showBack: true,
+                        builder: (context, state) => SpaceEditorScreen(
+                          spaceId: state.pathParameters['id']!,
                         ),
                       ),
                     ],

@@ -18,6 +18,16 @@ abstract final class Money {
     return '${negative ? '-' : ''}${symbol(currency)}$body';
   }
 
+  /// Centavos as a plain major-unit string for a text field: "900" or
+  /// "900.50", with no symbol and no grouping, because the owner has to be
+  /// able to edit it. `SpaceInput.toCents` reads it back.
+  static String toMajorInput(int cents) {
+    if (cents <= 0) return '';
+    return cents % 100 == 0
+        ? '${cents ~/ 100}'
+        : (cents / 100).toStringAsFixed(2);
+  }
+
   /// "₱5.6k" / "₱38.4k" / "₱1.2M" for KPI tiles.
   static String compact(int cents, {String currency = 'PHP'}) {
     final value = cents / 100;

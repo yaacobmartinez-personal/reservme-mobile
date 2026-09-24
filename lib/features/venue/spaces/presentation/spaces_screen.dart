@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/money/money.dart';
+import '../../../../core/router/routes.dart';
 import '../../../../core/theme/palette.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/theme/typography.dart';
@@ -58,6 +60,7 @@ class SpacesScreen extends ConsumerWidget {
                 _SpaceCard(
                   space: space,
                   currency: venue.currency,
+                  onOpen: () => context.push(Routes.spaceEdit(space.id)),
                   onToggle: (active) => _toggle(context, ref, venue.slug, space, active),
                 ),
                 const SizedBox(height: Spacing.x3),
@@ -67,7 +70,7 @@ class SpacesScreen extends ConsumerWidget {
                 kind: BannerKind.info,
                 title: 'Pausing takes a space off sale immediately',
                 body: 'Bookings already made are kept — pause only stops new '
-                    'ones. Editing hours, pricing and photos is coming next.',
+                    'ones. Tap a space to edit its hours, pricing and photo.',
               ),
             ],
           ),
@@ -105,11 +108,13 @@ class _SpaceCard extends StatelessWidget {
   const _SpaceCard({
     required this.space,
     required this.currency,
+    required this.onOpen,
     required this.onToggle,
   });
 
   final SpaceSummary space;
   final String currency;
+  final VoidCallback onOpen;
   final ValueChanged<bool> onToggle;
 
   @override
@@ -127,6 +132,7 @@ class _SpaceCard extends StatelessWidget {
         : 'Paused · not bookable';
 
     return AppCard(
+      onTap: onOpen,
       child: Row(
         children: [
           // A space with a photo shows it; without one, the kind glyph —

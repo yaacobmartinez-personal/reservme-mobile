@@ -1,6 +1,9 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../../../core/model/enums.dart';
+import '../../../../core/model/opening_hours.dart';
+import 'space_detail.dart';
+import 'space_input.dart';
 
 part 'space_summary.freezed.dart';
 part 'space_summary.g.dart';
@@ -41,4 +44,49 @@ abstract class SpacesRepository {
 
   /// Owner and admin only; a member gets a 403 with the server's wording.
   Future<SpaceSummary> setActive(String venueSlug, String spaceId, bool active);
+
+  /// G1 · everything the editor shows for one space (contract #28).
+  Future<SpaceDetail> detail(String venueSlug, String spaceId);
+
+  Future<SpaceDetail> create(String venueSlug, SpaceInput input);
+
+  Future<SpaceDetail> update(String venueSlug, String spaceId, SpaceInput input);
+
+  /// Refused while the space still has bookings ahead of it — pausing is the
+  /// reversible thing to do, and the screen offers that instead.
+  Future<void> remove(String venueSlug, String spaceId);
+
+  /// Replaces the whole week at once, like `setOpeningHours`: a closed day
+  /// simply has no row.
+  Future<SpaceDetail> setHours(String venueSlug, String spaceId, HoursInput hours);
+
+  /// [image] is the bytes of an already-resized JPEG, or null to clear.
+  Future<SpaceDetail> setImage(String venueSlug, String spaceId, List<int>? image);
+
+  Future<SpaceDetail> addPricingRule(
+    String venueSlug,
+    String spaceId,
+    PricingRuleInput input,
+  );
+
+  Future<SpaceDetail> removePricingRule(
+    String venueSlug,
+    String spaceId,
+    String ruleId,
+  );
+
+  /// [spaceId] is the space whose editor is open — what to return. The
+  /// closure's own scope comes from [ClosureInput.spaceId], which is null for
+  /// a whole-venue shutdown.
+  Future<SpaceDetail> addClosure(
+    String venueSlug,
+    String spaceId,
+    ClosureInput input,
+  );
+
+  Future<SpaceDetail> removeClosure(
+    String venueSlug,
+    String spaceId,
+    String closureId,
+  );
 }
