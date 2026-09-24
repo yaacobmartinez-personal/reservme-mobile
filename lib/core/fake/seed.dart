@@ -320,19 +320,16 @@ void seedFakeStore(FakeStore store, DateTime now) {
   book(court2, today, '19:00', customers[9]);
   book(court2, today, '21:00', customers[4]);
   book(court1, today, '21:00', customers[11], party: 4);
-  // Court 3 blocked 18:00–20:00 for net repair.
+  // Court 3 blocked 18:00–20:00 for net repair. A staff block is a closure,
+  // not a reservation — same as the web's blockOff (calendar-actions.ts).
   final blockStart = AppTime.fromLocal(today, '18:00', zone)!;
-  store.reservations.add(FakeReservation(
-    id: store.nextId('r'),
+  store.closures.add(FakeClosure(
+    id: store.nextId('cl'),
     venueId: katipunan.id,
     spaceId: court3.id,
-    kind: ReservationKind.sessionBlock,
     startsAt: blockStart,
     endsAt: blockStart.add(const Duration(hours: 2)),
-    blockReason: 'Net repair',
-    reference: _reference(rnd),
-    manageToken: _token(rnd),
-    createdAt: now.subtract(const Duration(days: 1)),
+    reason: 'Net repair',
   ));
 
   // Next week: enough taken slots that the slot grid shows both states.

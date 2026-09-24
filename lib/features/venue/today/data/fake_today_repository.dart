@@ -56,15 +56,18 @@ class FakeTodayRepository implements TodayRepository {
 
     final entries = [for (final r in rows) _entry(r, zone)];
 
-    final allLive = _store
-        .reservationsOf(venue.id)
-        .where((r) => r.status.isLive && r.kind != ReservationKind.sessionSeat);
+    // The stats count what was *sold* — rentals and session seats — exactly as
+    // the web's getVenueStats does (`kind IN ('rental','session_seat')`). The
+    // run sheet above is the other way round: it rolls the seats up into their
+    // session's one line, because that is what the desk reads.
+    final allLive = _store.reservationsOf(venue.id).where((r) =>
+        r.status.isLive && r.kind != ReservationKind.sessionBlock);
     final todays = allLive.where((r) => AppTime.localDate(r.startsAt, zone) == date);
 
     return TodayView(
       date: date,
       stats: VenueStats(
-        todayCount: todays.where((r) => !r.isBlock).length,
+        todayCount: todays.length,
         checkedIn: todays.where((r) => r.checkedInAt != null).length,
         upcomingCount: allLive.where((r) => r.startsAt.isAfter(now)).length,
         activeSpaces: _store.spacesOf(venue.id, activeOnly: true).length,
@@ -156,7 +159,7 @@ class FakeTodayRepository implements TodayRepository {
       reference: r.reference,
       spaceName: space?.name ?? 'Space',
       customerId: customer?.id,
-      customerName: customer?.name ?? (r.isBlock ? 'Blocked' : session?.title),
+      customerName: customer?.name ?? session?.title,
       customerPhone: customer?.phone,
       label: AppTime.formatRange(r.startsAt, r.endsAt, zone),
       startsAt: r.startsAt,
