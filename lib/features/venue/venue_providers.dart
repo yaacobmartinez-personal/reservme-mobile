@@ -20,6 +20,9 @@ import 'settings/domain/venue_settings.dart';
 import 'spaces/data/fake_spaces_repository.dart';
 import 'spaces/data/real_spaces_repository.dart';
 import 'spaces/domain/space_summary.dart';
+import 'team/data/fake_team_repository.dart';
+import 'team/data/real_team_repository.dart';
+import 'team/domain/team.dart';
 import 'today/data/fake_today_repository.dart';
 import 'today/data/real_today_repository.dart';
 import 'today/domain/today_repository.dart';
@@ -113,3 +116,17 @@ SettingsRepository settingsRepository(Ref ref) =>
         _roleLookup(ref),
       ),
     };
+
+@Riverpod(keepAlive: true)
+TeamRepository teamRepository(Ref ref) => switch (ref.watch(apiModeProvider)) {
+  ApiMode.real => RealTeamRepository(ref.watch(apiClientProvider), ApiMode.real),
+  ApiMode.fake => FakeTeamRepository(
+    ref.watch(fakeStoreProvider),
+    ref.watch(fakeLatencyProvider),
+    ref.watch(clockProvider),
+    () => !ref.mounted || !ref.read(isOnlineProvider),
+    _roleLookup(ref),
+    // "You cannot change your own role" needs to know which member is you.
+    () => !ref.mounted ? null : ref.read(authControllerProvider).userOrNull?.id,
+  ),
+};

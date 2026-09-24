@@ -5,9 +5,9 @@ import '../../../../../core/money/money.dart';
 import '../../../../../core/theme/palette.dart';
 import '../../../../../core/theme/spacing.dart';
 import '../../../../../core/theme/typography.dart';
+import '../../../../../core/widgets/sheet_shell.dart';
 import '../../../../../core/widgets/wall_clock_field.dart';
 import '../../domain/space_input.dart';
-import 'sheet_shell.dart';
 
 /// G1 · a peak-price rule, ported from `addPricingRule`: at least one day, an
 /// end after the start, and a price that overrides the base inside that

@@ -5,8 +5,8 @@ import '../../../../../core/money/money.dart';
 import '../../../../../core/theme/palette.dart';
 import '../../../../../core/theme/spacing.dart';
 import '../../../../../core/theme/typography.dart';
+import '../../../../../core/widgets/sheet_shell.dart';
 import '../../domain/space_input.dart';
-import 'sheet_shell.dart';
 
 /// G1 · the basics, ported from `spaceSchema`. The price is typed in pesos and
 /// stored in centavos, the same conversion `toCents` does on the server.

@@ -35,6 +35,7 @@ import '../../features/venue/more/presentation/more_screen.dart';
 import '../../features/venue/settings/presentation/venue_settings_screen.dart';
 import '../../features/venue/spaces/presentation/space_editor_screen.dart';
 import '../../features/venue/spaces/presentation/spaces_screen.dart';
+import '../../features/venue/team/presentation/team_screen.dart';
 import '../../features/venue/today/presentation/today_screen.dart';
 import '../../features/venue/venues/application/selected_venue_controller.dart';
 import '../../features/venue/venues/presentation/venue_picker_screen.dart';
@@ -268,8 +269,11 @@ GoRouter appRouter(Ref ref) {
                     path: 'settings',
                     builder: (context, state) => const VenueSettingsScreen(),
                   ),
+                  GoRoute(
+                    path: 'team',
+                    builder: (context, state) => const TeamScreen(),
+                  ),
                   for (final (segment, title, board) in const [
-                    ('team', 'Team', 'G3 · Team'),
                     ('billing', 'Billing', 'G4 · Billing'),
                     ('insights', 'Insights', 'G5 · Insights'),
                     ('account', 'Your account', 'G7 · Owner account'),

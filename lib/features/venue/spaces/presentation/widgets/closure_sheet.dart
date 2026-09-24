@@ -4,9 +4,9 @@ import '../../../../../core/theme/palette.dart';
 import '../../../../../core/theme/spacing.dart';
 import '../../../../../core/theme/typography.dart';
 import '../../../../../core/time/app_time.dart';
+import '../../../../../core/widgets/sheet_shell.dart';
 import '../../../../../core/widgets/wall_clock_field.dart';
 import '../../domain/space_input.dart';
-import 'sheet_shell.dart';
 
 /// G1 · a closure, ported from `addClosure`. Venue-local wall clock in and
 /// out — the server builds the instant in the venue's own zone, which is why

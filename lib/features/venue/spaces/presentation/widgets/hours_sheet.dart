@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/model/opening_hours.dart';
+import '../../../../../core/widgets/sheet_shell.dart';
 import '../../../../../core/widgets/week_hours_editor.dart';
-import 'sheet_shell.dart';
 
 /// G1 · the week. Same grid as onboarding's O5, and the same rule: the whole
 /// week is written at once, so a day switched off simply loses its row.

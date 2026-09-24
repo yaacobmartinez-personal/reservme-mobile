@@ -292,3 +292,44 @@ final class SettingsRepositoryProvider
 
 String _$settingsRepositoryHash() =>
     r'556094b971c6b01deb0435074a955483e51b7232';
+
+@ProviderFor(teamRepository)
+final teamRepositoryProvider = TeamRepositoryProvider._();
+
+final class TeamRepositoryProvider
+    extends $FunctionalProvider<TeamRepository, TeamRepository, TeamRepository>
+    with $Provider<TeamRepository> {
+  TeamRepositoryProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'teamRepositoryProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$teamRepositoryHash();
+
+  @$internal
+  @override
+  $ProviderElement<TeamRepository> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  TeamRepository create(Ref ref) {
+    return teamRepository(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(TeamRepository value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<TeamRepository>(value),
+    );
+  }
+}
+
+String _$teamRepositoryHash() => r'49931905b0c2c036754953c9b1a3077392e99d6c';

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../../../../../core/theme/palette.dart';
-import '../../../../../core/theme/spacing.dart';
-import '../../../../../core/theme/typography.dart';
-import '../../../../../core/ui/app_banner.dart';
+import '../theme/palette.dart';
+import '../theme/spacing.dart';
+import '../theme/typography.dart';
+import '../ui/app_banner.dart';
 
-/// The chrome every space-editor sheet shares: a title, an optional subtitle,
+/// The chrome the venue-side editor sheets share: a title, an optional subtitle,
 /// the fields, an inline refusal, and one primary button.
 ///
 /// Refusals show in place rather than as a snackbar, because the field that
