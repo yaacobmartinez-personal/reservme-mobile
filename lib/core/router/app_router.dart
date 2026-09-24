@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../features/auth/application/auth_controller.dart';
+import '../../features/auth/application/auth_state.dart';
 import '../../features/auth/presentation/forgot_password_screen.dart';
 import '../../features/auth/presentation/login_screen.dart';
 import '../../features/auth/presentation/reset_password_screen.dart';
@@ -16,6 +17,7 @@ import '../../features/customer/wallet/presentation/booking_detail_screen.dart';
 import '../../features/customer/wallet/presentation/bookings_screen.dart';
 import '../../features/customer/wallet/presentation/import_booking_screen.dart';
 import '../../features/customer/wallet/presentation/reschedule_screen.dart';
+import '../../features/onboarding/application/onboarding_controller.dart';
 import '../../features/onboarding/presentation/create_venue_screen.dart';
 import '../../features/onboarding/presentation/first_space_screen.dart';
 import '../../features/onboarding/presentation/hours_screen.dart';
@@ -58,6 +60,23 @@ part 'app_router.g.dart';
 /// on the root navigator via [rootNavigatorKey].
 final rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 
+/// Where the app opens, which is not the same question as where a signed-in
+/// person belongs.
+///
+/// A brand-new install has never been pitched to. O0 is the front door for
+/// a venue owner — and the only screen where the two audiences meet, so it
+/// is also how a customer gets told they do not need an account. Skipping
+/// it leaves the customer Find tab as the app's whole first impression.
+String firstLocation({
+  required AuthState auth,
+  required AppMode mode,
+  required bool welcomeSeen,
+}) {
+  if (auth.hasVenueAccess && mode == AppMode.venue) return mode.home;
+  if (!welcomeSeen) return Routes.welcome;
+  return AppMode.customer.home;
+}
+
 @Riverpod(keepAlive: true)
 GoRouter appRouter(Ref ref) {
   final refresh = RouterRefresh(ref);
@@ -65,7 +84,11 @@ GoRouter appRouter(Ref ref) {
 
   final auth = ref.read(authControllerProvider);
   final mode = ref.read(appModeControllerProvider);
-  final initial = auth.hasVenueAccess && mode == AppMode.venue ? mode.home : AppMode.customer.home;
+  final initial = firstLocation(
+    auth: auth,
+    mode: mode,
+    welcomeSeen: ref.read(welcomeSeenProvider),
+  );
 
   return GoRouter(
     navigatorKey: rootNavigatorKey,
@@ -88,7 +111,7 @@ GoRouter appRouter(Ref ref) {
         ),
       ),
       GoRoute(
-        path: '/auth/reset',
+        path: Routes.resetPasswordPath,
         builder: (context, state) => ResetPasswordScreen(
           email: state.uri.queryParameters['email'] ?? '',
         ),

@@ -75,9 +75,6 @@ class BarChart extends StatelessWidget {
     if (values.isEmpty) return const SizedBox.shrink();
     final highest = values.reduce((a, b) => a > b ? a : b);
 
-    // At most six labels, whatever the window.
-    final every = (values.length / 6).ceil().clamp(1, values.length);
-
     return Column(
       children: [
         Expanded(
@@ -110,24 +107,32 @@ class BarChart extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 4),
+        // Three labels, not one per bar. A 30-day window gives each bar
+        // about 27 logical pixels, which clips "24/9" to "2" — worse than
+        // no axis at all, because it looks like data.
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            for (var i = 0; i < values.length; i++)
-              Expanded(
-                child: i % every == 0
-                    ? Text(
-                        _dayLabel(labels[i]),
-                        textAlign: TextAlign.center,
-                        maxLines: 1,
-                        overflow: TextOverflow.clip,
-                        style: AppType.caption.copyWith(color: p.ink3),
-                      )
-                    : const SizedBox.shrink(),
+            for (final label in _axisLabels)
+              Text(
+                label,
+                style: AppType.caption.copyWith(color: p.ink3),
               ),
           ],
         ),
       ],
     );
+  }
+
+  /// First, middle and last day of the window.
+  List<String> get _axisLabels {
+    if (labels.isEmpty) return const [];
+    if (labels.length < 3) return labels.map(_dayLabel).toList();
+    return [
+      _dayLabel(labels.first),
+      _dayLabel(labels[labels.length ~/ 2]),
+      _dayLabel(labels.last),
+    ];
   }
 
   /// "2026-09-24" → "24/9".

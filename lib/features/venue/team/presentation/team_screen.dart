@@ -98,6 +98,7 @@ class TeamScreen extends ConsumerWidget {
                     invite: invite,
                     canManage: data.canManage,
                     venueSlug: venue.slug,
+                    timezone: venue.timezone,
                   ),
                   const SizedBox(height: Spacing.x2),
                 ],
@@ -252,11 +253,16 @@ class _InviteCard extends ConsumerWidget {
     required this.invite,
     required this.canManage,
     required this.venueSlug,
+    required this.timezone,
   });
 
   final PendingInvite invite;
   final bool canManage;
   final String venueSlug;
+
+  /// Every date in the app is shown in the venue's own zone; an expiry
+  /// rendered in UTC lands on the wrong day for most of a Manila evening.
+  final String timezone;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

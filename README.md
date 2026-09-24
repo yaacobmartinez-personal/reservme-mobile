@@ -1,8 +1,9 @@
 # ReservMe (mobile)
 
-> **Status:** Phase 2 — the customer booking loop and the venue desk both
-> work against the in-app fake world. Onboarding, calendar and customers fill
-> in next; the backend is a separate plan.
+> **Status:** Phase 4 — every screen in the plan is built and works against
+> the in-app fake world: the customer booking loop, the venue desk, onboarding,
+> and the owner half (spaces, settings, team, billing, insights, account).
+> What is left is a backend to talk to, and a device to prove it on.
 
 Flutter app for [ReservMe](https://reservme.pro), booking software for
 Philippine venues — courts, studios, rooms, tours. One app, two modes:
@@ -21,9 +22,9 @@ Design: the canvas at https://claude.ai/artifact/AwVPCW5bJKPBXo5RJBp7ek
 |---|---|
 | <img src="docs/images/o0-welcome.png" alt="Welcome screen: a floodlit padel court at dusk under the headline 'Your courts, booked while you sleep', with a 'Start your venue — first month free' button" width="300"> | <img src="docs/images/c1-find-a-venue.png" alt="Find a venue screen: a venue-code field prefixed reservme.pro/, a 'Scan a venue QR' button, and recently visited venues" width="300"> |
 
-Both are boards from the canvas, not app screenshots: C1 ships (Phase 1), O0
-lands with onboarding in Phase 3b. The photo is an AI-generated placeholder
-to be replaced before store submission (`docs/DEFERRED.md`, D2).
+Both are boards from the canvas, not app screenshots — the app has not been
+walked on a device yet (`docs/DEFERRED.md`, D18). The photo is an
+AI-generated placeholder to be replaced before store submission (D2b).
 
 ## Run
 
@@ -54,6 +55,9 @@ flutter test
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — modes, layers, `API_MODE`, the design system in code
 - [docs/API-CONTRACT.md](docs/API-CONTRACT.md) — backend contract (#1–#34)
 - [docs/DEFERRED.md](docs/DEFERRED.md) — everything knowingly left undone, and the phase that picks it up
+- [docs/RELEASE.md](docs/RELEASE.md) — what must be true before a build ships, signing, deep-link verification
+- [docs/STORE-LISTING.md](docs/STORE-LISTING.md) — store copy, data-safety answers, screenshot list (draft)
+- [docs/MAC-SETUP.md](docs/MAC-SETUP.md) — building the iOS side on a Mac
 
 ## Toolchain
 

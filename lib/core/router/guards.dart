@@ -11,7 +11,9 @@ import 'routes.dart';
 ///   the customer home; one that expired goes to login and comes back here.
 /// - `/v/*` with no selected venue: one membership auto-selects (handled by
 ///   the venue controller), several go to the picker.
-/// - Auth screens bounce a signed-in person to `from` (or their shell home).
+/// - Auth screens bounce a signed-in person to `from` (or their shell home) —
+///   except the reset screen, which is also how you change a password you
+///   still know, from the account screen.
 /// - Onboarding steps after sign-up need a session; the welcome and sign-up
 ///   screens do not.
 String? computeRedirect({
@@ -24,7 +26,11 @@ String? computeRedirect({
   final signedIn = auth.isSignedIn;
 
   if (path.startsWith('/auth/')) {
-    if (signedIn) return afterSignInTarget(from: uri.queryParameters['from'], auth: auth);
+    // Changing your password is the reset flow with the address already
+    // known, so a signed-in person belongs on this one.
+    if (signedIn && path != Routes.resetPasswordPath) {
+      return afterSignInTarget(from: uri.queryParameters['from'], auth: auth);
+    }
     return null;
   }
 

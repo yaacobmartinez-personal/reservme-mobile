@@ -475,7 +475,7 @@ class _Closures extends ConsumerWidget {
                                 style: AppType.bodyStrong,
                               ),
                               Text(
-                                '${AppTime.formatWhen(closure.startsAt, closure.endsAt, timezone)}'
+                                '${_closureWhen(closure, timezone)}'
                                 '${closure.isWholeVenue ? ' · whole venue' : ''}',
                                 style: AppType.bodyS.copyWith(color: p.ink3),
                               ),
@@ -613,6 +613,32 @@ class _Danger extends ConsumerWidget {
       messenger.showSnackBar(SnackBar(content: Text(AsyncView.messageFor(e))));
     }
   }
+}
+
+/// When a closure runs, in words that survive the awkward cases.
+///
+/// `formatWhen` renders one day with a time range, which turns an all-day
+/// closure into "Thu 29 Oct · 00:00–00:00" — a window that reads as covering
+/// no time at all. A closure that starts and ends at midnight is stated as
+/// whole days, and one that crosses midnight names both dates.
+String _closureWhen(ClosureView closure, String timezone) {
+  String dayOf(DateTime i) => AppTime.formatDay(i, timezone);
+  String timeOf(DateTime i) => AppTime.formatTime(i, timezone);
+
+  final startDay = dayOf(closure.startsAt);
+
+  if (closure.coversWholeDays(timeOf)) {
+    // The end is exclusive: midnight on the 30th closes the 29th.
+    final lastDay = dayOf(closure.endsAt.subtract(const Duration(minutes: 1)));
+    return startDay == lastDay
+        ? '$startDay · all day'
+        : '$startDay – $lastDay · all day';
+  }
+
+  final endDay = dayOf(closure.endsAt);
+  return startDay == endDay
+      ? '$startDay · ${timeOf(closure.startsAt)}–${timeOf(closure.endsAt)}'
+      : '$startDay ${timeOf(closure.startsAt)} – $endDay ${timeOf(closure.endsAt)}';
 }
 
 /// Runs a write and surfaces whatever the server refused with. Every editor
