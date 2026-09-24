@@ -30,9 +30,23 @@ abstract class AuthRepository {
   /// this endpoint would tell an attacker which emails exist.
   Future<void> requestPasswordReset(String email);
 
+  /// Finishes the reset in the app with the code from the email
+  /// (API-CONTRACT #26). Throws `ApiError(400)` for a wrong or stale code.
+  Future<void> resetPassword({
+    required String email,
+    required String code,
+    required String password,
+  });
+
   /// Confirms the token and refreshes the venue list.
   Future<Me> me();
 
   /// Best-effort: the app forgets the session either way.
   Future<void> signOut();
+
+  /// Deletes the account and everything that belongs only to it
+  /// (API-CONTRACT #34). Refused with `ApiError(409, reason: 'sole_owner')`
+  /// when the user solely owns a venue — it would be left with nobody who
+  /// can pay for it or hand it on, and the message names which.
+  Future<void> deleteAccount();
 }

@@ -86,6 +86,20 @@ class AuthController extends _$AuthController {
   Future<void> requestPasswordReset(String email) =>
       ref.read(authRepositoryProvider).requestPasswordReset(email);
 
+  /// Finishes a reset in the app (D14). Deliberately does **not** sign the
+  /// user in: they land back on the login screen and use the password they
+  /// just chose, which is the moment it sticks in the memory.
+  Future<void> resetPassword({
+    required String email,
+    required String code,
+    required String password,
+  }) =>
+      ref.read(authRepositoryProvider).resetPassword(
+            email: email,
+            code: code,
+            password: password,
+          );
+
   /// Pull the venue list from `/me`. This is also what confirms a restored
   /// token: a 401 here signs the app out through [UnauthorizedEvents].
   Future<List<VenueMembership>> refreshVenues() async {
@@ -153,5 +167,13 @@ class AuthController extends _$AuthController {
     await ref.read(prefsProvider).setString(Prefs.keySelectedVenue, null);
     ref.read(appModeControllerProvider.notifier).set(AppMode.customer);
     state = AuthState.signedOut(reason: reason);
+  }
+
+  /// Deletes the account, then ends the session locally. A refusal leaves
+  /// everything as it was, so the screen can explain and the user can go and
+  /// hand the venue over first.
+  Future<void> deleteAccount() async {
+    await ref.read(authRepositoryProvider).deleteAccount();
+    await signOut(reason: SignOutReason.accountDeleted);
   }
 }

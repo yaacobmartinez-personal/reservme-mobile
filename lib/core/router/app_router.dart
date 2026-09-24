@@ -5,6 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../features/auth/application/auth_controller.dart';
 import '../../features/auth/presentation/forgot_password_screen.dart';
 import '../../features/auth/presentation/login_screen.dart';
+import '../../features/auth/presentation/reset_password_screen.dart';
 import '../../features/customer/account/presentation/account_screen.dart';
 import '../../features/customer/booking/presentation/booking_form_screen.dart';
 import '../../features/customer/booking/presentation/space_day_screen.dart';
@@ -26,13 +27,18 @@ import '../../features/onboarding/presentation/welcome_screen.dart';
 import '../../features/shell/application/app_mode_controller.dart';
 import '../../features/shell/presentation/animated_branches.dart';
 import '../../features/shell/presentation/customer_shell.dart';
-import '../../features/shell/presentation/placeholder_screen.dart';
 import '../../features/shell/presentation/venue_shell.dart';
+import '../../features/venue/account/presentation/owner_account_screen.dart';
+import '../../features/venue/billing/presentation/billing_screen.dart';
 import '../../features/venue/calendar/presentation/calendar_screen.dart';
 import '../../features/venue/customers/presentation/customer_detail_screen.dart';
 import '../../features/venue/customers/presentation/customers_screen.dart';
+import '../../features/venue/insights/presentation/insights_screen.dart';
 import '../../features/venue/more/presentation/more_screen.dart';
+import '../../features/venue/settings/presentation/venue_settings_screen.dart';
+import '../../features/venue/spaces/presentation/space_editor_screen.dart';
 import '../../features/venue/spaces/presentation/spaces_screen.dart';
+import '../../features/venue/team/presentation/team_screen.dart';
 import '../../features/venue/today/presentation/today_screen.dart';
 import '../../features/venue/venues/application/selected_venue_controller.dart';
 import '../../features/venue/venues/presentation/venue_picker_screen.dart';
@@ -79,6 +85,12 @@ GoRouter appRouter(Ref ref) {
         pageBuilder: (context, state) => sharedAxisPage(
           state: state,
           child: LoginScreen(from: state.uri.queryParameters['from']),
+        ),
+      ),
+      GoRoute(
+        path: '/auth/reset',
+        builder: (context, state) => ResetPasswordScreen(
+          email: state.uri.queryParameters['email'] ?? '',
         ),
       ),
       GoRoute(
@@ -262,28 +274,34 @@ GoRouter appRouter(Ref ref) {
                     path: 'waitlist',
                     builder: (context, state) => const WaitlistScreen(),
                   ),
-                  for (final (segment, title, board) in const [
-                    ('settings', 'Venue settings', 'G2 · Venue settings'),
-                    ('team', 'Team', 'G3 · Team'),
-                    ('billing', 'Billing', 'G4 · Billing'),
-                    ('insights', 'Insights', 'G5 · Insights'),
-                    ('account', 'Your account', 'G7 · Owner account'),
-                  ])
-                    GoRoute(
-                      path: segment,
-                      builder: (context, state) =>
-                          PlaceholderScreen(title: title, board: board, showBack: true),
-                    ),
+                  GoRoute(
+                    path: 'settings',
+                    builder: (context, state) => const VenueSettingsScreen(),
+                  ),
+                  GoRoute(
+                    path: 'team',
+                    builder: (context, state) => const TeamScreen(),
+                  ),
+                  GoRoute(
+                    path: 'billing',
+                    builder: (context, state) => const BillingScreen(),
+                  ),
+                  GoRoute(
+                    path: 'insights',
+                    builder: (context, state) => const InsightsScreen(),
+                  ),
+                  GoRoute(
+                    path: 'account',
+                    builder: (context, state) => const OwnerAccountScreen(),
+                  ),
                   GoRoute(
                     path: 'spaces',
                     builder: (context, state) => const SpacesScreen(),
                     routes: [
                       GoRoute(
                         path: ':id',
-                        builder: (context, state) => const PlaceholderScreen(
-                          title: 'Space',
-                          board: 'G1 · Space editor',
-                          showBack: true,
+                        builder: (context, state) => SpaceEditorScreen(
+                          spaceId: state.pathParameters['id']!,
                         ),
                       ),
                     ],

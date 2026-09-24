@@ -202,3 +202,16 @@ enum BillingStatus {
         orElse: () => BillingStatus.trialing,
       );
 }
+
+/// Platform billing policy constants, shared by the billing feature and the
+/// fake world that has to seed a suspended venue.
+abstract final class BillingPolicy {
+  /// Days a venue stays live after its free month or paid period ends
+  /// (`GRACE_DAYS` in `src/lib/billing.ts`).
+  static const graceDays = 10;
+
+  /// Marks a suspension the billing system created for non-payment. The exact
+  /// string is the contract: an approved payment clears a suspension with this
+  /// reason and only this reason, so an admin's manual suspension survives.
+  static const suspendReason = 'Overdue — unpaid past the grace period';
+}
