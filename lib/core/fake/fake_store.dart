@@ -290,7 +290,6 @@ class FakeReservation {
     required this.reference,
     required this.manageToken,
     this.notes,
-    this.blockReason,
     required this.createdAt,
   });
 
@@ -311,12 +310,7 @@ class FakeReservation {
   final String reference;
   final String manageToken;
   String? notes;
-
-  /// Set on staff block-offs (a `session_block` with no session).
-  String? blockReason;
   final DateTime createdAt;
-
-  bool get isBlock => kind == ReservationKind.sessionBlock && sessionId == null;
 }
 
 class FakeWaitlistEntry {

@@ -144,9 +144,10 @@ class RoundIconButton extends StatelessWidget {
 /// Screen header with an eyebrow line, a serif title, and an optional
 /// trailing widget (design canvas: Today, Bookings, Customers, More).
 class BigHeader extends StatelessWidget {
-  const BigHeader({super.key, required this.eyebrow, required this.title, this.trailing});
+  const BigHeader({super.key, this.eyebrow, required this.title, this.trailing});
 
-  final String eyebrow;
+  /// The small line above the title. Some screens (Calendar) have none.
+  final String? eyebrow;
   final String title;
   final Widget? trailing;
 
@@ -161,8 +162,10 @@ class BigHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(eyebrow, style: AppType.caption.copyWith(color: p.ink3)),
-                const SizedBox(height: 2),
+                if (eyebrow != null) ...[
+                  Text(eyebrow!, style: AppType.caption.copyWith(color: p.ink3)),
+                  const SizedBox(height: 2),
+                ],
                 Text(title, style: AppType.displayAt(28).copyWith(color: p.ink)),
               ],
             ),

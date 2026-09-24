@@ -136,20 +136,14 @@ class RunSheetRow extends StatelessWidget {
     );
   }
 
-  /// Blocks and sessions are not people: nothing to check in.
-  bool get _canAct =>
-      !entry.isSession &&
-      entry.status.isLive &&
-      entry.customerName != 'Blocked';
+  /// A session line is a roll-up, not a person: nothing to check in.
+  bool get _canAct => !entry.isSession && entry.status.isLive;
 
   Widget _chip(BuildContext context) {
     if (entry.isSession && entry.sessionCapacity != null) {
       return StatusChip(
         '${entry.sessionBooked ?? 0} of ${entry.sessionCapacity}',
       );
-    }
-    if (entry.customerName == 'Blocked') {
-      return const StatusChip('Blocked', tone: ChipTone.neutral);
     }
     if (entry.isCheckedIn) {
       return StatusChip(

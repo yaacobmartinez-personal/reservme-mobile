@@ -144,6 +144,28 @@ abstract final class AppTime {
     return inZone(start, zone).weekday % 7;
   }
 
+  /// Wall-clock arithmetic on "HH:MM", staying inside the day. Used to step
+  /// the calendar grid and to move a block's end with its start — neither
+  /// wants an instant, because neither has a date until the venue supplies
+  /// one.
+  static String addMinutesToTime(String time, int minutes) {
+    final parts = time.trim().split(':');
+    if (parts.length != 2) return time;
+    final h = int.tryParse(parts[0]), m = int.tryParse(parts[1]);
+    if (h == null || m == null) return time;
+    final total = (h * 60 + m + minutes).clamp(0, 24 * 60);
+    return '${_two(total ~/ 60)}:${_two(total % 60)}';
+  }
+
+  /// Minutes from midnight for an "HH:MM", or null when it is not a time.
+  static int? minutesOfDay(String time) {
+    final parts = time.trim().split(':');
+    if (parts.length != 2) return null;
+    final h = int.tryParse(parts[0]), m = int.tryParse(parts[1]);
+    if (h == null || m == null) return null;
+    return h * 60 + m;
+  }
+
   /// Every zone this build knows, for the venue timezone picker.
   static List<String> supportedTimeZones() {
     ensureInitialized();

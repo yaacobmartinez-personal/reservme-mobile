@@ -20,10 +20,15 @@ import '../../features/shell/presentation/animated_branches.dart';
 import '../../features/shell/presentation/customer_shell.dart';
 import '../../features/shell/presentation/placeholder_screen.dart';
 import '../../features/shell/presentation/venue_shell.dart';
+import '../../features/venue/calendar/presentation/calendar_screen.dart';
+import '../../features/venue/customers/presentation/customer_detail_screen.dart';
+import '../../features/venue/customers/presentation/customers_screen.dart';
 import '../../features/venue/more/presentation/more_screen.dart';
+import '../../features/venue/spaces/presentation/spaces_screen.dart';
 import '../../features/venue/today/presentation/today_screen.dart';
 import '../../features/venue/venues/application/selected_venue_controller.dart';
 import '../../features/venue/venues/presentation/venue_picker_screen.dart';
+import '../../features/venue/waitlist/presentation/waitlist_screen.dart';
 import 'guards.dart';
 import 'router_refresh.dart';
 import 'routes.dart';
@@ -221,8 +226,9 @@ GoRouter appRouter(Ref ref) {
             routes: [
               GoRoute(
                 path: Routes.venueCalendar,
-                builder: (context, state) =>
-                    const PlaceholderScreen(title: 'Calendar', board: 'V7 · Calendar'),
+                builder: (context, state) => CalendarScreen(
+                  initialDate: state.uri.queryParameters['date'],
+                ),
               ),
             ],
           ),
@@ -230,15 +236,12 @@ GoRouter appRouter(Ref ref) {
             routes: [
               GoRoute(
                 path: Routes.venueCustomers,
-                builder: (context, state) =>
-                    const PlaceholderScreen(title: 'Customers', board: 'V10 · Customers'),
+                builder: (context, state) => const CustomersScreen(),
                 routes: [
                   GoRoute(
                     path: ':id',
-                    builder: (context, state) => const PlaceholderScreen(
-                      title: 'Customer',
-                      board: 'V11 · Customer detail',
-                      showBack: true,
+                    builder: (context, state) => CustomerDetailScreen(
+                      customerId: state.pathParameters['id']!,
                     ),
                   ),
                 ],
@@ -251,8 +254,11 @@ GoRouter appRouter(Ref ref) {
                 path: Routes.venueMore,
                 builder: (context, state) => const MoreScreen(),
                 routes: [
+                  GoRoute(
+                    path: 'waitlist',
+                    builder: (context, state) => const WaitlistScreen(),
+                  ),
                   for (final (segment, title, board) in const [
-                    ('waitlist', 'Waitlist', 'V13 · Waitlist'),
                     ('settings', 'Venue settings', 'G2 · Venue settings'),
                     ('team', 'Team', 'G3 · Team'),
                     ('billing', 'Billing', 'G4 · Billing'),
@@ -266,11 +272,7 @@ GoRouter appRouter(Ref ref) {
                     ),
                   GoRoute(
                     path: 'spaces',
-                    builder: (context, state) => const PlaceholderScreen(
-                      title: 'Spaces',
-                      board: 'V14 · Spaces',
-                      showBack: true,
-                    ),
+                    builder: (context, state) => const SpacesScreen(),
                     routes: [
                       GoRoute(
                         path: ':id',
