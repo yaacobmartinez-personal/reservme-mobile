@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reservme/core/model/enums.dart';
+import 'package:reservme/core/router/app_router.dart';
 import 'package:reservme/core/router/guards.dart';
 import 'package:reservme/core/router/routes.dart';
 import 'package:reservme/features/auth/application/auth_state.dart';
@@ -92,6 +93,50 @@ void main() {
 
     test('is reachable signed out too, which is where a reset starts', () {
       expect(go('/auth/reset?email=a%40b.co', const AuthState.signedOut()), isNull);
+    });
+  });
+
+  group('where the app opens', () {
+    test('a brand-new install is pitched to, not dropped on Find', () {
+      // O0 is the front door for an owner, and the only screen where the two
+      // audiences meet. Nothing else in the app navigates to it, so if the
+      // first location skips it, it is unreachable.
+      expect(
+        firstLocation(
+          auth: const AuthState.signedOut(),
+          mode: AppMode.customer,
+          welcomeSeen: false,
+        ),
+        Routes.welcome,
+      );
+    });
+
+    test('once it has been seen, the app opens where you left off', () {
+      expect(
+        firstLocation(
+          auth: const AuthState.signedOut(),
+          mode: AppMode.customer,
+          welcomeSeen: true,
+        ),
+        AppMode.customer.home,
+      );
+    });
+
+    test('signed-in staff go to their desk, seen or not', () {
+      for (final seen in [true, false]) {
+        expect(
+          firstLocation(auth: oneVenue, mode: AppMode.venue, welcomeSeen: seen),
+          AppMode.venue.home,
+          reason: 'welcomeSeen: $seen',
+        );
+      }
+    });
+
+    test('a signed-in customer-mode session still gets the customer home', () {
+      expect(
+        firstLocation(auth: oneVenue, mode: AppMode.customer, welcomeSeen: true),
+        AppMode.customer.home,
+      );
     });
   });
 }
