@@ -17,9 +17,12 @@ Future<ProviderContainer> pumpApp(
   required TestWorld world,
   List<Override> extraOverrides = const [],
   Future<void> Function(ProviderContainer container)? setup,
+  /// Physical pixels. The default is phone-shaped; a long form (onboarding)
+  /// wants a taller one so its fields are built rather than below the fold.
+  Size surface = const Size(1080, 2400),
 }) async {
   // A phone-shaped surface so lists show more than three rows.
-  tester.view.physicalSize = const Size(1080, 2400);
+  tester.view.physicalSize = surface;
   tester.view.devicePixelRatio = 3;
   addTearDown(tester.view.reset);
   final router = GoRouter(

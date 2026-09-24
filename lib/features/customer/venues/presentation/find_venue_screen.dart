@@ -144,7 +144,7 @@ class _FindVenueScreenState extends ConsumerState<FindVenueScreen> {
               title: 'Run a venue?',
               body: hasVenueAccess
                   ? 'Switch to venue mode for the run sheet.'
-                  : 'Sign in as staff to open the run sheet.',
+                  : 'Sign in as staff, or set one up in a few minutes.',
               actionLabel: hasVenueAccess ? 'Switch' : 'Sign in',
               onAction: () {
                 if (hasVenueAccess) {

@@ -29,69 +29,65 @@ part 'venue_providers.g.dart';
 
 @Riverpod(keepAlive: true)
 TodayRepository todayRepository(Ref ref) => switch (ref.watch(apiModeProvider)) {
-      ApiMode.real => RealTodayRepository(ref.watch(apiClientProvider), ApiMode.real),
-      ApiMode.fake => FakeTodayRepository(
-          ref.watch(fakeStoreProvider),
-          ref.watch(fakeLatencyProvider),
-          ref.watch(clockProvider),
-          () => !ref.read(isOnlineProvider),
-        ),
-    };
+  ApiMode.real => RealTodayRepository(ref.watch(apiClientProvider), ApiMode.real),
+  ApiMode.fake => FakeTodayRepository(
+    ref.watch(fakeStoreProvider),
+    ref.watch(fakeLatencyProvider),
+    ref.watch(clockProvider),
+    () => !ref.mounted || !ref.read(isOnlineProvider),
+  ),
+};
 
 @Riverpod(keepAlive: true)
-CalendarRepository calendarRepository(Ref ref) =>
-    switch (ref.watch(apiModeProvider)) {
-      ApiMode.real =>
-        RealCalendarRepository(ref.watch(apiClientProvider), ApiMode.real),
-      ApiMode.fake => FakeCalendarRepository(
-          ref.watch(fakeStoreProvider),
-          ref.watch(fakeLatencyProvider),
-          ref.watch(clockProvider),
-          () => !ref.read(isOnlineProvider),
-        ),
-    };
+CalendarRepository calendarRepository(Ref ref) => switch (ref.watch(apiModeProvider)) {
+  ApiMode.real => RealCalendarRepository(ref.watch(apiClientProvider), ApiMode.real),
+  ApiMode.fake => FakeCalendarRepository(
+    ref.watch(fakeStoreProvider),
+    ref.watch(fakeLatencyProvider),
+    ref.watch(clockProvider),
+    () => !ref.mounted || !ref.read(isOnlineProvider),
+  ),
+};
 
 @Riverpod(keepAlive: true)
-CustomersRepository customersRepository(Ref ref) =>
-    switch (ref.watch(apiModeProvider)) {
-      ApiMode.real =>
-        RealCustomersRepository(ref.watch(apiClientProvider), ApiMode.real),
-      ApiMode.fake => FakeCustomersRepository(
-          ref.watch(fakeStoreProvider),
-          ref.watch(fakeLatencyProvider),
-          ref.watch(clockProvider),
-          () => !ref.read(isOnlineProvider),
-        ),
-    };
+CustomersRepository customersRepository(Ref ref) => switch (ref.watch(apiModeProvider)) {
+  ApiMode.real => RealCustomersRepository(ref.watch(apiClientProvider), ApiMode.real),
+  ApiMode.fake => FakeCustomersRepository(
+    ref.watch(fakeStoreProvider),
+    ref.watch(fakeLatencyProvider),
+    ref.watch(clockProvider),
+    () => !ref.mounted || !ref.read(isOnlineProvider),
+  ),
+};
 
 @Riverpod(keepAlive: true)
 VenueWaitlistRepository venueWaitlistRepository(Ref ref) =>
     switch (ref.watch(apiModeProvider)) {
-      ApiMode.real =>
-        RealWaitlistRepository(ref.watch(apiClientProvider), ApiMode.real),
+      ApiMode.real => RealWaitlistRepository(ref.watch(apiClientProvider), ApiMode.real),
       ApiMode.fake => FakeWaitlistRepository(
-          ref.watch(fakeStoreProvider),
-          ref.watch(fakeLatencyProvider),
-          () => !ref.read(isOnlineProvider),
-        ),
+        ref.watch(fakeStoreProvider),
+        ref.watch(fakeLatencyProvider),
+        () => !ref.mounted || !ref.read(isOnlineProvider),
+      ),
     };
 
 @Riverpod(keepAlive: true)
 SpacesRepository spacesRepository(Ref ref) => switch (ref.watch(apiModeProvider)) {
-      ApiMode.real =>
-        RealSpacesRepository(ref.watch(apiClientProvider), ApiMode.real),
-      ApiMode.fake => FakeSpacesRepository(
-          ref.watch(fakeStoreProvider),
-          ref.watch(fakeLatencyProvider),
-          ref.watch(clockProvider),
-          () => !ref.read(isOnlineProvider),
-          // The fake enforces the same owner/admin rule the server does, so
-          // it needs to know who is asking.
-          (slug) => ref
+  ApiMode.real => RealSpacesRepository(ref.watch(apiClientProvider), ApiMode.real),
+  ApiMode.fake => FakeSpacesRepository(
+    ref.watch(fakeStoreProvider),
+    ref.watch(fakeLatencyProvider),
+    ref.watch(clockProvider),
+    () => !ref.mounted || !ref.read(isOnlineProvider),
+    // The fake enforces the same owner/admin rule the server does, so
+    // it needs to know who is asking.
+    (slug) => !ref.mounted
+        ? null
+        : ref
               .read(authControllerProvider)
               .venuesOrEmpty
               .where((v) => v.slug == slug)
               .map((v) => v.role)
               .firstOrNull,
-        ),
-    };
+  ),
+};

@@ -53,7 +53,7 @@ final class TodayRepositoryProvider
   }
 }
 
-String _$todayRepositoryHash() => r'83db73d5139f76357430322f78a2fc0d6669d5ec';
+String _$todayRepositoryHash() => r'a4d73b28408465702bc56cb54314c3a7b0de6d0a';
 
 @ProviderFor(calendarRepository)
 final calendarRepositoryProvider = CalendarRepositoryProvider._();
@@ -101,7 +101,7 @@ final class CalendarRepositoryProvider
 }
 
 String _$calendarRepositoryHash() =>
-    r'fde57f66f93a8f9e70b76b4a6bd45eff58530d46';
+    r'0ccdfe6d3f8dfa2f7489dd8dda55e15056f2e7bb';
 
 @ProviderFor(customersRepository)
 final customersRepositoryProvider = CustomersRepositoryProvider._();
@@ -149,7 +149,7 @@ final class CustomersRepositoryProvider
 }
 
 String _$customersRepositoryHash() =>
-    r'006b008101a0f91e8c3d584892026083cc02a938';
+    r'78c8669ade1c0fb95ca4c2d13f5655f65b81c8ea';
 
 @ProviderFor(venueWaitlistRepository)
 final venueWaitlistRepositoryProvider = VenueWaitlistRepositoryProvider._();
@@ -197,7 +197,7 @@ final class VenueWaitlistRepositoryProvider
 }
 
 String _$venueWaitlistRepositoryHash() =>
-    r'04844b77e2ef4b71868917c8e8f77daf8a39359f';
+    r'79029403eb92ded64d1f4ed4bba13bf273bc1670';
 
 @ProviderFor(spacesRepository)
 final spacesRepositoryProvider = SpacesRepositoryProvider._();
@@ -243,4 +243,4 @@ final class SpacesRepositoryProvider
   }
 }
 
-String _$spacesRepositoryHash() => r'3bb2e3416b74129ac572c0a06ec752c7e03b0a66';
+String _$spacesRepositoryHash() => r'9943b4d9130c71dc9cd0c251508104f08080ae56';

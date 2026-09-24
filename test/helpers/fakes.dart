@@ -86,6 +86,7 @@ class TestWorld {
     AppTime.ensureInitialized();
     seedFakeStore(store, this.now);
     _online = online;
+    _bootOverride = bootDataProvider.overrideWithValue(boot);
     overrides = [
       // Stream.multi rather than an async* generator: a generator parks on
       // its first yield until something listens, so a later setOnline never
@@ -107,7 +108,7 @@ class TestWorld {
       localStoreProvider.overrideWithValue(local),
       secureStoreProvider.overrideWithValue(secure),
       prefsProvider.overrideWithValue(prefs),
-      bootDataProvider.overrideWithValue(boot),
+      _bootOverride,
       // Looping animations would keep pumpAndSettle waiting forever.
       motionSettingsProvider.overrideWith(ReducedMotion.new),
     ];
@@ -128,6 +129,7 @@ class TestWorld {
   /// Push true/false to simulate the network coming and going.
   final StreamController<bool> connectivity;
   bool _online = true;
+  late final Override _bootOverride;
   late final List<Override> overrides;
 
   void setOnline(bool value) {
@@ -142,6 +144,26 @@ class TestWorld {
       await connectivity.close();
       await local.dispose();
     });
+    return c;
+  }
+
+  /// A second container over the *same* storage, with `BootData` re-read from
+  /// it — which is what relaunching the app actually does. A plain
+  /// [container] keeps the world's fixed boot data, so it can never see a
+  /// session or a draft that the first container wrote.
+  Future<ProviderContainer> relaunch() async {
+    final boot = await BootData.load(secure, prefs);
+    final c = ProviderContainer(
+      // Replace the world's fixed boot data rather than adding a second
+      // override of it, which Riverpod refuses.
+      overrides: [
+        for (final o in overrides)
+          if (o != _bootOverride) o,
+        bootDataProvider.overrideWithValue(boot),
+      ],
+      retry: appRetryPolicy,
+    );
+    addTearDown(c.dispose);
     return c;
   }
 }

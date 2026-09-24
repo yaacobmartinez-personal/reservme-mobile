@@ -12,6 +12,10 @@ import 'domain/auth_repository.dart';
 
 part 'auth_providers.g.dart';
 
+/// Reading through a captured [Ref] after its provider is gone throws, and
+/// these closures outlive a request: an in-flight `/me` can land after the
+/// container is torn down. A disposed ref reads as "no token" and "offline",
+/// which the repositories already handle, rather than crashing.
 @Riverpod(keepAlive: true)
 AuthRepository authRepository(Ref ref) => switch (ref.watch(apiModeProvider)) {
       ApiMode.real => RealAuthRepository(ref.watch(apiClientProvider), ApiMode.real),
@@ -19,7 +23,7 @@ AuthRepository authRepository(Ref ref) => switch (ref.watch(apiModeProvider)) {
           ref.watch(fakeStoreProvider),
           ref.watch(fakeLatencyProvider),
           ref.watch(clockProvider),
-          () => !ref.read(isOnlineProvider),
-          () => ref.read(currentTokenProvider),
+          () => !ref.mounted || !ref.read(isOnlineProvider),
+          () => ref.mounted ? ref.read(currentTokenProvider) : null,
         ),
     };
