@@ -32,6 +32,7 @@ import '../../features/venue/calendar/presentation/calendar_screen.dart';
 import '../../features/venue/customers/presentation/customer_detail_screen.dart';
 import '../../features/venue/customers/presentation/customers_screen.dart';
 import '../../features/venue/more/presentation/more_screen.dart';
+import '../../features/venue/settings/presentation/venue_settings_screen.dart';
 import '../../features/venue/spaces/presentation/space_editor_screen.dart';
 import '../../features/venue/spaces/presentation/spaces_screen.dart';
 import '../../features/venue/today/presentation/today_screen.dart';
@@ -263,8 +264,11 @@ GoRouter appRouter(Ref ref) {
                     path: 'waitlist',
                     builder: (context, state) => const WaitlistScreen(),
                   ),
+                  GoRoute(
+                    path: 'settings',
+                    builder: (context, state) => const VenueSettingsScreen(),
+                  ),
                   for (final (segment, title, board) in const [
-                    ('settings', 'Venue settings', 'G2 · Venue settings'),
                     ('team', 'Team', 'G3 · Team'),
                     ('billing', 'Billing', 'G4 · Billing'),
                     ('insights', 'Insights', 'G5 · Insights'),
