@@ -406,7 +406,8 @@ class _Results extends ConsumerWidget {
                                     Text(
                                       [
                                         if ((hit.phone ?? '').isNotEmpty) hit.phone!,
-                                        if (hit.visits > 0) '${hit.visits} visits',
+                                        if (hit.visits > 0)
+                                          hit.visits == 1 ? '1 visit' : '${hit.visits} visits',
                                       ].join(' · '),
                                       style: AppType.caption.copyWith(color: p.ink3),
                                     ),

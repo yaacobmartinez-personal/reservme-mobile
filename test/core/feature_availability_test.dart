@@ -26,6 +26,7 @@ void main() {
         Feature.onboarding,
         Feature.venueSettings,
         Feature.today,
+        Feature.calendar,
       };
 
       final shipped = {
@@ -54,10 +55,9 @@ void main() {
       expect(isAvailable(Feature.today, ApiMode.real), isTrue);
     });
 
-    test('the other three venue tabs are still shut', () {
-      // Calendar, Customers and Waitlist are #16-#23. Today is the only tab of
-      // the venue shell that works against a real server.
-      expect(isAvailable(Feature.calendar, ApiMode.real), isFalse);
+    test('the last two venue tabs are still shut', () {
+      // The Calendar's typeahead shares the customer search (#20), but the
+      // Customers screen needs #21 and #22 too, and the waitlist needs #23.
       expect(isAvailable(Feature.customers, ApiMode.real), isFalse);
       expect(isAvailable(Feature.venueWaitlist, ApiMode.real), isFalse);
     });

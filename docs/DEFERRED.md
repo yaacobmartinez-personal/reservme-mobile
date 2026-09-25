@@ -29,6 +29,8 @@ pick it up. Reviewed at the start of each phase, and again before release.
 
 - **A hold read as "Confirmed" on the run sheet.** Found the moment a real server put a held booking on the sheet: the chip switch had no `held` case, so it fell through to the default. A hold is unpaid and expires, and the slot frees up when it does — telling the desk it is confirmed is the one wrong answer that reads as reassuring. It says **Held** now, in amber, and beats the customer's no-show count because it describes the booking in front of you rather than the person. The seed had no hold at all, so the first version of the regression test passed by finding nothing to check; today's seed carries one now and the test asserts that first.
 
+- **"1 visits" in the booking typeahead.** A customer with one booking read "1 visits" — the first thing a member reads about somebody standing at the counter. The codebase already spells singulars out inline for no-shows, so this now matches. The regression test asserts a hit was *found* before asserting the wording, because `findsNothing` on its own passes just as happily against an empty list.
+
 ## Carry into later phases
 
 | # | Item | Phase |
@@ -37,7 +39,7 @@ pick it up. Reviewed at the start of each phase, and again before release.
 | D7 | Deep-link **handler** (parser is done): `app_links` wiring, Android intent filters, iOS entitlements, and the well-known files hosted by the marketing site. | 4 |
 | D10 | Store listing, screenshots, data-safety answers, signing keystore. | 4 |
 | D12 | Platform admin console — still undecided whether it moves into the app or stays web/CLI. **Decision needed.** | — |
-| D13 | Backend. **Auth, onboarding and the desk landed 2026-09-25** (rows 10–15, 24–28, 30, 34 — web repo, on Neon). O0 → O7 and Today were both walked on a device against the real database. Live flags: `venueLogin`, `signup`, `onboarding`, `venueSettings`, `today`, `deleteAccount`. **Row 16 (Calendar) is next.** `spaces` stays shut until **#29** (pricing rules, closures) lands, because one flag gates the whole repository. | separate plan |
+| D13 | Backend. **Auth, onboarding, the desk and the calendar landed 2026-09-25** (rows 10–20, 24–28, 30, 34 — web repo, on Neon). O0 → O7, Today and the Calendar were all walked on a device against the real database. Live flags: `venueLogin`, `signup`, `onboarding`, `venueSettings`, `today`, `calendar`, `deleteAccount`. **Rows 21–22 (Customers) are next**, then #23 (waitlist) and #29 (pricing rules, closures) — the last of which is what keeps `spaces` shut, since one flag gates the whole repository. | separate plan |
 | D17 | **Sessions are read-only on the calendar.** Tapping open play explains itself rather than offering create/cancel (`session-actions.ts`), which is parked for v1.1 with memberships and promos. | v1.1 |
 
 ## Product questions open
