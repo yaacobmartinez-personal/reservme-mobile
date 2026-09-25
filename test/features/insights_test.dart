@@ -43,6 +43,30 @@ void main() {
       expect(Kpi.delta(50, 100), -50.0);
       expect(Kpi.delta(1, 3), -66.7);
     });
+
+    test('no change is neither good news nor bad', () {
+      // Found on a device against a real venue whose takings were identical
+      // to the month before: the card painted 0.0% red, which tells an owner
+      // their takings fell when they did not move.
+      const flat = Kpi(value: 900, previous: 900, deltaPct: 0);
+      expect(flat.isGood(), isNull);
+      expect(flat.isGood(lowerIsBetter: true), isNull);
+
+      // And with no baseline at all there is nothing to judge either.
+      const first = Kpi(value: 900, previous: 0);
+      expect(first.isGood(), isNull);
+    });
+
+    test('up is good, unless lower is better', () {
+      const up = Kpi(value: 150, previous: 100, deltaPct: 50);
+      const down = Kpi(value: 50, previous: 100, deltaPct: -50);
+
+      expect(up.isGood(), isTrue);
+      expect(down.isGood(), isFalse);
+      // No-shows: fewer is the win.
+      expect(up.isGood(lowerIsBetter: true), isFalse);
+      expect(down.isGood(lowerIsBetter: true), isTrue);
+    });
   });
 
   group('the dashboard', () {

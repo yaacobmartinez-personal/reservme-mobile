@@ -362,6 +362,7 @@ class FakeBillingPayment {
     required this.paidAt,
     this.status = 'submitted',
     this.note,
+    this.receiptUrl,
     required this.createdAt,
   });
 
@@ -369,6 +370,9 @@ class FakeBillingPayment {
   final String venueId;
   final int amountCents;
   final String reference;
+
+  /// The screenshot of the transfer, when one was attached.
+  final String? receiptUrl;
 
   /// The venue-local date the owner says they transferred, "YYYY-MM-DD".
   final String paidAt;

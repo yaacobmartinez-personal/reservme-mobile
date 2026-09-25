@@ -91,6 +91,10 @@ class FakeBillingRepository implements BillingRepository {
       amountCents: state.amountDueCents!,
       reference: input.reference.trim(),
       paidAt: input.paidAt,
+      // The real server stores the bytes and hands back a URL; the fake has
+      // nowhere to put them, so it records that one was attached rather than
+      // pretending none was.
+      receiptUrl: receipt == null ? null : 'fake://receipt',
       createdAt: _clock(),
     ));
 
@@ -128,6 +132,7 @@ class FakeBillingRepository implements BillingRepository {
           paidAt: p.paidAt,
           status: _status(p.status),
           note: p.note,
+          receiptUrl: p.receiptUrl,
           createdAt: p.createdAt,
         ),
     ];

@@ -74,8 +74,10 @@ enum Feature {
 /// #29 existed would have opened the editor with two buttons that refuse,
 /// which is the same wall the sign-up flow used to walk into.
 ///
-/// What is still false is the customer half (#1–#9) and the three owner
-/// screens behind More: team (#31), billing (#32) and insights (#33).
+/// The venue side is complete as of 2026-09-26 — every flag below it is true.
+/// What is still false is the customer half, #1–#9: the public booking loop,
+/// which is the part a member of the public touches rather than a member of
+/// staff.
 const Map<Feature, bool> _shippedOnRealServer = {
   Feature.customerBrowse: false, // #1, #2
   Feature.customerBooking: false, // #3, #4
@@ -89,11 +91,11 @@ const Map<Feature, bool> _shippedOnRealServer = {
   Feature.venueWaitlist: true, // #23 — live
   Feature.spaces: true, // #24, #28, #29 — live
   Feature.signup: true, // #25, #26 — live
-  Feature.onboarding: true, // #27, #28 — live (#29 is not, see below)
+  Feature.onboarding: true, // #27, #28 — live
   Feature.venueSettings: true, // #30 — live
-  Feature.team: false, // #31
-  Feature.billing: false, // #32
-  Feature.insights: false, // #33
+  Feature.team: true, // #31 — live
+  Feature.billing: true, // #32 — live
+  Feature.insights: true, // #33 — live
   Feature.deleteAccount: true, // #34 — live
 };
 

@@ -221,11 +221,7 @@ class _KpiTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = context.palette;
     final delta = kpi.deltaPct;
-    final good = delta == null
-        ? null
-        : lowerIsBetter
-            ? delta < 0
-            : delta > 0;
+    final good = kpi.isGood(lowerIsBetter: lowerIsBetter);
 
     return AppCard(
       child: Column(
