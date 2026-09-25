@@ -88,7 +88,9 @@ void main() {
   });
 
   group('waitlist', () {
-    test('entries come back oldest first, with their status', () async {
+    test('entries come back soonest slot first', () async {
+      // The order the desk reads the queue in, and the server's own ORDER BY:
+      // the slot that is closest to happening is the one worth watching.
       final world = TestWorld();
       final container = world.container();
 
@@ -97,23 +99,26 @@ void main() {
       expect(entries, isNotEmpty);
       for (var i = 1; i < entries.length; i++) {
         expect(
-          entries[i].createdAt.isBefore(entries[i - 1].createdAt),
+          entries[i].startsAt.isBefore(entries[i - 1].startsAt),
           isFalse,
-          reason: 'oldest first',
+          reason: 'soonest slot first',
         );
       }
     });
 
-    test('a notified entry counts down its claim window', () async {
+    test('a notified entry has no claim countdown', () async {
+      // There is no claim window on the server: being notified is an email
+      // with a booking link, and whoever books first keeps the slot. A
+      // deadline the server does not enforce would be a promise the venue
+      // could not keep, so neither mode invents one (DEFERRED D19).
       final world = TestWorld();
       final container = world.container();
       final entries = await container.read(venueWaitlistProvider(slug).future);
-      final notified = entries.where((e) => e.isNotified);
+      final notified = entries.where((e) => e.isNotified).toList();
 
+      expect(notified, isNotEmpty, reason: 'the seed has a notified entry');
       for (final entry in notified) {
-        final left = entry.minutesLeft(testNow);
-        expect(left, isNotNull);
-        expect(left, greaterThanOrEqualTo(0));
+        expect(entry.minutesLeft(testNow), isNull);
       }
     });
 

@@ -4,8 +4,8 @@ import '../../../../core/network/api_error.dart';
 import '../../../../core/time/app_time.dart';
 import '../domain/waitlist_entry.dart';
 
-/// In-memory [VenueWaitlistRepository]. Oldest first, because that is the
-/// order the server's auto-fill offers a freed slot in.
+/// In-memory [VenueWaitlistRepository]. Soonest slot first, then join order
+/// within a slot — the same ORDER BY `listWaitlist` uses on the server.
 class FakeWaitlistRepository implements VenueWaitlistRepository {
   FakeWaitlistRepository(this._store, this._latency, this._offline);
 
@@ -23,7 +23,10 @@ class FakeWaitlistRepository implements VenueWaitlistRepository {
     final zone = venue.timezone;
 
     final rows = _store.waitlistOf(venue.id).toList()
-      ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+      ..sort((a, b) {
+        final slot = a.startsAt.compareTo(b.startsAt);
+        return slot != 0 ? slot : a.createdAt.compareTo(b.createdAt);
+      });
 
     return [
       for (final w in rows)
@@ -41,7 +44,8 @@ class FakeWaitlistRepository implements VenueWaitlistRepository {
             status: w.status,
             createdAt: w.createdAt,
             notifiedAt: w.notifiedAt,
-            claimExpiresAt: w.claimExpiresAt,
+            // Always null on the real server, so the fake does not invent one.
+            claimExpiresAt: null,
           ),
     ];
   }

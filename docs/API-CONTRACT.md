@@ -86,10 +86,10 @@ CustomerSummary { id, name, email, phone?, visits, noShowCount, tags[], lastVisi
 | 17 | `POST /mobile/venues/{slug}/bookings` | member | `{spaceId, date, time, slotCount, partySize, notes?, customerId? \| name, email, phone?}` → `201 {booking}` | 400, 409 `slot_taken` | `createManualBooking` (staff path) |
 | 18 | `POST /mobile/venues/{slug}/bookings/{id}/move` | member | `{spaceId, date, time}` → `{booking}` | 409 | `moveReservation` |
 | 19 | `POST /mobile/venues/{slug}/blocks` · `DELETE …/blocks/{id}` | member | `{spaceId?, date, from, to, reason?}` → `201 {block}` | 409 overlap | `blockOff`, `removeBlock` |
-| 20 | `GET /mobile/venues/{slug}/customers?q=&cursor=` | member | → `{customers: [CustomerSummary], next?}` | 403 | `searchCustomers` |
-| 21 | `GET /mobile/venues/{slug}/customers/{id}` | member | → `{customer, bookings: [Booking], notes: [{id, body, authorName, createdAt}]}` | 404 | customer detail page |
-| 22 | `POST …/customers/{id}/notes` · `DELETE …/notes/{noteId}` · `PUT …/customers/{id}/tags` · `PATCH …/customers/{id}` | member | per `customer-actions.ts` | 400, 404 | `customer-actions.ts` |
-| 23 | `GET /mobile/venues/{slug}/waitlist` | member | → `{entries: [{id, customerName, spaceName, startsAt, endsAt, status, notifiedAt?, claimExpiresAt?, createdAt}]}` | 403 | waitlist page |
+| 20 | `GET /mobile/venues/{slug}/customers?q=&segment=` | member | → `{rows: [CustomerSummary], total}` — `segment` is `regulars\|noShows\|newThisMonth`, anything else is no filter | 403 | `listCustomers` |
+| 21 | `GET /mobile/venues/{slug}/customers/{id}` | member | → `{customer: CustomerSummary, upcoming: [CustomerBooking], past: [CustomerBooking], notes: [{id, body, authorName, createdAt}], lastVisit}` | 404 | `getCustomer` |
+| 22 | `POST …/customers/{id}/notes` · `DELETE …/customers/{id}/notes/{noteId}` · `PUT …/customers/{id}/tags {tags:[]}` · `PATCH …/customers/{id} {name, phone}` | member | → `{note}` / `{ok}` / `{customer}` / `{customer}` | 400 `fieldErrors`, 404 | `customer-actions.ts` |
+| 23 | `GET /mobile/venues/{slug}/waitlist` | member | → `{entries: [{id, customerName, customerEmail, customerPhone, spaceName, startsAt, endsAt, whenLabel, status, notifiedAt, claimExpiresAt, createdAt}]}` | 403 | `listWaitlist` |
 | 24 | `GET /mobile/venues/{slug}/spaces` · `POST …/spaces/{id}/active {active}` | member (toggle: admin) | → `{spaces}` / `{space}` | 403 | `setSpaceActive` |
 | 25 | `POST /mobile/auth/signup` `{name, email, password}` → `{token, user}` · `POST /mobile/auth/verify` `{code}` → `{user}` · `POST /mobile/auth/resend-verification` | none / bearer | owner account + 6-digit email code | 400 fieldErrors, 409 email taken, 429 | Better Auth signUp.email + verification |
 | 26 | `POST /mobile/auth/reset-password` | none | `{email, code, password}` → `{token, user}` | 400 bad code | Better Auth reset |
@@ -159,15 +159,38 @@ axis comes from opening hours rather than from what is booked, each lane
 carries its **own** slot length, and a venue-wide closure is drawn in **every**
 lane — filtering on `space_id` alone puts it in none and hides a closed venue.
 
-`Feature.signup`, `onboarding`, `venueSettings`, `today` and `calendar` are now
-`true`. Two that look like they should have moved and have not:
+**Rows 21–23 shipped after that** — the customer's own page, the CRM writes and
+the waitlist. All four venue tabs are now live, which is the point where a venue
+can run a day on the app with no web dashboard anywhere. Four things worth
+restating:
+
+- **One page shape for two readers.** The Calendar's typeahead and the Customers
+  screen call the same endpoint (#20) and used to disagree about the key —
+  `customers` for one, `rows` for the other, so the screen would have come back
+  empty. It is `{rows, total}` for both, and `total` is what the header counts
+  (it differs from `rows.length` as soon as a venue passes one 25-row page).
+- **The segment chips filter on the server.** They were being sent and silently
+  ignored. `regulars` is new on the server side — somebody who has been back,
+  rather than somebody who came once.
+- **Tags are set as a whole list**, not appended one at a time as on the web.
+  The app edits a chip row and saves it, which also makes the write idempotent:
+  a retry after a dropped connection cannot duplicate a tag.
+- **Email is not editable** on #22, deliberately: it is the `(organization_id,
+  email)` key the booking engine matches returning customers on, so changing it
+  would either collide or split one person into two.
+
+`Feature.signup`, `onboarding`, `venueSettings`, `today`, `calendar`,
+`customers` and `venueWaitlist` are now `true`. One that looks like it should
+have moved and has not:
 
 - **`spaces`** gates every method on `RealSpacesRepository`, pricing rules and
   closures included — those are **#29**. Turning it on would open the space
   editor with two buttons that refuse.
-- **`customers`** — the Calendar's typeahead already uses the same search
-  (**#20**), but the Customers screen needs **#21** and **#22** as well.
-- **`venueWaitlist`** is **#23**.
+
+**`claimExpiresAt` is always null** and the app must not draw a countdown from
+nothing. There is no claim window on the server: `promoteWaitlist` emails the
+earliest match a booking link, and whoever books first keeps the slot. Tracked
+as D19.
 
 ## Backend follow-ups outside the contract
 

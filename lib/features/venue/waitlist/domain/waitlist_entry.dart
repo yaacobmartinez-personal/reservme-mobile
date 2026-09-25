@@ -35,7 +35,9 @@ abstract class WaitlistEntry with _$WaitlistEntry {
 
   bool get isNotified => status == WaitlistStatus.notified;
 
-  /// Minutes left on the claim link, or null when this entry has none.
+  /// Minutes left on the claim link, or null when this entry has none — which
+  /// on the real server is always, because being notified is an email and
+  /// whoever books first wins. See docs/DEFERRED.md D19.
   int? minutesLeft(DateTime now) {
     if (claimExpiresAt == null) return null;
     final left = claimExpiresAt!.difference(now).inMinutes;
@@ -44,6 +46,7 @@ abstract class WaitlistEntry with _$WaitlistEntry {
 }
 
 abstract class VenueWaitlistRepository {
-  /// Oldest first — the order the auto-fill will offer the slot in.
+  /// Soonest slot first, and within a slot the order the auto-fill will offer
+  /// it in — which is the order the desk reads the queue in.
   Future<List<WaitlistEntry>> entries(String venueSlug);
 }

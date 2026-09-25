@@ -27,6 +27,8 @@ void main() {
         Feature.venueSettings,
         Feature.today,
         Feature.calendar,
+        Feature.customers,
+        Feature.venueWaitlist,
       };
 
       final shipped = {
@@ -55,11 +57,17 @@ void main() {
       expect(isAvailable(Feature.today, ApiMode.real), isTrue);
     });
 
-    test('the last two venue tabs are still shut', () {
-      // The Calendar's typeahead shares the customer search (#20), but the
-      // Customers screen needs #21 and #22 too, and the waitlist needs #23.
-      expect(isAvailable(Feature.customers, ApiMode.real), isFalse);
-      expect(isAvailable(Feature.venueWaitlist, ApiMode.real), isFalse);
+    test('all four venue tabs are open', () {
+      // Today, Calendar, Customers and the waitlist behind More: a venue can
+      // run a whole day on the app without a web dashboard anywhere.
+      for (final feature in [
+        Feature.today,
+        Feature.calendar,
+        Feature.customers,
+        Feature.venueWaitlist,
+      ]) {
+        expect(isAvailable(feature, ApiMode.real), isTrue, reason: feature.name);
+      }
     });
 
     test('every feature has an explicit entry, not a default', () {

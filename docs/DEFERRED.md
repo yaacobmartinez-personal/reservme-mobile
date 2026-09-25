@@ -31,6 +31,14 @@ pick it up. Reviewed at the start of each phase, and again before release.
 
 - **"1 visits" in the booking typeahead.** A customer with one booking read "1 visits" — the first thing a member reads about somebody standing at the counter. The codebase already spells singulars out inline for no-shows, so this now matches. The regression test asserts a hit was *found* before asserting the wording, because `findsNothing` on its own passes just as happily against an empty list.
 
+- **A note refused after its dialog had already closed.** "Write something first." arrived as a snackbar behind a dismissed dialog, so a rejected note took whatever had been typed with it. The dialog validates in place now and stays open with the refusal under the field.
+
+- **#22's PATCH had no way in.** `updateContact` had a repository method, a controller method, a real endpoint and a passing mapping test — and no screen anywhere that called it, so a venue could not fix a mistyped phone number. Same shape as the Welcome screen that had a route and nothing that navigated to it. There is a pencil on the customer's header now. The email sits in that dialog as text rather than a field, because it is the `(venue, email)` key returning customers are matched on.
+
+- **"Notified" read as "Waiting".** The waitlist chip only said *Notified* when there was a countdown to show — and on the real server there never is one. So every customer who had already been emailed a booking link appeared to the desk as still waiting. See D19.
+
+- **Two readers of one endpoint disagreed about its key.** The Calendar's typeahead read `customers`, the Customers screen read `rows`, and the server sent `customers` — so the screen would have shown nothing against a real server while the typeahead worked. Both read `{rows, total}` now. Nothing caught this in fake mode, where each repository shapes its own answer and the two never have to agree.
+
 ## Carry into later phases
 
 | # | Item | Phase |
@@ -39,7 +47,9 @@ pick it up. Reviewed at the start of each phase, and again before release.
 | D7 | Deep-link **handler** (parser is done): `app_links` wiring, Android intent filters, iOS entitlements, and the well-known files hosted by the marketing site. | 4 |
 | D10 | Store listing, screenshots, data-safety answers, signing keystore. | 4 |
 | D12 | Platform admin console — still undecided whether it moves into the app or stays web/CLI. **Decision needed.** | — |
-| D13 | Backend. **Auth, onboarding, the desk and the calendar landed 2026-09-25** (rows 10–20, 24–28, 30, 34 — web repo, on Neon). O0 → O7, Today and the Calendar were all walked on a device against the real database. Live flags: `venueLogin`, `signup`, `onboarding`, `venueSettings`, `today`, `calendar`, `deleteAccount`. **Rows 21–22 (Customers) are next**, then #23 (waitlist) and #29 (pricing rules, closures) — the last of which is what keeps `spaces` shut, since one flag gates the whole repository. | separate plan |
+| D13 | Backend. **Auth, onboarding, the desk and the calendar landed 2026-09-25** (rows 10–20, 24–28, 30, 34 — web repo, on Neon). O0 → O7, Today and the Calendar were all walked on a device against the real database. Live flags: `venueLogin`, `signup`, `onboarding`, `venueSettings`, `today`, `calendar`, `deleteAccount`. **Rows 21–23 landed the same day** (Customers and the waitlist), so all four venue tabs run against the real database. What is left on the venue side is #29 (pricing rules, closures — this is what keeps `spaces` shut, since one flag gates the whole repository), #31 team, #32 billing and #33 insights; then the whole customer half, #1–#9. | separate plan |
+| D19 | **The waitlist has no claim window.** The app can draw a "12 min left" countdown on a notified entry, and the server has nothing behind it: `promoteWaitlist` sends an email with a booking link and whoever books first keeps the slot. `claimExpiresAt` is null in both modes rather than invented in one. Giving it a real deadline means holding the slot server-side, which is a booking-engine change, not a field. | v1.1 |
+| D20 | **The customer list is one page of 25.** `listCustomers` pages; the app sends no cursor and shows no paging control, so a venue with more than 25 customers sees the first 25 and a `total` that says there are more. Fine for a search-led screen, wrong for scrolling — needs either a cursor or infinite scroll before a busy venue notices. | v1.1 |
 | D17 | **Sessions are read-only on the calendar.** Tapping open play explains itself rather than offering create/cancel (`session-actions.ts`), which is parked for v1.1 with memberships and promos. | v1.1 |
 
 ## Product questions open

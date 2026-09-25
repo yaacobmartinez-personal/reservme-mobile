@@ -216,6 +216,90 @@ void main() {
 
       expect(find.text('Prefers Court 3.'), findsOneWidget);
     });
+
+    testWidgets('an empty note is refused without losing the dialog',
+        (tester) async {
+      // The refusal used to arrive after the dialog had already closed, which
+      // threw away whatever had been typed.
+      final world = TestWorld();
+      final container = await pumpApp(
+        tester,
+        const CustomersScreen(),
+        world: world,
+        extraOverrides: asOwner,
+      );
+      await tester.pumpAndSettle();
+      final someone =
+          (await container.read(customersProvider(katipunan.slug).future))
+              .rows
+              .first;
+
+      await tester.pumpWidget(const SizedBox());
+      await pumpApp(
+        tester,
+        CustomerDetailScreen(customerId: someone.id),
+        world: world,
+        extraOverrides: asOwner,
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Add note'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField).last, '   ');
+      await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Write something first.'), findsOneWidget);
+      // Still open, so the note can be corrected rather than retyped.
+      expect(find.text('Add a note'), findsOneWidget);
+    });
+
+    testWidgets('a phone number can be corrected from the detail screen',
+        (tester) async {
+      // #22's PATCH had a repository, a controller and an endpoint, and no
+      // screen that reached any of them.
+      final world = TestWorld();
+      final container = await pumpApp(
+        tester,
+        const CustomersScreen(),
+        world: world,
+        extraOverrides: asOwner,
+      );
+      await tester.pumpAndSettle();
+      final someone =
+          (await container.read(customersProvider(katipunan.slug).future))
+              .rows
+              .first;
+
+      await tester.pumpWidget(const SizedBox());
+      await pumpApp(
+        tester,
+        CustomerDetailScreen(customerId: someone.id),
+        world: world,
+        extraOverrides: asOwner,
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip('Edit contact'));
+      await tester.pumpAndSettle();
+
+      // The email is shown but not offered as a field: it is the key the
+      // booking engine matches returning customers on.
+      expect(find.textContaining(someone.email), findsWidgets);
+      expect(find.widgetWithText(TextField, someone.email), findsNothing);
+
+      await tester.enterText(find.byType(TextField).first, '   ');
+      await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+      await tester.pumpAndSettle();
+      expect(find.text("Name can't be empty."), findsOneWidget);
+
+      await tester.enterText(find.byType(TextField).first, 'Ramona Cruz');
+      await tester.enterText(find.byType(TextField).at(1), '+63 917 555 0000');
+      await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Ramona Cruz'), findsWidgets);
+    });
   });
 
   group('spaces', () {
@@ -237,7 +321,7 @@ void main() {
   });
 
   group('waitlist', () {
-    testWidgets('shows the queue oldest first with the auto-fill note',
+    testWidgets('shows the queue soonest first with the auto-fill note',
         (tester) async {
       final world = TestWorld();
       await pumpApp(
@@ -249,11 +333,13 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Auto-fills on cancellation'), findsOneWidget);
-      expect(find.textContaining('oldest first'), findsOneWidget);
+      expect(find.textContaining('soonest slot first'), findsOneWidget);
       // The queue runs past the fold, so look into the list, not just the
       // painted part of it.
       expect(find.text('Waiting', skipOffstage: false), findsWidgets);
-      expect(find.textContaining('Notified', skipOffstage: false), findsWidgets);
+      // "Notified" with no countdown after it — someone who has been emailed
+      // must not read as still waiting just because there is no deadline.
+      expect(find.text('Notified', skipOffstage: false), findsWidgets);
     });
   });
 }
