@@ -124,9 +124,18 @@ Three things the built server settled that this document had only guessed at:
 - **Verification codes are 6 digits, hashed at rest, good for 10 minutes**, and
   are a second channel beside the web's links rather than a replacement.
 
-`Feature.signup` stays shut although #25 and #26 are live: sign-up leads into
-"name your venue" (#27), which does not exist. **Row 27 is the next one to
-build** — until it does, a new account can be created and has nowhere to go.
+**Row 27 shipped the same day**: `POST /mobile/venues` and
+`GET /mobile/venues/slug-available`. Three rows must exist after it — Better
+Auth's organisation, our `venue`, and a trialing `subscription` — and the org
+is rolled back by hand if the other two fail, because a half-made venue shows
+in the picker and falls over on every screen. The slug check needs a session
+(the slug space is global, so anonymous it enumerates venues) and answers 200
+even when the answer is no.
+
+`Feature.onboarding` is still `false`, and so is `Feature.signup`. O4 and O5
+need **#28** (create a space, set hours) and O7 needs **#30** (the policy
+PATCH). Until those land, row 27 is built and dormant: a new account can be
+created and still has nowhere to go.
 
 ## Backend follow-ups outside the contract
 
