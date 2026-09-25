@@ -400,8 +400,9 @@ void main() {
     test('a gated feature refuses before it reaches the network', () async {
       final (:client, :stub) = stubbedClient([const Reply.ok({})]);
 
+      // Team (#31) is the gate that is still shut; spaces opened with #29.
       await expectLater(
-        RealSpacesRepository(client, ApiMode.real).list('katipunan'),
+        RealTeamRepository(client, ApiMode.real).get('katipunan'),
         throwsA(isA<ApiError>().having((e) => e.status, 'status', 501)),
       );
       // Nothing was sent: the point of the gate is not to call a 404.

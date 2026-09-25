@@ -95,7 +95,7 @@ CustomerSummary { id, name, email, phone?, visits, noShowCount, tags[], lastVisi
 | 26 | `POST /mobile/auth/reset-password` | none | `{email, code, password}` → `{token, user}` | 400 bad code | Better Auth reset |
 | 27 | `POST /mobile/venues` · `GET /mobile/venues/slug-available?slug=` | bearer | `{name, slug, timezone, address?, currency?}` → `201 {venue: VenueMembership}` (trialing subscription) | 400, 409 slug taken | `/api/venue/init`, slug rules |
 | 28 | `POST /mobile/venues/{slug}/spaces` · `PATCH …/spaces/{id}` · `DELETE …/spaces/{id}` · `PUT …/spaces/{id}/hours` `[{weekday, opensAt, closesAt}]` · `POST …/spaces/{id}/image` (multipart `image`, ≤2 MB) · `DELETE …/spaces/{id}/image` | admin | space editor; the photo is optional and every surface shows the kind placeholder without one | 400, 404, 413 | `createSpace`, `updateSpace`, `setOpeningHours`, `updateSpaceImage`, `/api/upload` |
-| 29 | `POST …/spaces/{id}/pricing-rules` · `DELETE …/pricing-rules/{id}` · `POST /mobile/venues/{slug}/closures` · `DELETE …/closures/{id}` · `POST …/sessions` · `POST …/sessions/{id}/cancel` | admin | pricing, closures, open-play sessions | 400, 409 | `addPricingRule`, `addClosure`, `session-actions.ts` |
+| 29 | `POST …/spaces/{id}/pricing-rules` · `DELETE …/spaces/{id}/pricing-rules/{ruleId}` · `POST …/closures` · `DELETE …/closures/{closureId}?forSpaceId=` | admin | each answers `{space}` — the whole space, so the editor redraws in one round trip | 400 `fieldErrors`, 404 | `addPricingRule`, `addClosure` |
 | 30 | `PATCH /mobile/venues/{slug}` · `POST …/branding/{logo\|cover}` (multipart) | admin | settings: tagline, address, theme, cancellation, notice/horizon, refund terms, gcash name, timezone | 400 | `updateVenueSettings`, `branding-actions.ts` |
 | 31 | `GET …/team` · `POST …/team/invitations` `{email, role}` · `DELETE …/team/invitations/{id}` · `PATCH …/team/members/{id}` `{role}` · `DELETE …/team/members/{id}` | admin (owner for owner role) | → `{members: [{id, userId, name, email, role, isSelf, joinedAt}], invitations: [{id, email, role, expiresAt}]}` | 403, 409 `last_owner` | Better Auth org plugin + last-owner guard |
 | 32 | `GET …/billing` · `POST …/billing/proof` (multipart: `reference`, `paidAt`, `image`) | owner/admin | → `{band, activeSpaces, status, trialEndsAt, paidUntil?, daysLeftInTrial, dueNow, suspended, instapay, pendingPayment?, history: []}`. The amount is **not** an input — the server derives it from the band, so a venue cannot declare what it owes; and the band itself is derived from the **active** space count at read time, never stored | 400 | `src/lib/billing.ts`, `billing-actions.ts` |
@@ -179,13 +179,29 @@ restating:
   email)` key the booking engine matches returning customers on, so changing it
   would either collide or split one person into two.
 
-`Feature.signup`, `onboarding`, `venueSettings`, `today`, `calendar`,
-`customers` and `venueWaitlist` are now `true`. One that looks like it should
-have moved and has not:
+**Every venue-side flag is now `true`**: `venueLogin`, `signup`, `onboarding`,
+`venueSettings`, `today`, `calendar`, `customers`, `venueWaitlist`, `spaces`
+and `deleteAccount`. What is still false is the customer half (#1–#9) and the
+three owner screens behind More — team (#31), billing (#32), insights (#33).
 
-- **`spaces`** gates every method on `RealSpacesRepository`, pricing rules and
-  closures included — those are **#29**. Turning it on would open the space
-  editor with two buttons that refuse.
+**Row 29 shipped last on the venue side**, which is what let `Feature.spaces`
+move: one flag gates every method on `RealSpacesRepository`, so the editor
+could not open at all until peak pricing and closures existed. Three notes:
+
+- **A pricing rule's times have no zone**, and must not. They are `time`
+  columns: 18:00 is the venue's evening wherever the server runs, and an
+  instant would move it when a clock somewhere else changed. A **closure** is
+  the opposite — a real instant, built with `make_timestamptz(..., timezone)`
+  in Postgres for exactly the reason `calendar-json.ts` documents.
+- **A closure from the editor is not a block from the calendar (#19)**, though
+  both write `closure`. A block shuts a window of *today* and any staff member
+  can put one in; a closure here can run across days and is owner-or-admin,
+  because a venue-wide one takes every space off sale. Neither cancels what is
+  already booked.
+- **Sessions are not in #29.** The row proposed create/cancel, and the app
+  treats sessions as read-only in v1 (D17) — `RealSpacesRepository` never calls
+  them. Building endpoints nothing calls is how a contract starts lying, so
+  they are deferred with the feature.
 
 **`claimExpiresAt` is always null** and the app must not draw a countdown from
 nothing. There is no claim window on the server: `promoteWaitlist` emails the

@@ -9,6 +9,7 @@ import '../../../../core/theme/typography.dart';
 import '../../../../core/time/app_time.dart';
 import '../../../../core/ui/app_banner.dart';
 import '../../../../core/ui/primitives.dart';
+import '../../../../core/widgets/app_choice_chip.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../onboarding/domain/onboarding_input.dart';
@@ -246,10 +247,10 @@ class _VenueSettingsScreenState extends ConsumerState<VenueSettingsScreen> {
                     runSpacing: Spacing.x2,
                     children: [
                       for (final theme in VenueTheme.values)
-                        ChoiceChip(
-                          label: Text(_themeLabel(theme)),
+                        AppChoiceChip(
+                          label: _themeLabel(theme),
                           selected: input.theme == theme,
-                          onSelected: (_) => setState(
+                          onSelected: () => setState(
                             () => _input = _current.copyWith(theme: theme),
                           ),
                         ),
