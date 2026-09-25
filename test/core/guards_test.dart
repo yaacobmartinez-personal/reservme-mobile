@@ -21,8 +21,20 @@ void main() {
   final twoVenues = AuthState.signedIn(user: user, token: 't', expiresAt: expiry, venues: const [katipunan, norte]);
   final noVenue = AuthState.signedIn(user: user, token: 't', expiresAt: expiry);
 
-  String? go(String path, AuthState auth, {AppMode mode = AppMode.customer, String? selected}) =>
-      computeRedirect(uri: Uri.parse(path), auth: auth, mode: mode, selectedVenueSlug: selected);
+  String? go(
+    String path,
+    AuthState auth, {
+    AppMode mode = AppMode.customer,
+    String? selected,
+    bool canOnboard = true,
+  }) =>
+      computeRedirect(
+        uri: Uri.parse(path),
+        auth: auth,
+        mode: mode,
+        canOnboard: canOnboard,
+        selectedVenueSlug: selected,
+      );
 
   test('customer routes are public', () {
     expect(go('/c/find', signedOut), isNull);
@@ -75,11 +87,56 @@ void main() {
     expect(safeFrom(null), isNull);
   });
 
+  group('signing in with no venue', () {
+    // Found on a device against the real server: login succeeded, /me came
+    // back with no venues, and the app opened "Name your venue" — whose only
+    // button answers "Not available on this server yet", because creating a
+    // venue is contract #27 and has not shipped. The gate caught the tap; the
+    // routing should never have gone there.
+    test('goes to onboarding when this server can create venues', () {
+      expect(go('/v/today', noVenue, mode: AppMode.venue), Routes.createVenue);
+      expect(
+        afterSignInTarget(from: null, auth: noVenue, canOnboard: true),
+        Routes.createVenue,
+      );
+    });
+
+    test('goes to the picker when it cannot', () {
+      expect(
+        go('/v/today', noVenue, mode: AppMode.venue, canOnboard: false),
+        Routes.venuePicker,
+      );
+      expect(
+        afterSignInTarget(from: null, auth: noVenue, canOnboard: false),
+        Routes.venuePicker,
+      );
+    });
+
+    test('and the picker itself is not bounced away, or it would loop', () {
+      // The redirect has to let the destination through. Sending someone to a
+      // route that redirects them again is a hang, not a screen.
+      expect(
+        go(Routes.venuePicker, noVenue, mode: AppMode.venue, canOnboard: false),
+        anyOf(isNull, Routes.venuePicker),
+      );
+    });
+
+    test('an owner with a venue is unaffected either way', () {
+      for (final canOnboard in [true, false]) {
+        expect(
+          afterSignInTarget(from: null, auth: oneVenue, canOnboard: canOnboard),
+          AppMode.venue.home,
+        );
+      }
+    });
+  });
+
   group('the reset screen', () {
     String? go(String location, AuthState auth) => computeRedirect(
           uri: Uri.parse(location),
           auth: auth,
           mode: AppMode.venue,
+          canOnboard: true,
           selectedVenueSlug: katipunan.slug,
         );
 

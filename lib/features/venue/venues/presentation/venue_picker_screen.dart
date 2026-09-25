@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/config/api_mode.dart';
+import '../../../../core/config/feature_availability.dart';
 import '../../../../core/model/enums.dart';
 import '../../../../core/router/routes.dart';
 import '../../../../core/theme/palette.dart';
@@ -17,6 +19,11 @@ import 'widgets/venue_avatar.dart';
 
 /// V3 · Venue picker: shown when the signed-in user belongs to more than one
 /// venue, and reachable from the venue switcher.
+///
+/// It is also where someone lands who belongs to *no* venue — after signing in
+/// on a server that cannot create one yet, or after their last membership was
+/// removed. That case needs its own words: an empty list under "Your venues"
+/// reads as a loading bug.
 class VenuePickerScreen extends ConsumerWidget {
   const VenuePickerScreen({super.key});
 
@@ -26,6 +33,7 @@ class VenuePickerScreen extends ConsumerWidget {
     final auth = ref.watch(authControllerProvider);
     final venues = auth.venuesOrEmpty;
     final selected = ref.watch(selectedVenueSlugProvider);
+    final canOnboard = isAvailable(Feature.onboarding, ref.watch(apiModeProvider));
 
     return Scaffold(
       body: SafeArea(
@@ -33,8 +41,26 @@ class VenuePickerScreen extends ConsumerWidget {
           children: [
             BigHeader(
               eyebrow: 'Signed in as ${auth.userOrNull?.email ?? ''}',
-              title: 'Your venues',
+              title: venues.isEmpty ? 'No venue yet' : 'Your venues',
             ),
+            if (venues.isEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  Spacing.gutter,
+                  0,
+                  Spacing.gutter,
+                  Spacing.x4,
+                ),
+                child: Text(
+                  canOnboard
+                      ? 'Set one up and your booking page goes live in a few '
+                          'minutes.'
+                      : "You're signed in, but this account doesn't belong to "
+                          'a venue yet. Ask an owner to invite you, or set one '
+                          'up once this server supports it.',
+                  style: AppType.bodyS.copyWith(color: p.ink2),
+                ),
+              ),
             Expanded(
               child: ListView.separated(
                 padding: const EdgeInsets.fromLTRB(Spacing.gutter, 0, Spacing.gutter, Spacing.x6),
@@ -45,11 +71,17 @@ class VenuePickerScreen extends ConsumerWidget {
                     return Column(
                       children: [
                         const SizedBox(height: Spacing.x2),
-                        OutlinedButton.icon(
-                          onPressed: () => context.push(Routes.createVenue),
-                          icon: const Icon(Icons.add_rounded),
-                          label: const Text('Add another venue'),
-                        ),
+                        // Hidden rather than disabled when this server cannot
+                        // create venues: a greyed button still reads as
+                        // "later", and there is nothing to wait for.
+                        if (canOnboard)
+                          OutlinedButton.icon(
+                            onPressed: () => context.push(Routes.createVenue),
+                            icon: const Icon(Icons.add_rounded),
+                            label: Text(
+                              venues.isEmpty ? 'Set up your venue' : 'Add another venue',
+                            ),
+                          ),
                         const SizedBox(height: Spacing.x6),
                         TextButton.icon(
                           onPressed: () async {

@@ -4,4 +4,14 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
+
+    <!-- Android 9 blocks cleartext by default, which is right for a shipped
+         app and wrong for the workflow app_config.dart documents:
+         SERVER_URL=http://10.0.2.2:3000 against a dev server on the laptop.
+
+         This file is merged into debug builds alone, so the release manifest
+         keeps the default and a store build can only talk HTTPS. Do not move
+         this attribute into the main manifest to "fix" a connection problem.
+    -->
+    <application android:usesCleartextTraffic="true" />
 </manifest>

@@ -62,15 +62,22 @@ enum Feature {
 }
 
 /// Flip an entry to `true` when the corresponding contract items land on the
-/// real server. Kept as a plain map so the change is a one-line diff. Nothing
-/// has shipped yet: the backend is a separate plan.
+/// real server. Kept as a plain map so the change is a one-line diff.
+///
+/// Auth shipped on 2026-09-25 (Better Auth bearer + email OTP, walked against
+/// the real database by `npm run test:mobile-auth` in the web repo). Everything
+/// else is still a separate plan.
+///
+/// `signup` stays false on purpose even though #25 and #26 are live: the
+/// sign-up screen leads straight into "name your venue", which is #27 and does
+/// not exist. Opening it would walk a new owner into a wall.
 const Map<Feature, bool> _shippedOnRealServer = {
   Feature.customerBrowse: false, // #1, #2
   Feature.customerBooking: false, // #3, #4
   Feature.manageBooking: false, // #5, #6
   Feature.reschedule: false, // #7, #8
   Feature.waitlist: false, // #9
-  Feature.venueLogin: false, // #10–#13
+  Feature.venueLogin: true, // #10–#13 — live
   Feature.today: false, // #14, #15
   Feature.calendar: false, // #16–#19
   Feature.customers: false, // #20–#22
@@ -82,7 +89,7 @@ const Map<Feature, bool> _shippedOnRealServer = {
   Feature.team: false, // #31
   Feature.billing: false, // #32
   Feature.insights: false, // #33
-  Feature.deleteAccount: false, // #34
+  Feature.deleteAccount: true, // #34 — live
 };
 
 bool isAvailable(Feature feature, ApiMode mode) => switch (mode) {

@@ -21,8 +21,16 @@ class ApiError implements Exception {
   /// Build from a decoded response body, applying the standard fallbacks.
   factory ApiError.fromResponse(int status, Object? body) {
     final map = body is Map<String, dynamic> ? body : const <String, dynamic>{};
-    final message = switch (map['error']) {
-      final String s when s.isNotEmpty => s,
+    // `{error, message?}` (API-CONTRACT §Conventions): `error` is the slug the
+    // app switches on, `message` is the sentence a person reads. Prefer the
+    // sentence.
+    //
+    // The fallback to `error` is not tidiness — it is what the fakes have
+    // always sent, and it is what a hand-rolled 404 from a proxy sends too.
+    // Without it the real server's first refusal rendered as "unauthorized".
+    final message = switch ((map['message'], map['error'])) {
+      (final String m, _) when m.isNotEmpty => m,
+      (_, final String e) when e.isNotEmpty => e,
       _ => defaultMessage(status),
     };
     final fields = <String, String>{};

@@ -16,10 +16,15 @@ import 'routes.dart';
 ///   still know, from the account screen.
 /// - Onboarding steps after sign-up need a session; the welcome and sign-up
 ///   screens do not.
+/// - [canOnboard] is `Feature.onboarding` for the running API mode. Signing in
+///   with no venue normally means "finish setting one up" — but against a
+///   server that cannot create venues yet, that sends the owner to a form whose
+///   only button refuses. They go to the picker and read why instead.
 String? computeRedirect({
   required Uri uri,
   required AuthState auth,
   required AppMode mode,
+  required bool canOnboard,
   String? selectedVenueSlug,
 }) {
   final path = uri.path;
@@ -29,7 +34,11 @@ String? computeRedirect({
     // Changing your password is the reset flow with the address already
     // known, so a signed-in person belongs on this one.
     if (signedIn && path != Routes.resetPasswordPath) {
-      return afterSignInTarget(from: uri.queryParameters['from'], auth: auth);
+      return afterSignInTarget(
+        from: uri.queryParameters['from'],
+        auth: auth,
+        canOnboard: canOnboard,
+      );
     }
     return null;
   }
@@ -43,8 +52,10 @@ String? computeRedirect({
 
   if (isVenuePath(path)) {
     if (!auth.hasVenueAccess) {
-      // Signed in but no venue yet: finish setting one up.
-      return Routes.createVenue;
+      // Signed in but no venue yet: finish setting one up, when this server
+      // can. When it cannot, the picker says so — better than a form that
+      // refuses on submit.
+      return canOnboard ? Routes.createVenue : Routes.venuePicker;
     }
     if (path != Routes.venuePicker && selectedVenueSlug == null) {
       final venues = auth.venuesOrEmpty;
@@ -71,8 +82,14 @@ String loginFor(Uri uri) => '${Routes.login}?from=${Uri.encodeComponent(uri.toSt
 /// Where to go once signed in: `from` if it is a safe in-app venue path,
 /// else the venue home (that is what a staff login is for) — or venue setup
 /// when the account has no venue yet.
-String afterSignInTarget({required String? from, required AuthState auth}) {
-  if (!auth.hasVenueAccess) return Routes.createVenue;
+String afterSignInTarget({
+  required String? from,
+  required AuthState auth,
+  required bool canOnboard,
+}) {
+  if (!auth.hasVenueAccess) {
+    return canOnboard ? Routes.createVenue : Routes.venuePicker;
+  }
   final safe = safeFrom(from);
   if (safe != null && (isVenuePath(safe) || safe.startsWith('/onboarding/'))) return safe;
   return AppMode.venue.home;
