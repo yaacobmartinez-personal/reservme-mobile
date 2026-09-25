@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/config/api_mode.dart';
 import '../../../core/config/app_config.dart';
+import '../../../core/config/feature_availability.dart';
 import '../../../core/router/guards.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/theme/palette.dart';
@@ -58,7 +59,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (!mounted) return;
       final auth = ref.read(authControllerProvider);
       ref.read(appModeControllerProvider.notifier).set(AppMode.venue);
-      context.go(afterSignInTarget(from: widget.from, auth: auth));
+      context.go(afterSignInTarget(
+        from: widget.from,
+        auth: auth,
+        canOnboard: isAvailable(Feature.onboarding, ref.read(apiModeProvider)),
+      ));
     } catch (e) {
       if (mounted) {
         setState(() {

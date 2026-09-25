@@ -38,9 +38,11 @@ class RealAuthRepository implements AuthRepository {
     required String code,
     required String password,
   }) async {
-    // The in-app reset belongs to the sign-up feature's endpoints (#26),
-    // not to login, so it is gated with them.
-    if (!isAvailable(Feature.signup, _mode)) throw ApiError.notAvailable();
+    // Gated with login (#11 requests the code, #26 spends it), not with
+    // sign-up. They ship together and they are one flow on screen: gating the
+    // two halves apart would let the app email somebody a code and then refuse
+    // to accept it.
+    if (!isAvailable(Feature.venueLogin, _mode)) throw ApiError.notAvailable();
     await _api.post('/mobile/auth/reset-password', body: {
       'email': email.trim().toLowerCase(),
       'code': code.trim(),

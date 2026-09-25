@@ -15,19 +15,31 @@ void main() {
       }
     });
 
-    test('nothing has shipped on the real server yet', () {
-      // The backend is a separate plan. When an endpoint lands, flip its
-      // entry in `_shippedOnRealServer` and this test tells you which.
-      final shipped = [
+    test('exactly the endpoints that exist are live', () {
+      // Auth shipped 2026-09-25; the rest of the backend is still to come.
+      // This list is the tripwire: flipping a flag without an endpoint behind
+      // it fails here rather than on somebody's phone.
+      const live = {Feature.venueLogin, Feature.deleteAccount};
+
+      final shipped = {
         for (final feature in Feature.values)
-          if (isAvailable(feature, ApiMode.real)) feature.name,
-      ];
+          if (isAvailable(feature, ApiMode.real)) feature,
+      };
+
       expect(
         shipped,
-        isEmpty,
-        reason: 'These claim to be live on the real server: $shipped. If that '
-            'is true, the matching Real* repository has to work against it.',
+        live,
+        reason: 'A flag moved. Anything claiming to be live needs its '
+            'endpoints deployed and its Real* repository working against them.',
       );
+    });
+
+    test('sign-up stays shut until a new owner can create a venue', () {
+      // #25 and #26 are live, but sign-up leads into "name your venue" (#27),
+      // which is not. Opening the door without the room behind it walks a new
+      // owner into a wall on the third screen.
+      expect(isAvailable(Feature.signup, ApiMode.real), isFalse);
+      expect(isAvailable(Feature.onboarding, ApiMode.real), isFalse);
     });
 
     test('every feature has an explicit entry, not a default', () {

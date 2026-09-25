@@ -102,13 +102,39 @@ CustomerSummary { id, name, email, phone?, visits, noShowCount, tags[], lastVisi
 | 33 | `GET …/insights?period=today\|7d\|30d\|90d` | member | → `{range, bookedValueCents, bookings, utilisationPct, noShowRatePct` (each `{value, previous, deltaPct, series}`)`, bookedByDay, peakHours` (7×24)`, mix, bySpace, customers, needsYou}`. Every bucket is a **venue-local** date and hour. `rental`+`session_seat` drive counts and value; `rental`+`session_block` drive utilisation — counting seats as occupancy would show a full court as over-booked. `deltaPct` is null against a zero baseline. An unknown `period` falls back to 30d. No `awaitingPayments` tile: v1 is pay-at-venue, so the app has no payment records to count. | 403 | `src/lib/analytics.ts` |
 | 34 | `DELETE /mobile/me` | bearer | → `{ok: true}` | 409 `sole_owner` `{venues: [slug]}` | account deletion with the sole-owner guard |
 
+## What is live
+
+**Auth shipped on 2026-09-25** — rows 10–13, 25, 26 and 34, on the app host,
+in the web repo (`src/app/api/mobile/**`, branch `feat/mobile-auth-api`).
+`Feature.venueLogin` and `Feature.deleteAccount` are `true`; everything else is
+still `false`.
+
+Three things the built server settled that this document had only guessed at:
+
+- **The token is opaque.** §Token above describes `base64url(JSON{sub,exp})`
+  `.signature`; Better Auth's bearer plugin returns its own session token,
+  which is `<random>.<signature>` and carries no readable `exp`. The app falls
+  back to its 30-day default, which is what that fallback was for. Keeping
+  Better Auth's token means one session table and one revocation path instead
+  of a second token format to keep honest.
+- **`message`, not `error`, is the sentence.** The server sends
+  `{error: "unauthorized", message: "That email and password don't match."}`.
+  `ApiError` was reading `error`, so the first real refusal rendered as
+  "unauthorized".
+- **Verification codes are 6 digits, hashed at rest, good for 10 minutes**, and
+  are a second channel beside the web's links rather than a replacement.
+
+`Feature.signup` stays shut although #25 and #26 are live: sign-up leads into
+"name your venue" (#27), which does not exist. **Row 27 is the next one to
+build** — until it does, a new account can be created and has nowhere to go.
+
 ## Backend follow-ups outside the contract
 
 - Serve `/.well-known/assetlinks.json` (package `pro.reservme.app`, SHA-256 of
   the upload key **and** the Play App Signing key) and
   `/.well-known/apple-app-site-association` on `reservme.pro` — the marketing
   static site owns that host.
-- Email templates for the 6-digit verification / reset codes (the web uses
-  links).
+- ~~Email templates for the 6-digit verification / reset codes~~ — done
+  (`deliverAuthCode`, alongside the web's link templates).
 - Booking confirmation emails keep the `reservme.pro/<slug>/manage/<token>`
   link; the app imports it into the wallet.

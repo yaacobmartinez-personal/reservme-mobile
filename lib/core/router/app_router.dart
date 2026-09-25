@@ -45,6 +45,8 @@ import '../../features/venue/today/presentation/today_screen.dart';
 import '../../features/venue/venues/application/selected_venue_controller.dart';
 import '../../features/venue/venues/presentation/venue_picker_screen.dart';
 import '../../features/venue/waitlist/presentation/waitlist_screen.dart';
+import '../config/api_mode.dart';
+import '../config/feature_availability.dart';
 import 'guards.dart';
 import 'router_refresh.dart';
 import 'routes.dart';
@@ -99,6 +101,7 @@ GoRouter appRouter(Ref ref) {
       uri: state.uri,
       auth: ref.read(authControllerProvider),
       mode: ref.read(appModeControllerProvider),
+      canOnboard: isAvailable(Feature.onboarding, ref.read(apiModeProvider)),
       selectedVenueSlug: ref.read(selectedVenueSlugProvider),
     ),
     routes: [

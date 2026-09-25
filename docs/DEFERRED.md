@@ -25,6 +25,8 @@ pick it up. Reviewed at the start of each phase, and again before release.
 
 - **D18 walked on a device** — O0 → O7 end to end on a fresh install, plus the venue side (picker, Today, More, Insights, Spaces, the space editor, Billing, Team, Your account, the reset screen) and both deep-link forms. Confirmed on the way: the slug check flipping from “Another venue has that address” to “Available” as the name changed, the wrong-code refusal on O2, the space name carrying into O5's heading, and the new venue landing on its own empty run sheet. The emulator failure was never the app: it was host memory. The recipe is `android/gradlew --stop`, then boot with `-memory 1536` — and for driving it, `adb input` needs the screen re-read after every keystroke, because the keyboard shifts the layout under fixed coordinates.
 
+- **Real mode found what 305 passing tests could not.** Signing in against the live server landed a venue-less owner on O3 "Name your venue" — whose only button answers "Not available on this server yet", because creating a venue is #27 and does not exist. `computeRedirect` and `afterSignInTarget` take `canOnboard` now and send them to the picker, which grew a real empty state instead of an empty list under "Your venues". Two smaller ones from the same run: `ApiError` read the machine slug `error` as the human message, so the first real refusal rendered as "unauthorized"; and debug builds had no cleartext permission, so the `http://10.0.2.2:3000` workflow `app_config.dart` documents could not connect. The permission is in a **debug-only** manifest — release builds stay HTTPS-only.
+
 ## Carry into later phases
 
 | # | Item | Phase |
@@ -33,7 +35,7 @@ pick it up. Reviewed at the start of each phase, and again before release.
 | D7 | Deep-link **handler** (parser is done): `app_links` wiring, Android intent filters, iOS entitlements, and the well-known files hosted by the marketing site. | 4 |
 | D10 | Store listing, screenshots, data-safety answers, signing keystore. | 4 |
 | D12 | Platform admin console — still undecided whether it moves into the app or stays web/CLI. **Decision needed.** | — |
-| D13 | Backend plan: none of the 34 endpoints exist. The app ships demoable in fake mode; `real` mode does nothing until they land. | separate plan |
+| D13 | Backend. **Auth landed 2026-09-25** (rows 10–13, 25, 26, 34 — web repo, branch `feat/mobile-auth-api`, Better Auth bearer + email OTP, on Neon). `venueLogin` and `deleteAccount` are live; the other 27 rows are not. **Row 27 `POST /mobile/venues` is next**: without it a new account signs in and has nowhere to go, which is why `Feature.signup` stays shut. | separate plan |
 | D17 | **Sessions are read-only on the calendar.** Tapping open play explains itself rather than offering create/cancel (`session-actions.ts`), which is parked for v1.1 with memberships and promos. | v1.1 |
 
 ## Product questions open
