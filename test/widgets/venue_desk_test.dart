@@ -118,6 +118,32 @@ void main() {
         findsOneWidget,
       );
     });
+
+    testWidgets('the typeahead counts one visit as a visit', (tester) async {
+      // Seen against the real server: a customer with one booking read
+      // "1 visits". Small, but it is the first thing a member reads about
+      // somebody standing at the counter.
+      final world = TestWorld();
+      await pumpApp(
+        tester,
+        const CalendarScreen(),
+        world: world,
+        extraOverrides: asOwner,
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('New booking'));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.widgetWithText(TextField, 'Find a customer'), 'a');
+      await tester.pumpAndSettle(const Duration(milliseconds: 600));
+
+      // Assert the typeahead found somebody first: `findsNothing` on its own
+      // would pass just as happily on an empty list, which is how a test like
+      // this quietly stops checking anything.
+      expect(find.textContaining('visit'), findsWidgets);
+      expect(find.textContaining('1 visits'), findsNothing);
+    });
   });
 
   group('customers', () {

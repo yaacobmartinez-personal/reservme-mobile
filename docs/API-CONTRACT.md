@@ -152,15 +152,22 @@ closure and never reaches the sheet, "today" is the *venue's* today via
 `AT TIME ZONE`, and takings count confirmed rows only. Check-in takes an
 optional time and clamps it into the booking's own window.
 
-`Feature.signup`, `onboarding`, `venueSettings` and `today` are now `true`.
-Two that look like they should have moved and have not:
+**Rows 16–20 shipped next** — the day grid, walk-ins, moves, blocks and the
+customer typeahead. The grid is built on the web's `getCalendarDay`, so what
+belongs on a day is decided in one place. Three rules worth restating: the hour
+axis comes from opening hours rather than from what is booked, each lane
+carries its **own** slot length, and a venue-wide closure is drawn in **every**
+lane — filtering on `space_id` alone puts it in none and hides a closed venue.
+
+`Feature.signup`, `onboarding`, `venueSettings`, `today` and `calendar` are now
+`true`. Two that look like they should have moved and have not:
 
 - **`spaces`** gates every method on `RealSpacesRepository`, pricing rules and
   closures included — those are **#29**. Turning it on would open the space
   editor with two buttons that refuse.
-- **`calendar`, `customers`, `venueWaitlist`** are the venue shell's other
-  three tabs (**#16–#23**). Today is the only one that works against a real
-  server; the rest say so on arrival.
+- **`customers`** — the Calendar's typeahead already uses the same search
+  (**#20**), but the Customers screen needs **#21** and **#22** as well.
+- **`venueWaitlist`** is **#23**.
 
 ## Backend follow-ups outside the contract
 
