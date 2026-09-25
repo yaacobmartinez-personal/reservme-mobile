@@ -35,7 +35,6 @@ class RealCalendarRepository implements CalendarRepository {
     final json = await _api.post(
       '/mobile/venues/$venueSlug/bookings',
       body: input.toJson(),
-      idempotent: true,
     );
     return RunSheetEntry.fromJson(json['booking'] as Map<String, dynamic>);
   }
@@ -52,7 +51,6 @@ class RealCalendarRepository implements CalendarRepository {
     final json = await _api.post(
       '/mobile/venues/$venueSlug/bookings/$bookingId/move',
       body: {'spaceId': spaceId, 'date': date, 'time': time},
-      idempotent: true,
     );
     return RunSheetEntry.fromJson(json['booking'] as Map<String, dynamic>);
   }
@@ -63,7 +61,6 @@ class RealCalendarRepository implements CalendarRepository {
     final json = await _api.post(
       '/mobile/venues/$venueSlug/blocks',
       body: input.toJson(),
-      idempotent: true,
     );
     return CalendarItem.fromJson(json['block'] as Map<String, dynamic>);
   }

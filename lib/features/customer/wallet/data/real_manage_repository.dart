@@ -79,7 +79,6 @@ class RealManageRepository implements ManageRepository {
           'startsAt': startsAt.toUtc().toIso8601String(),
           'endsAt': endsAt.toUtc().toIso8601String(),
         },
-        idempotent: true,
       );
       return Rescheduled(Booking.fromJson(json['booking'] as Map<String, dynamic>));
     } on ApiError catch (e) {

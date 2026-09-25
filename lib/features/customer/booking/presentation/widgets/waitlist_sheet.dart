@@ -163,7 +163,11 @@ class _WaitlistSheetState extends ConsumerState<_WaitlistSheet> {
             ],
             const SizedBox(height: Spacing.x3),
             Text(
-              'If it frees up we send you a link; you have 30 minutes to claim it.',
+              // No deadline: there is no claim window on the server, and
+              // promising one the venue cannot keep is worse than saying
+              // plainly that it is first come (docs/DEFERRED.md D19).
+              'If it frees up we email you a booking link. First to book '
+              'keeps it, so be quick.',
               style: AppType.caption.copyWith(color: p.ink3),
             ),
             const SizedBox(height: Spacing.x4),

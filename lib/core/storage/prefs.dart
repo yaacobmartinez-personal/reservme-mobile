@@ -21,6 +21,11 @@ class Prefs {
   static const keyWelcomeSeen = 'welcomeSeen';
   static const keyContact = 'contact';
 
+  /// This installation's id. Self-reported to the server as one of the
+  /// buckets public writes are rate-limited on — never an identity, and
+  /// never tied to a person.
+  static const keyDeviceId = 'deviceId';
+
   Future<String?> getString(String key) async {
     try {
       return await _prefs.getString(key);

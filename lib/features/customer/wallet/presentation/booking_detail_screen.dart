@@ -193,7 +193,12 @@ class _BodyState extends ConsumerState<_Body> {
                 children: [
                   Expanded(
                     child: OutlinedButton.icon(
-                      onPressed: _busy
+                      // Gated on the same rule as Cancel. The policy governs
+                      // both, so offering the picker here walked the customer
+                      // through seven days of slots to a refusal at the end —
+                      // found on a device, with a booking inside its grace
+                      // window.
+                      onPressed: _busy || !booking.cancellation.canCancel
                           ? null
                           : () => context.push(
                                 Routes.reschedule(widget.slug, widget.token),
