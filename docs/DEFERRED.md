@@ -27,6 +27,8 @@ pick it up. Reviewed at the start of each phase, and again before release.
 
 - **Real mode found what 305 passing tests could not.** Signing in against the live server landed a venue-less owner on O3 "Name your venue" — whose only button answers "Not available on this server yet", because creating a venue is #27 and does not exist. `computeRedirect` and `afterSignInTarget` take `canOnboard` now and send them to the picker, which grew a real empty state instead of an empty list under "Your venues". Two smaller ones from the same run: `ApiError` read the machine slug `error` as the human message, so the first real refusal rendered as "unauthorized"; and debug builds had no cleartext permission, so the `http://10.0.2.2:3000` workflow `app_config.dart` documents could not connect. The permission is in a **debug-only** manifest — release builds stay HTTPS-only.
 
+- **A hold read as "Confirmed" on the run sheet.** Found the moment a real server put a held booking on the sheet: the chip switch had no `held` case, so it fell through to the default. A hold is unpaid and expires, and the slot frees up when it does — telling the desk it is confirmed is the one wrong answer that reads as reassuring. It says **Held** now, in amber, and beats the customer's no-show count because it describes the booking in front of you rather than the person. The seed had no hold at all, so the first version of the regression test passed by finding nothing to check; today's seed carries one now and the test asserts that first.
+
 ## Carry into later phases
 
 | # | Item | Phase |
@@ -35,7 +37,7 @@ pick it up. Reviewed at the start of each phase, and again before release.
 | D7 | Deep-link **handler** (parser is done): `app_links` wiring, Android intent filters, iOS entitlements, and the well-known files hosted by the marketing site. | 4 |
 | D10 | Store listing, screenshots, data-safety answers, signing keystore. | 4 |
 | D12 | Platform admin console — still undecided whether it moves into the app or stays web/CLI. **Decision needed.** | — |
-| D13 | Backend. **Auth and onboarding landed 2026-09-25** (rows 10–13, 24, 25, 26, 27, 28, 30, 34 — web repo, branch `feat/mobile-auth-api`, Better Auth bearer + email OTP, on Neon). O0 → O7 was walked on a device against the real database: account, venue, space, week, policy, live. Live flags: `venueLogin`, `signup`, `onboarding`, `venueSettings`, `deleteAccount`. **Row 14 (Today) is next** — O7 hands the new owner to a run sheet that says it is not available yet. `spaces` stays shut until **#29** (pricing rules, closures) lands, because one flag gates the whole repository. | separate plan |
+| D13 | Backend. **Auth, onboarding and the desk landed 2026-09-25** (rows 10–15, 24–28, 30, 34 — web repo, on Neon). O0 → O7 and Today were both walked on a device against the real database. Live flags: `venueLogin`, `signup`, `onboarding`, `venueSettings`, `today`, `deleteAccount`. **Row 16 (Calendar) is next.** `spaces` stays shut until **#29** (pricing rules, closures) lands, because one flag gates the whole repository. | separate plan |
 | D17 | **Sessions are read-only on the calendar.** Tapping open play explains itself rather than offering create/cancel (`session-actions.ts`), which is parked for v1.1 with memberships and promos. | v1.1 |
 
 ## Product questions open

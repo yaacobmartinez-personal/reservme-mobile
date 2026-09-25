@@ -160,6 +160,14 @@ class RunSheetRow extends StatelessWidget {
         'Cancelled',
         tone: ChipTone.danger,
       ),
+      // A hold is not a confirmed booking: it is unpaid and it expires, and the
+      // slot frees up when it does. Without this case it fell through to
+      // "Confirmed", which tells the desk a walk-in is guaranteed when it is
+      // the one row on the sheet with a clock running on it.
+      //
+      // It beats the no-show count below on purpose — that describes the
+      // person, this describes the booking in front of you.
+      ReservationStatus.held => const StatusChip('Held', tone: ChipTone.warn),
       _ when entry.noShowCount > 0 => StatusChip(
         entry.noShowCount == 1 ? '1 no-show' : '${entry.noShowCount} no-shows',
         tone: ChipTone.clay,
