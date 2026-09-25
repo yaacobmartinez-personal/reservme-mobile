@@ -46,6 +46,40 @@ void main() {
     expect(find.text(view.runSheet.first.customerName ?? 'Walk-in'), findsWidgets);
   });
 
+  testWidgets('a hold says so, rather than passing for a confirmed booking', (tester) async {
+    // Found against the real server: the chip switch had no `held` case, so a
+    // hold fell through to "Confirmed". A hold is unpaid and expires, and the
+    // slot frees up when it does — telling the desk it is confirmed is the one
+    // wrong answer that reads as reassuring.
+    final world = TestWorld();
+    final container = await pumpApp(
+      tester,
+      const TodayScreen(),
+      world: world,
+      extraOverrides: overrides,
+    );
+    await tester.pumpAndSettle();
+
+    final view = (await container.read(todayProvider(katipunan.slug).future)).view;
+    // The seed puts a hold on today on purpose. Asserting that first means this
+    // test cannot quietly pass by finding nothing to check — which is exactly
+    // how it passed the first time I wrote it.
+    expect(
+      view.runSheet.where((r) => r.status == ReservationStatus.held),
+      isNotEmpty,
+      reason: "today's seed must keep a hold on it, or this test checks nothing",
+    );
+
+    // The sheet opens at the current hour, so the hold may be below the fold —
+    // the list virtualises and never builds a row nobody has scrolled to.
+    await tester.scrollUntilVisible(
+      find.text('Held'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.text('Held'), findsWidgets);
+  });
+
   testWidgets('checking someone in is confirmed on the row', (tester) async {
     final world = TestWorld();
     final container = await pumpApp(

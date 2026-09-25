@@ -146,15 +146,21 @@ Two shapes this document did not pin down, and the device did:
 - **Hours are `PUT` and replace the whole week**, because a closed day is an
   absent row. A partial update cannot express "Sunday is closed".
 
-`Feature.signup`, `onboarding` and `venueSettings` are now `true`. Two that
-look like they should have moved and have not:
+**Rows 14 and 15 shipped next**, which is the desk: `GET …/today` and the four
+run-sheet actions. Three rules the phone would otherwise lose — a block is a
+closure and never reaches the sheet, "today" is the *venue's* today via
+`AT TIME ZONE`, and takings count confirmed rows only. Check-in takes an
+optional time and clamps it into the booking's own window.
+
+`Feature.signup`, `onboarding`, `venueSettings` and `today` are now `true`.
+Two that look like they should have moved and have not:
 
 - **`spaces`** gates every method on `RealSpacesRepository`, pricing rules and
   closures included — those are **#29**. Turning it on would open the space
   editor with two buttons that refuse.
-- **`today`** is where O7 hands the new owner. It is **#14**. Onboarding works
-  end to end and the run sheet then says it is not available yet — legible
-  rather than broken, and the next thing to fix.
+- **`calendar`, `customers`, `venueWaitlist`** are the venue shell's other
+  three tabs (**#16–#23**). Today is the only one that works against a real
+  server; the rest say so on arrival.
 
 ## Backend follow-ups outside the contract
 

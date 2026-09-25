@@ -25,6 +25,7 @@ void main() {
         Feature.signup,
         Feature.onboarding,
         Feature.venueSettings,
+        Feature.today,
       };
 
       final shipped = {
@@ -47,12 +48,18 @@ void main() {
       expect(isAvailable(Feature.spaces, ApiMode.real), isFalse);
     });
 
-    test('onboarding is open, and the desk it hands over to is not', () {
-      // Worth stating rather than discovering: O7 sends the new owner to
-      // Today, which is #14. Onboarding works end to end; the run sheet then
-      // says it is not available yet.
+    test('onboarding now hands over to a working run sheet', () {
+      // O7 sends the new owner to Today. Both ends of that handover are live.
       expect(isAvailable(Feature.onboarding, ApiMode.real), isTrue);
-      expect(isAvailable(Feature.today, ApiMode.real), isFalse);
+      expect(isAvailable(Feature.today, ApiMode.real), isTrue);
+    });
+
+    test('the other three venue tabs are still shut', () {
+      // Calendar, Customers and Waitlist are #16-#23. Today is the only tab of
+      // the venue shell that works against a real server.
+      expect(isAvailable(Feature.calendar, ApiMode.real), isFalse);
+      expect(isAvailable(Feature.customers, ApiMode.real), isFalse);
+      expect(isAvailable(Feature.venueWaitlist, ApiMode.real), isFalse);
     });
 
     test('every feature has an explicit entry, not a default', () {

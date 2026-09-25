@@ -329,6 +329,10 @@ void seedFakeStore(FakeStore store, DateTime now) {
   book(court2, today, '18:00', customers[2]);
   book(court2, today, '19:00', customers[9]);
   book(court2, today, '21:00', customers[4]);
+  // A hold on today's sheet, because real ones are always there: a booking
+  // taken but not yet confirmed, with an expiry running on it. Without one the
+  // demo world never shows the "Held" chip and no test can exercise it.
+  book(court3, today, '20:00', customers[6], status: ReservationStatus.held);
   book(court1, today, '21:00', customers[11], party: 4);
   // Court 3 blocked 18:00–20:00 for net repair. A staff block is a closure,
   // not a reservation — same as the web's blockOff (calendar-actions.ts).
