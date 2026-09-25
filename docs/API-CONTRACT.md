@@ -124,18 +124,37 @@ Three things the built server settled that this document had only guessed at:
 - **Verification codes are 6 digits, hashed at rest, good for 10 minutes**, and
   are a second channel beside the web's links rather than a replacement.
 
-**Row 27 shipped the same day**: `POST /mobile/venues` and
-`GET /mobile/venues/slug-available`. Three rows must exist after it — Better
+**Rows 24, 27, 28 and 30 shipped the same day**, which completes O0 → O7
+against a real database. `POST /mobile/venues` and
+`GET /mobile/venues/slug-available`; Three rows must exist after it — Better
 Auth's organisation, our `venue`, and a trialing `subscription` — and the org
 is rolled back by hand if the other two fail, because a half-made venue shows
 in the picker and falls over on every screen. The slug check needs a session
 (the slug space is global, so anonymous it enumerates venues) and answers 200
 even when the answer is no.
 
-`Feature.onboarding` is still `false`, and so is `Feature.signup`. O4 and O5
-need **#28** (create a space, set hours) and O7 needs **#30** (the policy
-PATCH). Until those land, row 27 is built and dormant: a new account can be
-created and still has nowhere to go.
+plus the space routes and the venue PATCH.
+
+Two shapes this document did not pin down, and the device did:
+
+- **`PATCH /mobile/venues/{slug}` has two callers that parse its `venue`
+  differently.** Settings reads it as `VenueSettings`; onboarding's go-live
+  reads the same field as a `VenueMembership`, which needs `orgId`, `role` and
+  `activeSpaces`. The endpoint answered 200 and the app said "Something went
+  wrong". The payload is a superset of both now. A third caller adds its fields
+  there rather than branching on who asked.
+- **Hours are `PUT` and replace the whole week**, because a closed day is an
+  absent row. A partial update cannot express "Sunday is closed".
+
+`Feature.signup`, `onboarding` and `venueSettings` are now `true`. Two that
+look like they should have moved and have not:
+
+- **`spaces`** gates every method on `RealSpacesRepository`, pricing rules and
+  closures included — those are **#29**. Turning it on would open the space
+  editor with two buttons that refuse.
+- **`today`** is where O7 hands the new owner. It is **#14**. Onboarding works
+  end to end and the run sheet then says it is not available yet — legible
+  rather than broken, and the next thing to fix.
 
 ## Backend follow-ups outside the contract
 

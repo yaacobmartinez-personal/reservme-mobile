@@ -35,7 +35,7 @@ pick it up. Reviewed at the start of each phase, and again before release.
 | D7 | Deep-link **handler** (parser is done): `app_links` wiring, Android intent filters, iOS entitlements, and the well-known files hosted by the marketing site. | 4 |
 | D10 | Store listing, screenshots, data-safety answers, signing keystore. | 4 |
 | D12 | Platform admin console — still undecided whether it moves into the app or stays web/CLI. **Decision needed.** | — |
-| D13 | Backend. **Auth landed 2026-09-25** (rows 10–13, 25, 26, 34 — web repo, branch `feat/mobile-auth-api`, Better Auth bearer + email OTP, on Neon). `venueLogin` and `deleteAccount` are live; the other 27 rows are not. **Row 27 `POST /mobile/venues` is next**: without it a new account signs in and has nowhere to go, which is why `Feature.signup` stays shut. | separate plan |
+| D13 | Backend. **Auth and onboarding landed 2026-09-25** (rows 10–13, 24, 25, 26, 27, 28, 30, 34 — web repo, branch `feat/mobile-auth-api`, Better Auth bearer + email OTP, on Neon). O0 → O7 was walked on a device against the real database: account, venue, space, week, policy, live. Live flags: `venueLogin`, `signup`, `onboarding`, `venueSettings`, `deleteAccount`. **Row 14 (Today) is next** — O7 hands the new owner to a run sheet that says it is not available yet. `spaces` stays shut until **#29** (pricing rules, closures) lands, because one flag gates the whole repository. | separate plan |
 | D17 | **Sessions are read-only on the calendar.** Tapping open play explains itself rather than offering create/cancel (`session-actions.ts`), which is parked for v1.1 with memberships and promos. | v1.1 |
 
 ## Product questions open

@@ -68,9 +68,16 @@ enum Feature {
 /// the real database by `npm run test:mobile-auth` in the web repo). Everything
 /// else is still a separate plan.
 ///
-/// `signup` stays false on purpose even though #25 and #26 are live: the
-/// sign-up screen leads straight into "name your venue", which is #27 and does
-/// not exist. Opening it would walk a new owner into a wall.
+/// Two that look like they should have moved and have not:
+///
+/// - `spaces` gates every method on `RealSpacesRepository`, including pricing
+///   rules and closures — which are #29 and do not exist. Turning it on would
+///   open the space editor with two buttons that refuse, which is the same
+///   wall the sign-up flow used to walk into.
+/// - `today` is the screen O7 hands the new owner to. It is #14 and still to
+///   come, so finishing onboarding on a real server lands on a run sheet that
+///   says it is not available yet. That is legible rather than broken, and it
+///   is the next thing to fix.
 const Map<Feature, bool> _shippedOnRealServer = {
   Feature.customerBrowse: false, // #1, #2
   Feature.customerBooking: false, // #3, #4
@@ -83,9 +90,9 @@ const Map<Feature, bool> _shippedOnRealServer = {
   Feature.customers: false, // #20–#22
   Feature.venueWaitlist: false, // #23
   Feature.spaces: false, // #24
-  Feature.signup: false, // #25, #26
-  Feature.onboarding: false, // #27–#29
-  Feature.venueSettings: false, // #30
+  Feature.signup: true, // #25, #26 — live
+  Feature.onboarding: true, // #27, #28 — live (#29 is not, see below)
+  Feature.venueSettings: true, // #30 — live
   Feature.team: false, // #31
   Feature.billing: false, // #32
   Feature.insights: false, // #33

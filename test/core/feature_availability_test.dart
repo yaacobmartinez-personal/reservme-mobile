@@ -19,7 +19,13 @@ void main() {
       // Auth shipped 2026-09-25; the rest of the backend is still to come.
       // This list is the tripwire: flipping a flag without an endpoint behind
       // it fails here rather than on somebody's phone.
-      const live = {Feature.venueLogin, Feature.deleteAccount};
+      const live = {
+        Feature.venueLogin,
+        Feature.deleteAccount,
+        Feature.signup,
+        Feature.onboarding,
+        Feature.venueSettings,
+      };
 
       final shipped = {
         for (final feature in Feature.values)
@@ -34,12 +40,19 @@ void main() {
       );
     });
 
-    test('sign-up stays shut until a new owner can create a venue', () {
-      // #25 and #26 are live, but sign-up leads into "name your venue" (#27),
-      // which is not. Opening the door without the room behind it walks a new
-      // owner into a wall on the third screen.
-      expect(isAvailable(Feature.signup, ApiMode.real), isFalse);
-      expect(isAvailable(Feature.onboarding, ApiMode.real), isFalse);
+    test('the space editor stays shut while #29 is missing', () {
+      // `Feature.spaces` gates every method on RealSpacesRepository, pricing
+      // rules and closures included. Those are #29. Opening the editor would
+      // put two refusing buttons on it — the same wall sign-up used to be.
+      expect(isAvailable(Feature.spaces, ApiMode.real), isFalse);
+    });
+
+    test('onboarding is open, and the desk it hands over to is not', () {
+      // Worth stating rather than discovering: O7 sends the new owner to
+      // Today, which is #14. Onboarding works end to end; the run sheet then
+      // says it is not available yet.
+      expect(isAvailable(Feature.onboarding, ApiMode.real), isTrue);
+      expect(isAvailable(Feature.today, ApiMode.real), isFalse);
     });
 
     test('every feature has an explicit entry, not a default', () {
