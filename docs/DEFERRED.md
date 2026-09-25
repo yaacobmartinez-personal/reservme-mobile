@@ -7,7 +7,6 @@ pick it up. Reviewed at the start of each phase, and again before release.
 
 | # | Item | Phase |
 |---|---|---|
-| D18 | **Walk O1–O7 by hand on a device.** Mostly done. The emulator renders again — the cause was host memory, and the recipe is: stop the Gradle daemons (`android/gradlew --stop`), then boot with `-memory 1536`. Walked and confirmed: fresh install → O0, O1 sign-up, the venue picker, Today, More, Insights, Spaces, the space editor, Billing, Team, Your account, the reset screen, and both deep-link forms (`https://reservme.pro/<slug>` and `reservme://<slug>/manage/<token>`). **Not done:** typing through O1 → O7 end to end. Driving text entry over `adb input` puts every string into the first field once the keyboard shifts the layout, so this wants five minutes of a human's thumbs rather than more automation. The flow is covered by a fake-backed test that runs the whole sequence. | before launch |
 | D2b | **The onboarding photos are AI-generated placeholders.** They are bundled and named now, but they are not real venue photography and should not ship as-is. The Welcome hero matters most — it is the first thing an owner sees. | before store submission |
 
 ## Closed
@@ -23,6 +22,8 @@ pick it up. Reviewed at the start of each phase, and again before release.
 - **D16 typed times** — `core/widgets/wall_clock_field.dart` gives the calendar sheets a real date and time picker. Both still deal in venue-local wall clock (`YYYY-MM-DD`, `HH:MM`), never instants, because that is what the server turns into a timestamp in the venue's own zone.
 - **D11 account deletion** — G7 · Your account deletes the account and the notes that user wrote; bookings belong to the venue and stay with it. Refused with a 409 (`reason: sole_owner`) naming the venues that would be left ownerless, because a venue with no owner has nobody who can pay for it or hand it on and no way back short of support. Confirming means typing DELETE: it is the one action in the app with no undo.
 - **D14 in-app password reset** — the forgot screen now offers "I have the code" and V3 finishes the reset in the app (contract #26). Until now a staff member with only a phone could start a reset and never finish one. The step refuses a wrong code and an address with no account with the *same* wording, so it does not undo the request step's deliberate silence about which emails exist.
+
+- **D18 walked on a device** — O0 → O7 end to end on a fresh install, plus the venue side (picker, Today, More, Insights, Spaces, the space editor, Billing, Team, Your account, the reset screen) and both deep-link forms. Confirmed on the way: the slug check flipping from “Another venue has that address” to “Available” as the name changed, the wrong-code refusal on O2, the space name carrying into O5's heading, and the new venue landing on its own empty run sheet. The emulator failure was never the app: it was host memory. The recipe is `android/gradlew --stop`, then boot with `-memory 1536` — and for driving it, `adb input` needs the screen re-read after every keystroke, because the keyboard shifts the layout under fixed coordinates.
 
 ## Carry into later phases
 

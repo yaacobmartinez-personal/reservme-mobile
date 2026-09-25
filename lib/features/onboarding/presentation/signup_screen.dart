@@ -31,7 +31,25 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   String? _error;
 
   @override
+  void initState() {
+    super.initState();
+    // A refusal names one field. Once that field is edited the message is
+    // stale and, worse, contradicts what is on screen: "That email doesn't
+    // look right" sitting under a perfectly good address.
+    for (final field in [_name, _email, _password]) {
+      field.addListener(_clearError);
+    }
+  }
+
+  void _clearError() {
+    if (_error != null) setState(() => _error = null);
+  }
+
+  @override
   void dispose() {
+    for (final field in [_name, _email, _password]) {
+      field.removeListener(_clearError);
+    }
     _name.dispose();
     _email.dispose();
     _password.dispose();
