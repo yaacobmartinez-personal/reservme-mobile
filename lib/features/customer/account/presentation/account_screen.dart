@@ -106,29 +106,33 @@ class AccountScreen extends ConsumerWidget {
                   const Eyebrow('Preferences'),
                   const SizedBox(height: Spacing.x2),
                   group([
+                    // Label above, control below: side by side, the segmented
+                    // control took the row and broke "Appearance" mid-word on a
+                    // 360pt phone.
                     ListTile(
                       leading: const Icon(Icons.dark_mode_outlined),
                       title: const Text('Appearance'),
-                      trailing: SegmentedButton<ThemeMode>(
-                        showSelectedIcon: false,
-                        style: SegmentedButton.styleFrom(
-                          visualDensity: VisualDensity.compact,
-                          textStyle: AppType.buttonS,
+                      subtitle: Padding(
+                        padding: const EdgeInsets.only(top: Spacing.x2),
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: SegmentedButton<ThemeMode>(
+                            showSelectedIcon: false,
+                            style: SegmentedButton.styleFrom(
+                              visualDensity: VisualDensity.compact,
+                              textStyle: AppType.buttonS,
+                            ),
+                            segments: const [
+                              ButtonSegment(value: ThemeMode.system, label: Text('Auto')),
+                              ButtonSegment(value: ThemeMode.light, label: Text('Light')),
+                              ButtonSegment(value: ThemeMode.dark, label: Text('Dark')),
+                            ],
+                            selected: {appearance},
+                            onSelectionChanged: (s) =>
+                                ref.read(appearanceControllerProvider.notifier).set(s.first),
+                          ),
                         ),
-                        segments: const [
-                          ButtonSegment(value: ThemeMode.system, label: Text('Auto')),
-                          ButtonSegment(value: ThemeMode.light, label: Text('Light')),
-                          ButtonSegment(value: ThemeMode.dark, label: Text('Dark')),
-                        ],
-                        selected: {appearance},
-                        onSelectionChanged: (s) =>
-                            ref.read(appearanceControllerProvider.notifier).set(s.first),
                       ),
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.public_rounded),
-                      title: const Text('Server'),
-                      subtitle: Text(Uri.parse(AppConfig.defaultServerUrl).host),
                     ),
                   ]),
                   const SizedBox(height: Spacing.x5),
@@ -172,7 +176,7 @@ class AccountScreen extends ConsumerWidget {
                   const SizedBox(height: Spacing.x8),
                   Center(
                     child: Text(
-                      'ReservMe ${AppConfig.appVersion} · ${apiMode.name} API',
+                      versionLine(apiMode),
                       style: AppType.caption.copyWith(color: p.ink3),
                     ),
                   ),

@@ -61,3 +61,12 @@ abstract final class AppConfig {
   static const String defaultTimezone = 'Asia/Manila';
   static const String defaultCurrency = 'PHP';
 }
+
+/// The footer under Account and More. A real build shows the version only —
+/// which server the app talks to is not something a customer or a venue owner
+/// needs, or should be invited to wonder about. A fake build says so, because
+/// someone demoing it must not mistake seeded data for a live venue's.
+String versionLine(ApiMode mode) => switch (mode) {
+      ApiMode.real => 'ReservMe ${AppConfig.appVersion}',
+      ApiMode.fake => 'ReservMe ${AppConfig.appVersion} · demo data',
+    };

@@ -195,13 +195,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             actionLabel: 'Find a venue',
             onAction: () => context.go(AppMode.customer.home),
           ),
-          const SizedBox(height: Spacing.x4),
-          Center(
-            child: Text(
-              'Server: ${Uri.parse(AppConfig.defaultServerUrl).host}',
-              style: AppType.caption.copyWith(color: p.ink3),
-            ),
-          ),
         ],
       ),
     );
