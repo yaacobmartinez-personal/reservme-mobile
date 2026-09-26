@@ -82,6 +82,14 @@ class VenuePickerScreen extends ConsumerWidget {
                               venues.isEmpty ? 'Set up your venue' : 'Add another venue',
                             ),
                           ),
+                        if (auth.isPlatformAdmin) ...[
+                          const SizedBox(height: Spacing.x3),
+                          OutlinedButton.icon(
+                            onPressed: () => context.push(Routes.admin),
+                            icon: const Icon(Icons.admin_panel_settings_outlined),
+                            label: const Text('Platform admin'),
+                          ),
+                        ],
                         const SizedBox(height: Spacing.x6),
                         TextButton.icon(
                           onPressed: () async {

@@ -148,7 +148,11 @@ class FakeAuthRepository implements AuthRepository {
           ),
     ]..sort((a, b) => a.name.compareTo(b.name));
 
-    return Me(user: _userOf(user), venues: venues);
+    return Me(
+      user: _userOf(user),
+      venues: venues,
+      platformAdmin: _store.platformAdmins.contains(user.id),
+    );
   }
 
   @override

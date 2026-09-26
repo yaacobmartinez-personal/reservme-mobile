@@ -513,6 +513,29 @@ class FakeBillingPayment {
   final DateTime createdAt;
 }
 
+/// One row of the admin audit trail. `actorUserId` is always the real person.
+class FakeAdminAudit {
+  FakeAdminAudit({
+    required this.id,
+    required this.actorUserId,
+    required this.action,
+    this.venueId,
+    this.target,
+    this.detail,
+    required this.createdAt,
+  });
+
+  final String id;
+  final String actorUserId;
+
+  /// `admin.approved_payment`, `admin.suspended_venue`, …
+  final String action;
+  final String? venueId;
+  final String? target;
+  final Map<String, Object?>? detail;
+  final DateTime createdAt;
+}
+
 class FakeStore {
   FakeStore();
 
@@ -536,6 +559,13 @@ class FakeStore {
   final promos = <FakePromo>[];
   final webhooks = <FakeWebhook>[];
   final apiKeys = <FakeApiKey>[];
+
+  /// User ids with a current platform-admin grant (`platform_admin`).
+  final platformAdmins = <String>{};
+  final adminAudit = <FakeAdminAudit>[];
+
+  /// `platform_setting`: the InstaPay QR, payee and account.
+  final platformSettings = <String, String>{};
 
   /// Email → 6-digit code the fake server "sent" (verification / reset).
   final emailCodes = <String, String>{};
@@ -655,4 +685,4 @@ class FakeEmail {
   final DateTime sentAt;
 }
 
-enum FakeEmailKind { verify, reset, invite, confirmation, reminder, waitlistClaim }
+enum FakeEmailKind { verify, reset, invite, confirmation, reminder, waitlistClaim, adminMessage }

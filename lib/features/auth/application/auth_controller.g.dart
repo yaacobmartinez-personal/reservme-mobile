@@ -56,7 +56,7 @@ final class AuthControllerProvider
   }
 }
 
-String _$authControllerHash() => r'e37456ac3f7783c284d9fcd364240ab49bb232c9';
+String _$authControllerHash() => r'6eef01a480e10c77a0211ca53f7de84a9f1f2292';
 
 /// The venue-staff session.
 ///

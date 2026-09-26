@@ -158,6 +158,14 @@ class AccountScreen extends ConsumerWidget {
                         trailing: const Icon(Icons.chevron_right_rounded),
                         onTap: () => context.push(Routes.login),
                       ),
+                    if (auth.isPlatformAdmin)
+                      ListTile(
+                        leading: Icon(Icons.admin_panel_settings_outlined, color: p.pineInk),
+                        title: const Text('Platform admin'),
+                        subtitle: const Text('Every venue, payments to review'),
+                        trailing: const Icon(Icons.chevron_right_rounded),
+                        onTap: () => context.push(Routes.admin),
+                      ),
                   ]),
                   const SizedBox(height: Spacing.x5),
                   const Eyebrow('Data'),

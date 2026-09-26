@@ -27,6 +27,7 @@ class MoreScreen extends ConsumerWidget {
     final p = context.palette;
     final venue = ref.watch(selectedVenueProvider);
     final apiMode = ref.watch(apiModeProvider);
+    final isPlatformAdmin = ref.watch(authControllerProvider).isPlatformAdmin;
 
     Widget group(List<Widget> tiles) => AppCard(
           padding: EdgeInsets.zero,
@@ -121,6 +122,9 @@ class MoreScreen extends ConsumerWidget {
                       },
                     ),
                     tile(Icons.person_outline_rounded, 'Your account', null, Routes.ownerAccount),
+                    if (isPlatformAdmin)
+                      tile(Icons.admin_panel_settings_outlined, 'Platform admin',
+                          'Every venue, payments to review', Routes.admin),
                   ]),
                   const SizedBox(height: Spacing.x4),
                   TextButton.icon(

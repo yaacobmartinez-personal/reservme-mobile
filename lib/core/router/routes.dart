@@ -63,4 +63,15 @@ abstract final class Routes {
   static const venueMarketing = '/v/more/marketing';
   static const venueIntegrations = '/v/more/integrations';
   static const venueExport = '/v/more/export';
+
+  // ---- platform admin (outside both shells) -------------------------------
+  /// Its own stack rather than a venue tab: a platform admin need not belong
+  /// to any venue, and the console is about all of them.
+  static const admin = '/admin';
+  static const adminTenants = '/admin/tenants';
+  static String adminTenant(String orgId) => '/admin/tenants/$orgId';
+  static const adminPayments = '/admin/payments';
+  static const adminAudit = '/admin/audit';
+  static const adminAdmins = '/admin/admins';
+  static const adminInstapay = '/admin/instapay';
 }
