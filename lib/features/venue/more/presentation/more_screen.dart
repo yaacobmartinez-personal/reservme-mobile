@@ -126,7 +126,7 @@ class MoreScreen extends ConsumerWidget {
                   const SizedBox(height: Spacing.x4),
                   Center(
                     child: Text(
-                      'ReservMe ${AppConfig.appVersion} · ${apiMode.name} API',
+                      versionLine(apiMode),
                       style: AppType.caption.copyWith(color: p.ink3),
                     ),
                   ),
