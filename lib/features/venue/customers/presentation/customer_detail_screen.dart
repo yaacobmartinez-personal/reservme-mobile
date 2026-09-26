@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../core/model/enums.dart';
 import '../../../../core/money/money.dart';
 import '../../../../core/theme/palette.dart';
 import '../../../../core/theme/spacing.dart';
@@ -11,6 +12,7 @@ import '../../../../core/ui/primitives.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/confirm_dialog.dart';
 import '../../../../core/widgets/empty_state.dart';
+import '../../growth/presentation/widgets/holdings_section.dart';
 import '../../venues/application/selected_venue_controller.dart';
 import '../application/customers_controller.dart';
 import '../domain/customer.dart';
@@ -50,6 +52,8 @@ class CustomerDetailScreen extends ConsumerWidget {
           profile: p,
           venueSlug: venue.slug,
           currency: venue.currency,
+          timezone: venue.timezone,
+          canManage: venue.role.atLeast(VenueRole.admin),
         ),
       ),
     );
@@ -61,11 +65,15 @@ class _Body extends ConsumerWidget {
     required this.profile,
     required this.venueSlug,
     required this.currency,
+    required this.timezone,
+    required this.canManage,
   });
 
   final CustomerProfile profile;
   final String venueSlug;
   final String currency;
+  final String timezone;
+  final bool canManage;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -157,6 +165,24 @@ class _Body extends ConsumerWidget {
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: Spacing.x2),
+          Text(
+            [
+              c.loyaltyPoints == 1 ? '1 loyalty point' : '${c.loyaltyPoints} loyalty points',
+              c.marketingOptIn ? 'agreed to marketing email' : 'no marketing email',
+            ].join(' · '),
+            style: AppType.bodyS.copyWith(color: p.ink3),
+          ),
+          const SizedBox(height: Spacing.x5),
+
+          HoldingsSection(
+            venueSlug: venueSlug,
+            customerId: c.id,
+            holdings: profile.holdings,
+            timezone: timezone,
+            currency: currency,
+            canManage: canManage,
           ),
           const SizedBox(height: Spacing.x5),
 

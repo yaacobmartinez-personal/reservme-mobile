@@ -59,6 +59,10 @@ enum Feature {
 
   /// Delete account (#34).
   deleteAccount,
+
+  /// Memberships, promo codes, the review link and loyalty rules,
+  /// integrations and CSV export (#42–#47) — what only the web dashboard did.
+  growth,
 }
 
 /// Flip an entry to `true` when the corresponding contract items land on the
@@ -93,6 +97,7 @@ const Map<Feature, bool> _shippedOnRealServer = {
   Feature.billing: true, // #32 — live
   Feature.insights: true, // #33 — live
   Feature.deleteAccount: true, // #34 — live
+  Feature.growth: true, // #42–#47 — live
 };
 
 bool isAvailable(Feature feature, ApiMode mode) => switch (mode) {
