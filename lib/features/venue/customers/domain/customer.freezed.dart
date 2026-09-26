@@ -17,7 +17,10 @@ T _$identity<T>(T value) => value;
 mixin _$CustomerSummary {
 
  String get id; String get name; String get email; String? get phone; List<String> get tags; int get bookings; int get lifetimeValueCents; int get noShowCount;/// Whole days since the last confirmed past booking; null if never.
- int? get lastVisitDays; DateTime get createdAt;
+ int? get lastVisitDays; DateTime get createdAt;/// One point per ₱100 of a confirmed booking, accrued by a background
+/// job (#43). Read, never edited.
+ int get loyaltyPoints;/// Whether they agreed to marketing email — win-backs go only to them.
+ bool get marketingOptIn;
 /// Create a copy of CustomerSummary
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -31,20 +34,20 @@ $CustomerSummaryCopyWith<CustomerSummary> get copyWith => _$CustomerSummaryCopyW
 @override
 bool operator ==(Object other) {
   final _this = this as CustomerSummary;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CustomerSummary&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.email, _this.email) || other.email == _this.email)&&(identical(other.phone, _this.phone) || other.phone == _this.phone)&&const DeepCollectionEquality().equals(other.tags, _this.tags)&&(identical(other.bookings, _this.bookings) || other.bookings == _this.bookings)&&(identical(other.lifetimeValueCents, _this.lifetimeValueCents) || other.lifetimeValueCents == _this.lifetimeValueCents)&&(identical(other.noShowCount, _this.noShowCount) || other.noShowCount == _this.noShowCount)&&(identical(other.lastVisitDays, _this.lastVisitDays) || other.lastVisitDays == _this.lastVisitDays)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CustomerSummary&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.email, _this.email) || other.email == _this.email)&&(identical(other.phone, _this.phone) || other.phone == _this.phone)&&const DeepCollectionEquality().equals(other.tags, _this.tags)&&(identical(other.bookings, _this.bookings) || other.bookings == _this.bookings)&&(identical(other.lifetimeValueCents, _this.lifetimeValueCents) || other.lifetimeValueCents == _this.lifetimeValueCents)&&(identical(other.noShowCount, _this.noShowCount) || other.noShowCount == _this.noShowCount)&&(identical(other.lastVisitDays, _this.lastVisitDays) || other.lastVisitDays == _this.lastVisitDays)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt)&&(identical(other.loyaltyPoints, _this.loyaltyPoints) || other.loyaltyPoints == _this.loyaltyPoints)&&(identical(other.marketingOptIn, _this.marketingOptIn) || other.marketingOptIn == _this.marketingOptIn));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as CustomerSummary;
-  return Object.hash(runtimeType,_this.id,_this.name,_this.email,_this.phone,const DeepCollectionEquality().hash(_this.tags),_this.bookings,_this.lifetimeValueCents,_this.noShowCount,_this.lastVisitDays,_this.createdAt);
+  return Object.hash(runtimeType,_this.id,_this.name,_this.email,_this.phone,const DeepCollectionEquality().hash(_this.tags),_this.bookings,_this.lifetimeValueCents,_this.noShowCount,_this.lastVisitDays,_this.createdAt,_this.loyaltyPoints,_this.marketingOptIn);
 }
 
 @override
 String toString() {
   final _this = this as CustomerSummary;
-  return 'CustomerSummary(id: ${_this.id}, name: ${_this.name}, email: ${_this.email}, phone: ${_this.phone}, tags: ${_this.tags}, bookings: ${_this.bookings}, lifetimeValueCents: ${_this.lifetimeValueCents}, noShowCount: ${_this.noShowCount}, lastVisitDays: ${_this.lastVisitDays}, createdAt: ${_this.createdAt})';
+  return 'CustomerSummary(id: ${_this.id}, name: ${_this.name}, email: ${_this.email}, phone: ${_this.phone}, tags: ${_this.tags}, bookings: ${_this.bookings}, lifetimeValueCents: ${_this.lifetimeValueCents}, noShowCount: ${_this.noShowCount}, lastVisitDays: ${_this.lastVisitDays}, createdAt: ${_this.createdAt}, loyaltyPoints: ${_this.loyaltyPoints}, marketingOptIn: ${_this.marketingOptIn})';
 }
 
 
@@ -55,7 +58,7 @@ abstract mixin class $CustomerSummaryCopyWith<$Res>  {
   factory $CustomerSummaryCopyWith(CustomerSummary value, $Res Function(CustomerSummary) _then) = _$CustomerSummaryCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String email, String? phone, List<String> tags, int bookings, int lifetimeValueCents, int noShowCount, int? lastVisitDays, DateTime createdAt
+ String id, String name, String email, String? phone, List<String> tags, int bookings, int lifetimeValueCents, int noShowCount, int? lastVisitDays, DateTime createdAt, int loyaltyPoints, bool marketingOptIn
 });
 
 
@@ -72,7 +75,7 @@ class _$CustomerSummaryCopyWithImpl<$Res>
 
 /// Create a copy of CustomerSummary
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? email = null,Object? phone = freezed,Object? tags = null,Object? bookings = null,Object? lifetimeValueCents = null,Object? noShowCount = null,Object? lastVisitDays = freezed,Object? createdAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? email = null,Object? phone = freezed,Object? tags = null,Object? bookings = null,Object? lifetimeValueCents = null,Object? noShowCount = null,Object? lastVisitDays = freezed,Object? createdAt = null,Object? loyaltyPoints = null,Object? marketingOptIn = null,}) {
   return _then(CustomerSummary(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -84,7 +87,9 @@ as int,lifetimeValueCents: null == lifetimeValueCents ? _self.lifetimeValueCents
 as int,noShowCount: null == noShowCount ? _self.noShowCount : noShowCount // ignore: cast_nullable_to_non_nullable
 as int,lastVisitDays: freezed == lastVisitDays ? _self.lastVisitDays : lastVisitDays // ignore: cast_nullable_to_non_nullable
 as int?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
-as DateTime,
+as DateTime,loyaltyPoints: null == loyaltyPoints ? _self.loyaltyPoints : loyaltyPoints // ignore: cast_nullable_to_non_nullable
+as int,marketingOptIn: null == marketingOptIn ? _self.marketingOptIn : marketingOptIn // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -169,10 +174,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String email,  String? phone,  List<String> tags,  int bookings,  int lifetimeValueCents,  int noShowCount,  int? lastVisitDays,  DateTime createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String email,  String? phone,  List<String> tags,  int bookings,  int lifetimeValueCents,  int noShowCount,  int? lastVisitDays,  DateTime createdAt,  int loyaltyPoints,  bool marketingOptIn)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CustomerSummary() when $default != null:
-return $default(_that.id,_that.name,_that.email,_that.phone,_that.tags,_that.bookings,_that.lifetimeValueCents,_that.noShowCount,_that.lastVisitDays,_that.createdAt);case _:
+return $default(_that.id,_that.name,_that.email,_that.phone,_that.tags,_that.bookings,_that.lifetimeValueCents,_that.noShowCount,_that.lastVisitDays,_that.createdAt,_that.loyaltyPoints,_that.marketingOptIn);case _:
   return orElse();
 
 }
@@ -190,10 +195,10 @@ return $default(_that.id,_that.name,_that.email,_that.phone,_that.tags,_that.boo
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String email,  String? phone,  List<String> tags,  int bookings,  int lifetimeValueCents,  int noShowCount,  int? lastVisitDays,  DateTime createdAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String email,  String? phone,  List<String> tags,  int bookings,  int lifetimeValueCents,  int noShowCount,  int? lastVisitDays,  DateTime createdAt,  int loyaltyPoints,  bool marketingOptIn)  $default,) {final _that = this;
 switch (_that) {
 case _CustomerSummary():
-return $default(_that.id,_that.name,_that.email,_that.phone,_that.tags,_that.bookings,_that.lifetimeValueCents,_that.noShowCount,_that.lastVisitDays,_that.createdAt);case _:
+return $default(_that.id,_that.name,_that.email,_that.phone,_that.tags,_that.bookings,_that.lifetimeValueCents,_that.noShowCount,_that.lastVisitDays,_that.createdAt,_that.loyaltyPoints,_that.marketingOptIn);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -210,10 +215,10 @@ return $default(_that.id,_that.name,_that.email,_that.phone,_that.tags,_that.boo
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String email,  String? phone,  List<String> tags,  int bookings,  int lifetimeValueCents,  int noShowCount,  int? lastVisitDays,  DateTime createdAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String email,  String? phone,  List<String> tags,  int bookings,  int lifetimeValueCents,  int noShowCount,  int? lastVisitDays,  DateTime createdAt,  int loyaltyPoints,  bool marketingOptIn)?  $default,) {final _that = this;
 switch (_that) {
 case _CustomerSummary() when $default != null:
-return $default(_that.id,_that.name,_that.email,_that.phone,_that.tags,_that.bookings,_that.lifetimeValueCents,_that.noShowCount,_that.lastVisitDays,_that.createdAt);case _:
+return $default(_that.id,_that.name,_that.email,_that.phone,_that.tags,_that.bookings,_that.lifetimeValueCents,_that.noShowCount,_that.lastVisitDays,_that.createdAt,_that.loyaltyPoints,_that.marketingOptIn);case _:
   return null;
 
 }
@@ -225,7 +230,7 @@ return $default(_that.id,_that.name,_that.email,_that.phone,_that.tags,_that.boo
 @JsonSerializable()
 
 class _CustomerSummary extends CustomerSummary {
-  const _CustomerSummary({required this.id, required this.name, required this.email, this.phone,  List<String> tags = const [], this.bookings = 0, this.lifetimeValueCents = 0, this.noShowCount = 0, this.lastVisitDays, required this.createdAt}): _tags = tags,super._();
+  const _CustomerSummary({required this.id, required this.name, required this.email, this.phone,  List<String> tags = const [], this.bookings = 0, this.lifetimeValueCents = 0, this.noShowCount = 0, this.lastVisitDays, required this.createdAt, this.loyaltyPoints = 0, this.marketingOptIn = false}): _tags = tags,super._();
   factory _CustomerSummary.fromJson(Map<String, dynamic> json) => _$CustomerSummaryFromJson(json);
 
 @override final  String id;
@@ -245,6 +250,11 @@ class _CustomerSummary extends CustomerSummary {
 /// Whole days since the last confirmed past booking; null if never.
 @override final  int? lastVisitDays;
 @override final  DateTime createdAt;
+/// One point per ₱100 of a confirmed booking, accrued by a background
+/// job (#43). Read, never edited.
+@override@JsonKey() final  int loyaltyPoints;
+/// Whether they agreed to marketing email — win-backs go only to them.
+@override@JsonKey() final  bool marketingOptIn;
 
 /// Create a copy of CustomerSummary
 /// with the given fields replaced by the non-null parameter values.
@@ -259,18 +269,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _CustomerSummary&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.email, email) || other.email == email)&&(identical(other.phone, phone) || other.phone == phone)&&const DeepCollectionEquality().equals(other.tags, _tags)&&(identical(other.bookings, bookings) || other.bookings == bookings)&&(identical(other.lifetimeValueCents, lifetimeValueCents) || other.lifetimeValueCents == lifetimeValueCents)&&(identical(other.noShowCount, noShowCount) || other.noShowCount == noShowCount)&&(identical(other.lastVisitDays, lastVisitDays) || other.lastVisitDays == lastVisitDays)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _CustomerSummary&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.email, email) || other.email == email)&&(identical(other.phone, phone) || other.phone == phone)&&const DeepCollectionEquality().equals(other.tags, _tags)&&(identical(other.bookings, bookings) || other.bookings == bookings)&&(identical(other.lifetimeValueCents, lifetimeValueCents) || other.lifetimeValueCents == lifetimeValueCents)&&(identical(other.noShowCount, noShowCount) || other.noShowCount == noShowCount)&&(identical(other.lastVisitDays, lastVisitDays) || other.lastVisitDays == lastVisitDays)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.loyaltyPoints, loyaltyPoints) || other.loyaltyPoints == loyaltyPoints)&&(identical(other.marketingOptIn, marketingOptIn) || other.marketingOptIn == marketingOptIn));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,name,email,phone,const DeepCollectionEquality().hash(_tags),bookings,lifetimeValueCents,noShowCount,lastVisitDays,createdAt);
+    return Object.hash(runtimeType,id,name,email,phone,const DeepCollectionEquality().hash(_tags),bookings,lifetimeValueCents,noShowCount,lastVisitDays,createdAt,loyaltyPoints,marketingOptIn);
 }
 
 @override
 String toString() {
-    return 'CustomerSummary(id: $id, name: $name, email: $email, phone: $phone, tags: $tags, bookings: $bookings, lifetimeValueCents: $lifetimeValueCents, noShowCount: $noShowCount, lastVisitDays: $lastVisitDays, createdAt: $createdAt)';
+    return 'CustomerSummary(id: $id, name: $name, email: $email, phone: $phone, tags: $tags, bookings: $bookings, lifetimeValueCents: $lifetimeValueCents, noShowCount: $noShowCount, lastVisitDays: $lastVisitDays, createdAt: $createdAt, loyaltyPoints: $loyaltyPoints, marketingOptIn: $marketingOptIn)';
 }
 
 
@@ -281,7 +291,7 @@ abstract mixin class _$CustomerSummaryCopyWith<$Res> implements $CustomerSummary
   factory _$CustomerSummaryCopyWith(_CustomerSummary value, $Res Function(_CustomerSummary) _then) = __$CustomerSummaryCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, String email, String? phone, List<String> tags, int bookings, int lifetimeValueCents, int noShowCount, int? lastVisitDays, DateTime createdAt
+ String id, String name, String email, String? phone, List<String> tags, int bookings, int lifetimeValueCents, int noShowCount, int? lastVisitDays, DateTime createdAt, int loyaltyPoints, bool marketingOptIn
 });
 
 
@@ -298,7 +308,7 @@ class __$CustomerSummaryCopyWithImpl<$Res>
 
 /// Create a copy of CustomerSummary
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? email = null,Object? phone = freezed,Object? tags = null,Object? bookings = null,Object? lifetimeValueCents = null,Object? noShowCount = null,Object? lastVisitDays = freezed,Object? createdAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? email = null,Object? phone = freezed,Object? tags = null,Object? bookings = null,Object? lifetimeValueCents = null,Object? noShowCount = null,Object? lastVisitDays = freezed,Object? createdAt = null,Object? loyaltyPoints = null,Object? marketingOptIn = null,}) {
   return _then(_CustomerSummary(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -310,7 +320,9 @@ as int,lifetimeValueCents: null == lifetimeValueCents ? _self.lifetimeValueCents
 as int,noShowCount: null == noShowCount ? _self.noShowCount : noShowCount // ignore: cast_nullable_to_non_nullable
 as int,lastVisitDays: freezed == lastVisitDays ? _self.lastVisitDays : lastVisitDays // ignore: cast_nullable_to_non_nullable
 as int?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
-as DateTime,
+as DateTime,loyaltyPoints: null == loyaltyPoints ? _self.loyaltyPoints : loyaltyPoints // ignore: cast_nullable_to_non_nullable
+as int,marketingOptIn: null == marketingOptIn ? _self.marketingOptIn : marketingOptIn // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -896,7 +908,8 @@ as DateTime,
 /// @nodoc
 mixin _$CustomerProfile {
 
- CustomerSummary get customer; List<CustomerBooking> get upcoming; List<CustomerBooking> get past; List<CustomerNote> get notes; DateTime? get lastVisit;
+ CustomerSummary get customer; List<CustomerBooking> get upcoming; List<CustomerBooking> get past; List<CustomerNote> get notes; DateTime? get lastVisit;/// Passes and memberships they hold (#43), active first.
+ List<Holding> get holdings;
 /// Create a copy of CustomerProfile
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -910,20 +923,20 @@ $CustomerProfileCopyWith<CustomerProfile> get copyWith => _$CustomerProfileCopyW
 @override
 bool operator ==(Object other) {
   final _this = this as CustomerProfile;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CustomerProfile&&(identical(other.customer, _this.customer) || other.customer == _this.customer)&&const DeepCollectionEquality().equals(other.upcoming, _this.upcoming)&&const DeepCollectionEquality().equals(other.past, _this.past)&&const DeepCollectionEquality().equals(other.notes, _this.notes)&&(identical(other.lastVisit, _this.lastVisit) || other.lastVisit == _this.lastVisit));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CustomerProfile&&(identical(other.customer, _this.customer) || other.customer == _this.customer)&&const DeepCollectionEquality().equals(other.upcoming, _this.upcoming)&&const DeepCollectionEquality().equals(other.past, _this.past)&&const DeepCollectionEquality().equals(other.notes, _this.notes)&&(identical(other.lastVisit, _this.lastVisit) || other.lastVisit == _this.lastVisit)&&const DeepCollectionEquality().equals(other.holdings, _this.holdings));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as CustomerProfile;
-  return Object.hash(runtimeType,_this.customer,const DeepCollectionEquality().hash(_this.upcoming),const DeepCollectionEquality().hash(_this.past),const DeepCollectionEquality().hash(_this.notes),_this.lastVisit);
+  return Object.hash(runtimeType,_this.customer,const DeepCollectionEquality().hash(_this.upcoming),const DeepCollectionEquality().hash(_this.past),const DeepCollectionEquality().hash(_this.notes),_this.lastVisit,const DeepCollectionEquality().hash(_this.holdings));
 }
 
 @override
 String toString() {
   final _this = this as CustomerProfile;
-  return 'CustomerProfile(customer: ${_this.customer}, upcoming: ${_this.upcoming}, past: ${_this.past}, notes: ${_this.notes}, lastVisit: ${_this.lastVisit})';
+  return 'CustomerProfile(customer: ${_this.customer}, upcoming: ${_this.upcoming}, past: ${_this.past}, notes: ${_this.notes}, lastVisit: ${_this.lastVisit}, holdings: ${_this.holdings})';
 }
 
 
@@ -934,7 +947,7 @@ abstract mixin class $CustomerProfileCopyWith<$Res>  {
   factory $CustomerProfileCopyWith(CustomerProfile value, $Res Function(CustomerProfile) _then) = _$CustomerProfileCopyWithImpl;
 @useResult
 $Res call({
- CustomerSummary customer, List<CustomerBooking> upcoming, List<CustomerBooking> past, List<CustomerNote> notes, DateTime? lastVisit
+ CustomerSummary customer, List<CustomerBooking> upcoming, List<CustomerBooking> past, List<CustomerNote> notes, DateTime? lastVisit, List<Holding> holdings
 });
 
 
@@ -951,14 +964,15 @@ class _$CustomerProfileCopyWithImpl<$Res>
 
 /// Create a copy of CustomerProfile
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? customer = null,Object? upcoming = null,Object? past = null,Object? notes = null,Object? lastVisit = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? customer = null,Object? upcoming = null,Object? past = null,Object? notes = null,Object? lastVisit = freezed,Object? holdings = null,}) {
   return _then(CustomerProfile(
 customer: null == customer ? _self.customer : customer // ignore: cast_nullable_to_non_nullable
 as CustomerSummary,upcoming: null == upcoming ? _self.upcoming : upcoming // ignore: cast_nullable_to_non_nullable
 as List<CustomerBooking>,past: null == past ? _self.past : past // ignore: cast_nullable_to_non_nullable
 as List<CustomerBooking>,notes: null == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
 as List<CustomerNote>,lastVisit: freezed == lastVisit ? _self.lastVisit : lastVisit // ignore: cast_nullable_to_non_nullable
-as DateTime?,
+as DateTime?,holdings: null == holdings ? _self.holdings : holdings // ignore: cast_nullable_to_non_nullable
+as List<Holding>,
   ));
 }
 /// Create a copy of CustomerProfile
@@ -1052,10 +1066,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( CustomerSummary customer,  List<CustomerBooking> upcoming,  List<CustomerBooking> past,  List<CustomerNote> notes,  DateTime? lastVisit)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( CustomerSummary customer,  List<CustomerBooking> upcoming,  List<CustomerBooking> past,  List<CustomerNote> notes,  DateTime? lastVisit,  List<Holding> holdings)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CustomerProfile() when $default != null:
-return $default(_that.customer,_that.upcoming,_that.past,_that.notes,_that.lastVisit);case _:
+return $default(_that.customer,_that.upcoming,_that.past,_that.notes,_that.lastVisit,_that.holdings);case _:
   return orElse();
 
 }
@@ -1073,10 +1087,10 @@ return $default(_that.customer,_that.upcoming,_that.past,_that.notes,_that.lastV
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( CustomerSummary customer,  List<CustomerBooking> upcoming,  List<CustomerBooking> past,  List<CustomerNote> notes,  DateTime? lastVisit)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( CustomerSummary customer,  List<CustomerBooking> upcoming,  List<CustomerBooking> past,  List<CustomerNote> notes,  DateTime? lastVisit,  List<Holding> holdings)  $default,) {final _that = this;
 switch (_that) {
 case _CustomerProfile():
-return $default(_that.customer,_that.upcoming,_that.past,_that.notes,_that.lastVisit);case _:
+return $default(_that.customer,_that.upcoming,_that.past,_that.notes,_that.lastVisit,_that.holdings);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1093,10 +1107,10 @@ return $default(_that.customer,_that.upcoming,_that.past,_that.notes,_that.lastV
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( CustomerSummary customer,  List<CustomerBooking> upcoming,  List<CustomerBooking> past,  List<CustomerNote> notes,  DateTime? lastVisit)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( CustomerSummary customer,  List<CustomerBooking> upcoming,  List<CustomerBooking> past,  List<CustomerNote> notes,  DateTime? lastVisit,  List<Holding> holdings)?  $default,) {final _that = this;
 switch (_that) {
 case _CustomerProfile() when $default != null:
-return $default(_that.customer,_that.upcoming,_that.past,_that.notes,_that.lastVisit);case _:
+return $default(_that.customer,_that.upcoming,_that.past,_that.notes,_that.lastVisit,_that.holdings);case _:
   return null;
 
 }
@@ -1108,7 +1122,7 @@ return $default(_that.customer,_that.upcoming,_that.past,_that.notes,_that.lastV
 @JsonSerializable()
 
 class _CustomerProfile implements CustomerProfile {
-  const _CustomerProfile({required this.customer,  List<CustomerBooking> upcoming = const [],  List<CustomerBooking> past = const [],  List<CustomerNote> notes = const [], this.lastVisit}): _upcoming = upcoming,_past = past,_notes = notes;
+  const _CustomerProfile({required this.customer,  List<CustomerBooking> upcoming = const [],  List<CustomerBooking> past = const [],  List<CustomerNote> notes = const [], this.lastVisit,  List<Holding> holdings = const <Holding>[]}): _upcoming = upcoming,_past = past,_notes = notes,_holdings = holdings;
   factory _CustomerProfile.fromJson(Map<String, dynamic> json) => _$CustomerProfileFromJson(json);
 
 @override final  CustomerSummary customer;
@@ -1134,6 +1148,15 @@ class _CustomerProfile implements CustomerProfile {
 }
 
 @override final  DateTime? lastVisit;
+/// Passes and memberships they hold (#43), active first.
+ final  List<Holding> _holdings;
+/// Passes and memberships they hold (#43), active first.
+@override@JsonKey() List<Holding> get holdings {
+  if (_holdings is EqualUnmodifiableListView) return _holdings;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_holdings);
+}
+
 
 /// Create a copy of CustomerProfile
 /// with the given fields replaced by the non-null parameter values.
@@ -1148,18 +1171,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _CustomerProfile&&(identical(other.customer, customer) || other.customer == customer)&&const DeepCollectionEquality().equals(other.upcoming, _upcoming)&&const DeepCollectionEquality().equals(other.past, _past)&&const DeepCollectionEquality().equals(other.notes, _notes)&&(identical(other.lastVisit, lastVisit) || other.lastVisit == lastVisit));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _CustomerProfile&&(identical(other.customer, customer) || other.customer == customer)&&const DeepCollectionEquality().equals(other.upcoming, _upcoming)&&const DeepCollectionEquality().equals(other.past, _past)&&const DeepCollectionEquality().equals(other.notes, _notes)&&(identical(other.lastVisit, lastVisit) || other.lastVisit == lastVisit)&&const DeepCollectionEquality().equals(other.holdings, _holdings));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,customer,const DeepCollectionEquality().hash(_upcoming),const DeepCollectionEquality().hash(_past),const DeepCollectionEquality().hash(_notes),lastVisit);
+    return Object.hash(runtimeType,customer,const DeepCollectionEquality().hash(_upcoming),const DeepCollectionEquality().hash(_past),const DeepCollectionEquality().hash(_notes),lastVisit,const DeepCollectionEquality().hash(_holdings));
 }
 
 @override
 String toString() {
-    return 'CustomerProfile(customer: $customer, upcoming: $upcoming, past: $past, notes: $notes, lastVisit: $lastVisit)';
+    return 'CustomerProfile(customer: $customer, upcoming: $upcoming, past: $past, notes: $notes, lastVisit: $lastVisit, holdings: $holdings)';
 }
 
 
@@ -1170,7 +1193,7 @@ abstract mixin class _$CustomerProfileCopyWith<$Res> implements $CustomerProfile
   factory _$CustomerProfileCopyWith(_CustomerProfile value, $Res Function(_CustomerProfile) _then) = __$CustomerProfileCopyWithImpl;
 @override @useResult
 $Res call({
- CustomerSummary customer, List<CustomerBooking> upcoming, List<CustomerBooking> past, List<CustomerNote> notes, DateTime? lastVisit
+ CustomerSummary customer, List<CustomerBooking> upcoming, List<CustomerBooking> past, List<CustomerNote> notes, DateTime? lastVisit, List<Holding> holdings
 });
 
 
@@ -1187,14 +1210,15 @@ class __$CustomerProfileCopyWithImpl<$Res>
 
 /// Create a copy of CustomerProfile
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? customer = null,Object? upcoming = null,Object? past = null,Object? notes = null,Object? lastVisit = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? customer = null,Object? upcoming = null,Object? past = null,Object? notes = null,Object? lastVisit = freezed,Object? holdings = null,}) {
   return _then(_CustomerProfile(
 customer: null == customer ? _self.customer : customer // ignore: cast_nullable_to_non_nullable
 as CustomerSummary,upcoming: null == upcoming ? _self._upcoming : upcoming // ignore: cast_nullable_to_non_nullable
 as List<CustomerBooking>,past: null == past ? _self._past : past // ignore: cast_nullable_to_non_nullable
 as List<CustomerBooking>,notes: null == notes ? _self._notes : notes // ignore: cast_nullable_to_non_nullable
 as List<CustomerNote>,lastVisit: freezed == lastVisit ? _self.lastVisit : lastVisit // ignore: cast_nullable_to_non_nullable
-as DateTime?,
+as DateTime?,holdings: null == holdings ? _self._holdings : holdings // ignore: cast_nullable_to_non_nullable
+as List<Holding>,
   ));
 }
 

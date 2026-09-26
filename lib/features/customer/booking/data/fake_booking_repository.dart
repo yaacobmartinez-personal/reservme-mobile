@@ -78,6 +78,25 @@ class FakeBookingRepository implements BookingRepository {
       );
     }
 
+    // `validatePromo`, before anything is written, in its words.
+    final promoCode = input.promo?.trim() ?? '';
+    FakePromo? promo;
+    if (promoCode.isNotEmpty) {
+      promo = _store.promos
+          .where((p) => p.venueId == venue.id && p.code.toLowerCase() == promoCode.toLowerCase())
+          .firstOrNull;
+      final reason = switch (promo) {
+        null => "That promo code isn't recognised.",
+        FakePromo(active: false) => 'That promo code is no longer active.',
+        FakePromo(:final expiresAt?) when !expiresAt.isAfter(_clock()) =>
+          'That promo code has expired.',
+        FakePromo(:final maxUses?, :final uses) when uses >= maxUses =>
+          'That promo code has been fully used.',
+        _ => null,
+      };
+      if (reason != null) return BookingInvalid({'promo': reason}, reason);
+    }
+
     final space = _store.spaceById(input.spaceId);
     if (space == null || space.venueId != venue.id || !space.isActive) {
       return const VenueClosed('That space is not taking bookings.');
@@ -113,7 +132,16 @@ class FakeBookingRepository implements BookingRepository {
     final customer = _upsertCustomer(venue.id, input.name, input.email, input.phone);
     final minutes = input.endsAt.difference(input.startsAt).inMinutes;
     final price = FakeAvailability(_store, _clock).priceFor(space, date, time, zone);
-    final amount = Money.forDuration(price, space.slotMinutes, minutes);
+    var amount = Money.forDuration(price, space.slotMinutes, minutes);
+
+    // `applyBookingDiscounts`: the promo first, then a pass credit or a
+    // membership discount on whatever is left.
+    if (promo != null) {
+      promo.uses += 1;
+      final off = promo.kind == 'percent' ? (amount * promo.value) ~/ 100 : promo.value;
+      amount = (amount - off.clamp(0, amount)).toInt();
+    }
+    amount = _redeem(venue.id, customer.id, amount, now);
 
     final reservation = FakeReservation(
       id: _store.nextId('r'),
@@ -138,6 +166,36 @@ class FakeBookingRepository implements BookingRepository {
     ));
 
     return Booked(bookingFrom(_store, reservation, includeToken: true, now: now));
+  }
+
+  /// `redeemForBooking`: spend one credit from the soonest-expiring holding
+  /// that has one, or else take the best active percentage off. A free slot
+  /// never spends a credit.
+  int _redeem(String venueId, String customerId, int amount, DateTime now) {
+    if (amount <= 0) return amount;
+    bool live(FakeHolding h) =>
+        h.venueId == venueId &&
+        h.customerId == customerId &&
+        h.status == 'active' &&
+        (h.expiresAt == null || h.expiresAt!.isAfter(now));
+
+    final withCredit = _store.holdings.where((h) => live(h) && h.creditsRemaining > 0).toList()
+      ..sort((a, b) {
+        if (a.expiresAt == null) return 1;
+        if (b.expiresAt == null) return -1;
+        return a.expiresAt!.compareTo(b.expiresAt!);
+      });
+    if (withCredit.isNotEmpty) {
+      withCredit.first.creditsRemaining -= 1;
+      return 0;
+    }
+
+    final best = _store.holdings
+        .where(live)
+        .map((h) => _store.plans.where((p) => p.id == h.planId).firstOrNull?.discountPct ?? 0)
+        .fold(0, (a, b) => a > b ? a : b);
+    if (best <= 0) return amount;
+    return amount - (amount * best) ~/ 100;
   }
 
   @override

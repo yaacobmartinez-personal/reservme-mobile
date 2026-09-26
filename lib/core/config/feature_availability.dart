@@ -59,6 +59,14 @@ enum Feature {
 
   /// Delete account (#34).
   deleteAccount,
+
+  /// The platform-admin console (#35–#41): tenants, the payment queue,
+  /// suspensions, the audit trail. Only ever shown to a platform admin.
+  admin,
+
+  /// Memberships, promo codes, the review link and loyalty rules,
+  /// integrations and CSV export (#42–#47) — what only the web dashboard did.
+  growth,
 }
 
 /// Flip an entry to `true` when the corresponding contract items land on the
@@ -93,6 +101,8 @@ const Map<Feature, bool> _shippedOnRealServer = {
   Feature.billing: true, // #32 — live
   Feature.insights: true, // #33 — live
   Feature.deleteAccount: true, // #34 — live
+  Feature.admin: true, // #35–#41 — live
+  Feature.growth: true, // #42–#47 — live
 };
 
 bool isAvailable(Feature feature, ApiMode mode) => switch (mode) {

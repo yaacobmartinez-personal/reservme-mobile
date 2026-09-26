@@ -101,6 +101,29 @@ CustomerSummary { id, name, email, phone?, visits, noShowCount, tags[], lastVisi
 | 32 | `GET …/billing` · `POST …/billing/proof` (multipart: reference, paidAt, optional image) | owner/admin | → `{billing}` | 400, 409 `quoted` \| `already_pending`, 413 | `getBillingState`, `listOrgPayments`, `instapayConfig` |
 | 33 | `GET …/insights?period=today\|7d\|30d\|90d` | member | → `{insights}` — an unknown period is 30 days, not a 400 | 403 | `getDashboard` |
 | 34 | `DELETE /mobile/me` | bearer | → `{ok: true}` | 409 `sole_owner` `{venues: [slug]}` | account deletion with the sole-owner guard |
+| 35 | `GET /mobile/admin/overview` | platform admin | → `{totals: {tenants, suspended, activeSpaces, bookingsLast30, customers, runRateCents}, radar: {endingSoon, inGrace, suspended: [Tenant]}, pendingPayments, growth: [{month, signups, cancellations, cumulative}]}` | 401, 404 (not an admin) | the console's front page |
+| 36 | `GET /mobile/admin/tenants?q=` · `GET /mobile/admin/tenants/{orgId}` | platform admin | → `{tenants: [Tenant]}` · `{tenant, spaces, members, recentBookings, payments}` | 404 | every venue; one venue |
+| 37 | `POST …/tenants/{orgId}/suspend` `{reason?}` · `POST …/reactivate` · `POST …/email` `{subject, body}` | platform admin | → `{ok: true}` | 400, 404, 409 `no_owner_email`, 502 `send_failed` | venue access, and a message to the first owner |
+| 38 | `POST …/tenants/{orgId}/billing` `{action: "mark_paid", paidUntil: "YYYY-MM-DD"}` \| `{action: "comp"}` \| `{action: "cancel"}` | platform admin | → `{ok: true}` | 400, 404 | billing overrides; mark-paid is inclusive |
+| 39 | `GET /mobile/admin/payments` · `POST …/payments/{id}/approve` · `POST …/payments/{id}/reject` `{note?}` | platform admin | → `{payments: [Payment]}` · `{ok: true}` | 404, 409 `not_submitted` | the verification queue |
+| 40 | `GET` · `PUT /mobile/admin/billing-config` `{qrUrl, payee, account}` | platform admin | → `{qrUrl, payee, account, configured}` | 400 | the platform's InstaPay details |
+| 41 | `GET /mobile/admin/audit?limit=` · `GET /mobile/admin/admins` · `POST …/admins/{userId}/revoke` | platform admin | → `{entries}` · `{admins}` · `{ok: true}` | 404, 409 `last_admin` | the audit trail; admins |
+
+### Rows 42–47 — what only the web dashboard did
+
+| # | Method & path | Auth | Request → Response | Errors | Notes |
+|---|---|---|---|---|---|
+| 42 | `GET` · `POST /mobile/venues/{slug}/membership-plans` · `PATCH …/membership-plans/{id}` `{active}` | member reads; owner/admin writes | `{name, kind: pass\|membership, price (pesos), credits?, discountPct?, validDays?}` → `{plans}` · `{plan}` | 400 (needs credits or a discount; duplicate name), 403, 404 | the kind decides the period: a pass is one-time, a membership monthly |
+| 43 | `POST …/customers/{id}/memberships` `{planId}` · profile (#21) gains `loyaltyPoints`, `marketingOptIn`, `holdings` | owner/admin | → `{holdings}` | 404, 409 `plan_unavailable` | records a plan sold at the desk; seeds credits and expiry |
+| 44 | `GET` · `POST …/promo-codes` · `PATCH …/promo-codes/{id}` `{active}` | member reads; owner/admin writes | `{code, kind: percent\|amount, value, maxUses?, expiresAt? YYYY-MM-DD}` → `{codes}` · `{code}` | 400 | code upper-cased; `amountCents` for a peso amount; expiry is end of that day in the **venue's** zone |
+| 45 | `GET` · `PUT …/marketing` `{reviewUrl \| null}` | member reads; owner/admin writes | → `{reviewUrl, loyalty: {pesosPerPoint, winbackAfterDays}}` | 400 | loyalty is shown, not edited — the same for every venue |
+| 46 | `GET …/integrations` · `POST …/integrations/ical` · `POST …/integrations/webhooks` `{url, events}` · `DELETE …/webhooks/{id}` · `POST …/integrations/api-keys` `{name}` · `DELETE …/api-keys/{id}` | owner/admin | → `{icalUrl, webhookEvents, webhooks, apiKeys}`; key creation adds `key` | 400 (https only), 403 | an API key is whole in its creation response only; webhook secrets are listed |
+| 47 | `GET …/export/{bookings\|customers\|transactions}` | member | → `text/csv` (CRLF) | 404 | the web's CSVs; the app hands them to the share sheet |
+
+The promo code a customer types already travelled with #3; it is validated
+before anything is written and refused in `validatePromo`'s words. The
+discount order is the server's: the promo first, then a pass credit or a
+membership discount on what is left.
 
 ## What is live
 
@@ -260,6 +283,29 @@ stranger can write to:
   opened and cancelled. Only new bookings are refused.
 - **Availability is a prediction.** The exclusion constraint decides, so
   `slot_taken` is a normal answer on a slot the grid showed as open.
+
+**Rows 35–41: the platform-admin console.** The app is the only surface after
+launch, so the web's `/admin` console comes with it. What is worth restating:
+
+- **Admin status is read from `platform_admin` on every request**, never
+  cached in a token. `/me` carries `platformAdmin` so the app can show the
+  entry, but every admin route checks for itself, and a revoke lands on the
+  next tap rather than the next sign-in.
+- **A signed-in non-admin gets 404, not 403.** A venue owner's token should
+  not be able to confirm the console exists.
+- **Both surfaces share one set of rules** (`src/lib/admin/operations.ts`): an
+  approval extends a month from the later of now and the paid-through date,
+  approving twice is a 409 and not a second month, a payment or comp lifts a
+  *billing* suspension and never a manual one, and the last admin cannot be
+  revoked.
+- **Every decision is audited with the real person and the request's origin.**
+  The IP stays on the server; the app is shown who, what and when.
+- **`PUT billing-config` clears an empty field.** Keeping the current QR means
+  sending it back — the app reads it first when no new image was picked.
+- **Not here, deliberately:** impersonation (it sets a browser cookie on the
+  web host and means nothing in the app) and granting admin, which stays
+  `scripts/grant-admin.ts` — making someone a platform admin should need
+  database access, not a phone.
 
 ## Backend follow-ups outside the contract
 

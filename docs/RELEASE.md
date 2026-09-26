@@ -22,12 +22,23 @@ so run `build_runner` after your last source edit, not before it.
 
 ## Build-time configuration
 
-Nothing secret lives in `--dart-define`. `release.json` holds the four values a
+Nothing secret lives in `--dart-define`. `release.json` holds the values a
 store build needs and is committed on purpose:
 
 ```json
-{ "API_MODE": "real", "SERVER_URL": "…", "PUBLIC_ORIGIN": "…", "APP_ORIGIN": "…" }
+{ "API_MODE": "real", "SERVER_URL": "…", "PUBLIC_ORIGIN": "…", "APP_ORIGIN": "…", "SENTRY_DSN": "…" }
 ```
+
+**Until the domain exists, all three origins are `https://reservme-web.onrender.com`.**
+The server is built with that as its app host (`NEXT_PUBLIC_APP_HOST` on
+Render). When `reservme.pro` is live, change these back to
+`https://app.reservme.pro` / `https://reservme.pro` **in the same release** as
+the server's host switch — an app pointed at a host the server does not route
+`/api` on gets 404 for everything.
+
+`SENTRY_DSN` turns on crash reporting (`lib/core/observability/`). Empty means
+off. A client DSN is not a secret — it can only submit events — but reports are
+scrubbed of manage tokens and email addresses before they leave the phone.
 
 ```bash
 flutter build appbundle --dart-define-from-file=release.json

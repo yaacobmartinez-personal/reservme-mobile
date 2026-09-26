@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../features/admin/presentation/admin_admins_screen.dart';
+import '../../features/admin/presentation/admin_audit_screen.dart';
+import '../../features/admin/presentation/admin_home_screen.dart';
+import '../../features/admin/presentation/admin_instapay_screen.dart';
+import '../../features/admin/presentation/admin_payments_screen.dart';
+import '../../features/admin/presentation/admin_tenant_screen.dart';
+import '../../features/admin/presentation/admin_tenants_screen.dart';
 import '../../features/auth/application/auth_controller.dart';
 import '../../features/auth/application/auth_state.dart';
 import '../../features/auth/presentation/forgot_password_screen.dart';
@@ -35,6 +42,10 @@ import '../../features/venue/billing/presentation/billing_screen.dart';
 import '../../features/venue/calendar/presentation/calendar_screen.dart';
 import '../../features/venue/customers/presentation/customer_detail_screen.dart';
 import '../../features/venue/customers/presentation/customers_screen.dart';
+import '../../features/venue/growth/presentation/export_screen.dart';
+import '../../features/venue/growth/presentation/integrations_screen.dart';
+import '../../features/venue/growth/presentation/marketing_screen.dart';
+import '../../features/venue/growth/presentation/memberships_screen.dart';
 import '../../features/venue/insights/presentation/insights_screen.dart';
 import '../../features/venue/more/presentation/more_screen.dart';
 import '../../features/venue/settings/presentation/venue_settings_screen.dart';
@@ -242,6 +253,30 @@ GoRouter appRouter(Ref ref) {
         ],
       ),
 
+      // ---- platform admin: its own stack, outside both shells --------------
+      GoRoute(
+        path: Routes.admin,
+        pageBuilder: (context, state) =>
+            fadeThroughPage(state: state, child: const AdminHomeScreen()),
+        routes: [
+          GoRoute(
+            path: 'tenants',
+            builder: (context, state) => const AdminTenantsScreen(),
+            routes: [
+              GoRoute(
+                path: ':orgId',
+                builder: (context, state) =>
+                    AdminTenantScreen(orgId: state.pathParameters['orgId']!),
+              ),
+            ],
+          ),
+          GoRoute(path: 'payments', builder: (context, state) => const AdminPaymentsScreen()),
+          GoRoute(path: 'instapay', builder: (context, state) => const AdminInstapayScreen()),
+          GoRoute(path: 'audit', builder: (context, state) => const AdminAuditScreen()),
+          GoRoute(path: 'admins', builder: (context, state) => const AdminAdminsScreen()),
+        ],
+      ),
+
       // ---- venue: picker outside the shell ---------------------------------
       GoRoute(
         path: Routes.venuePicker,
@@ -320,6 +355,10 @@ GoRouter appRouter(Ref ref) {
                     path: 'account',
                     builder: (context, state) => const OwnerAccountScreen(),
                   ),
+                  GoRoute(path: 'memberships', builder: (context, state) => const MembershipsScreen()),
+                  GoRoute(path: 'marketing', builder: (context, state) => const MarketingScreen()),
+                  GoRoute(path: 'integrations', builder: (context, state) => const IntegrationsScreen()),
+                  GoRoute(path: 'export', builder: (context, state) => const ExportScreen()),
                   GoRoute(
                     path: 'spaces',
                     builder: (context, state) => const SpacesScreen(),

@@ -113,7 +113,12 @@ class AuthController extends _$AuthController {
         SecureStore.keyVenues,
         me.venues.map((v) => v.toJson()).toList(),
       );
-      state = current.copyWith(user: me.user, venues: me.venues, venuesFresh: true);
+      state = current.copyWith(
+        user: me.user,
+        venues: me.venues,
+        venuesFresh: true,
+        platformAdmin: me.platformAdmin,
+      );
       return me.venues;
     } on ApiError catch (e) {
       // 401 already signed us out via the interceptor. Anything else (offline,

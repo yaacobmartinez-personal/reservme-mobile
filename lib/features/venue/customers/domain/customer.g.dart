@@ -20,6 +20,8 @@ _CustomerSummary _$CustomerSummaryFromJson(Map<String, dynamic> json) =>
       noShowCount: (json['noShowCount'] as num?)?.toInt() ?? 0,
       lastVisitDays: (json['lastVisitDays'] as num?)?.toInt(),
       createdAt: DateTime.parse(json['createdAt'] as String),
+      loyaltyPoints: (json['loyaltyPoints'] as num?)?.toInt() ?? 0,
+      marketingOptIn: json['marketingOptIn'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$CustomerSummaryToJson(_CustomerSummary instance) =>
@@ -34,6 +36,8 @@ Map<String, dynamic> _$CustomerSummaryToJson(_CustomerSummary instance) =>
       'noShowCount': instance.noShowCount,
       'lastVisitDays': instance.lastVisitDays,
       'createdAt': instance.createdAt.toIso8601String(),
+      'loyaltyPoints': instance.loyaltyPoints,
+      'marketingOptIn': instance.marketingOptIn,
     };
 
 _CustomerBooking _$CustomerBookingFromJson(Map<String, dynamic> json) =>
@@ -120,6 +124,11 @@ _CustomerProfile _$CustomerProfileFromJson(Map<String, dynamic> json) =>
       lastVisit: json['lastVisit'] == null
           ? null
           : DateTime.parse(json['lastVisit'] as String),
+      holdings:
+          (json['holdings'] as List<dynamic>?)
+              ?.map((e) => Holding.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const <Holding>[],
     );
 
 Map<String, dynamic> _$CustomerProfileToJson(_CustomerProfile instance) =>
@@ -129,6 +138,7 @@ Map<String, dynamic> _$CustomerProfileToJson(_CustomerProfile instance) =>
       'past': instance.past,
       'notes': instance.notes,
       'lastVisit': instance.lastVisit?.toIso8601String(),
+      'holdings': instance.holdings,
     };
 
 _CustomerPage _$CustomerPageFromJson(Map<String, dynamic> json) =>

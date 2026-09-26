@@ -120,11 +120,11 @@ return signedIn(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( SignOutReason? reason)?  signedOut,TResult Function( User user,  String token,  DateTime expiresAt,  List<VenueMembership> venues,  bool venuesFresh)?  signedIn,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( SignOutReason? reason)?  signedOut,TResult Function( User user,  String token,  DateTime expiresAt,  List<VenueMembership> venues,  bool venuesFresh,  bool platformAdmin)?  signedIn,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case SignedOut() when signedOut != null:
 return signedOut(_that.reason);case SignedIn() when signedIn != null:
-return signedIn(_that.user,_that.token,_that.expiresAt,_that.venues,_that.venuesFresh);case _:
+return signedIn(_that.user,_that.token,_that.expiresAt,_that.venues,_that.venuesFresh,_that.platformAdmin);case _:
   return orElse();
 
 }
@@ -142,11 +142,11 @@ return signedIn(_that.user,_that.token,_that.expiresAt,_that.venues,_that.venues
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( SignOutReason? reason)  signedOut,required TResult Function( User user,  String token,  DateTime expiresAt,  List<VenueMembership> venues,  bool venuesFresh)  signedIn,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( SignOutReason? reason)  signedOut,required TResult Function( User user,  String token,  DateTime expiresAt,  List<VenueMembership> venues,  bool venuesFresh,  bool platformAdmin)  signedIn,}) {final _that = this;
 switch (_that) {
 case SignedOut():
 return signedOut(_that.reason);case SignedIn():
-return signedIn(_that.user,_that.token,_that.expiresAt,_that.venues,_that.venuesFresh);}
+return signedIn(_that.user,_that.token,_that.expiresAt,_that.venues,_that.venuesFresh,_that.platformAdmin);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -160,11 +160,11 @@ return signedIn(_that.user,_that.token,_that.expiresAt,_that.venues,_that.venues
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( SignOutReason? reason)?  signedOut,TResult? Function( User user,  String token,  DateTime expiresAt,  List<VenueMembership> venues,  bool venuesFresh)?  signedIn,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( SignOutReason? reason)?  signedOut,TResult? Function( User user,  String token,  DateTime expiresAt,  List<VenueMembership> venues,  bool venuesFresh,  bool platformAdmin)?  signedIn,}) {final _that = this;
 switch (_that) {
 case SignedOut() when signedOut != null:
 return signedOut(_that.reason);case SignedIn() when signedIn != null:
-return signedIn(_that.user,_that.token,_that.expiresAt,_that.venues,_that.venuesFresh);case _:
+return signedIn(_that.user,_that.token,_that.expiresAt,_that.venues,_that.venuesFresh,_that.platformAdmin);case _:
   return null;
 
 }
@@ -244,7 +244,7 @@ as SignOutReason?,
 
 
 class SignedIn extends AuthState {
-  const SignedIn({required this.user, required this.token, required this.expiresAt,  List<VenueMembership> venues = const [], this.venuesFresh = false}): _venues = venues,super._();
+  const SignedIn({required this.user, required this.token, required this.expiresAt,  List<VenueMembership> venues = const [], this.venuesFresh = false, this.platformAdmin = false}): _venues = venues,super._();
   
 
  final  User user;
@@ -260,6 +260,9 @@ class SignedIn extends AuthState {
 /// False until `/mobile/me` has confirmed the cached venue list this
 /// session.
 @JsonKey() final  bool venuesFresh;
+/// From `/mobile/me`, never cached: a revoked grant must not outlive the
+/// next refresh, and until one lands the console's entry is simply hidden.
+@JsonKey() final  bool platformAdmin;
 
 /// Create a copy of AuthState
 /// with the given fields replaced by the non-null parameter values.
@@ -271,18 +274,18 @@ $SignedInCopyWith<SignedIn> get copyWith => _$SignedInCopyWithImpl<SignedIn>(thi
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is SignedIn&&(identical(other.user, user) || other.user == user)&&(identical(other.token, token) || other.token == token)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&const DeepCollectionEquality().equals(other.venues, _venues)&&(identical(other.venuesFresh, venuesFresh) || other.venuesFresh == venuesFresh));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is SignedIn&&(identical(other.user, user) || other.user == user)&&(identical(other.token, token) || other.token == token)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&const DeepCollectionEquality().equals(other.venues, _venues)&&(identical(other.venuesFresh, venuesFresh) || other.venuesFresh == venuesFresh)&&(identical(other.platformAdmin, platformAdmin) || other.platformAdmin == platformAdmin));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,user,token,expiresAt,const DeepCollectionEquality().hash(_venues),venuesFresh);
+    return Object.hash(runtimeType,user,token,expiresAt,const DeepCollectionEquality().hash(_venues),venuesFresh,platformAdmin);
 }
 
 @override
 String toString() {
-    return 'AuthState.signedIn(user: $user, token: $token, expiresAt: $expiresAt, venues: $venues, venuesFresh: $venuesFresh)';
+    return 'AuthState.signedIn(user: $user, token: $token, expiresAt: $expiresAt, venues: $venues, venuesFresh: $venuesFresh, platformAdmin: $platformAdmin)';
 }
 
 
@@ -293,7 +296,7 @@ abstract mixin class $SignedInCopyWith<$Res> implements $AuthStateCopyWith<$Res>
   factory $SignedInCopyWith(SignedIn value, $Res Function(SignedIn) _then) = _$SignedInCopyWithImpl;
 @useResult
 $Res call({
- User user, String token, DateTime expiresAt, List<VenueMembership> venues, bool venuesFresh
+ User user, String token, DateTime expiresAt, List<VenueMembership> venues, bool venuesFresh, bool platformAdmin
 });
 
 
@@ -310,13 +313,14 @@ class _$SignedInCopyWithImpl<$Res>
 
 /// Create a copy of AuthState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? user = null,Object? token = null,Object? expiresAt = null,Object? venues = null,Object? venuesFresh = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? user = null,Object? token = null,Object? expiresAt = null,Object? venues = null,Object? venuesFresh = null,Object? platformAdmin = null,}) {
   return _then(SignedIn(
 user: null == user ? _self.user : user // ignore: cast_nullable_to_non_nullable
 as User,token: null == token ? _self.token : token // ignore: cast_nullable_to_non_nullable
 as String,expiresAt: null == expiresAt ? _self.expiresAt : expiresAt // ignore: cast_nullable_to_non_nullable
 as DateTime,venues: null == venues ? _self._venues : venues // ignore: cast_nullable_to_non_nullable
 as List<VenueMembership>,venuesFresh: null == venuesFresh ? _self.venuesFresh : venuesFresh // ignore: cast_nullable_to_non_nullable
+as bool,platformAdmin: null == platformAdmin ? _self.platformAdmin : platformAdmin // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }

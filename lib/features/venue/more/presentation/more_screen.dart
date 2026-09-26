@@ -27,6 +27,7 @@ class MoreScreen extends ConsumerWidget {
     final p = context.palette;
     final venue = ref.watch(selectedVenueProvider);
     final apiMode = ref.watch(apiModeProvider);
+    final isPlatformAdmin = ref.watch(authControllerProvider).isPlatformAdmin;
 
     Widget group(List<Widget> tiles) => AppCard(
           padding: EdgeInsets.zero,
@@ -89,12 +90,21 @@ class MoreScreen extends ConsumerWidget {
                     tile(Icons.grid_view_rounded, 'Spaces', 'Hours, pricing, photos', Routes.venueSpaces),
                   ]),
                   const SizedBox(height: Spacing.x5),
+                  const Eyebrow('Grow'),
+                  const SizedBox(height: Spacing.x2),
+                  group([
+                    tile(Icons.card_membership_outlined, 'Passes & memberships', 'Sell packs and monthly plans', Routes.venueMemberships),
+                    tile(Icons.local_offer_outlined, 'Promos & reviews', 'Promo codes, review link, loyalty', Routes.venueMarketing),
+                  ]),
+                  const SizedBox(height: Spacing.x5),
                   const Eyebrow('Venue'),
                   const SizedBox(height: Spacing.x2),
                   group([
                     tile(Icons.tune_rounded, 'Venue settings', 'Policy, hours, branding, booking page', Routes.venueSettings),
                     tile(Icons.people_outline_rounded, 'Team', null, Routes.venueTeam),
                     tile(Icons.receipt_long_outlined, 'Billing', null, Routes.venueBilling, tone: p.clayInk),
+                    tile(Icons.hub_outlined, 'Integrations', 'Calendar feed, webhooks, API keys', Routes.venueIntegrations),
+                    tile(Icons.download_rounded, 'Export', 'Bookings, customers, transactions', Routes.venueExport),
                     tile(Icons.add_business_outlined, 'New venue', 'Add another location', Routes.createVenue),
                   ]),
                   const SizedBox(height: Spacing.x5),
@@ -112,6 +122,9 @@ class MoreScreen extends ConsumerWidget {
                       },
                     ),
                     tile(Icons.person_outline_rounded, 'Your account', null, Routes.ownerAccount),
+                    if (isPlatformAdmin)
+                      tile(Icons.admin_panel_settings_outlined, 'Platform admin',
+                          'Every venue, payments to review', Routes.admin),
                   ]),
                   const SizedBox(height: Spacing.x4),
                   TextButton.icon(

@@ -69,6 +69,7 @@ class RealAuthRepository implements AuthRepository {
             .whereType<Map<String, dynamic>>())
           VenueMembership.fromJson(v),
       ],
+      platformAdmin: json['platformAdmin'] == true,
     );
   }
 
