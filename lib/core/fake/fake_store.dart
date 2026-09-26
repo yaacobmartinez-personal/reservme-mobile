@@ -47,8 +47,10 @@ class FakeVenue {
     this.gcashName,
     this.suspendedAt,
     this.suspendedReason,
+    this.reviewUrl,
+    String? icalToken,
     required this.createdAt,
-  });
+  }) : icalToken = icalToken ?? 'ical-$id';
 
   final String id;
   String slug;
@@ -68,9 +70,135 @@ class FakeVenue {
   String? gcashName;
   DateTime? suspendedAt;
   String? suspendedReason;
+
+  /// Where review requests point (Google, Facebook…); none go out without it.
+  String? reviewUrl;
+
+  /// The calendar feed's secret path segment; rotating it cuts off old URLs.
+  String icalToken;
   final DateTime createdAt;
 
   bool get suspended => suspendedAt != null;
+}
+
+/// A pass or membership a venue sells (`membership_plan`).
+class FakePlan {
+  FakePlan({
+    required this.id,
+    required this.venueId,
+    required this.name,
+    required this.kind,
+    required this.priceCents,
+    this.credits,
+    this.discountPct,
+    this.validDays,
+    this.active = true,
+    required this.createdAt,
+  });
+
+  final String id;
+  final String venueId;
+  final String name;
+
+  /// 'pass' | 'membership'.
+  final String kind;
+  final int priceCents;
+  final int? credits;
+  final int? discountPct;
+  final int? validDays;
+  bool active;
+  final DateTime createdAt;
+
+  String get period => kind == 'membership' ? 'monthly' : 'one_time';
+}
+
+/// A plan a customer holds (`customer_membership`).
+class FakeHolding {
+  FakeHolding({
+    required this.id,
+    required this.venueId,
+    required this.customerId,
+    required this.planId,
+    required this.creditsRemaining,
+    this.status = 'active',
+    this.expiresAt,
+    required this.createdAt,
+  });
+
+  final String id;
+  final String venueId;
+  final String customerId;
+  final String planId;
+  int creditsRemaining;
+  String status;
+  final DateTime? expiresAt;
+  final DateTime createdAt;
+}
+
+class FakePromo {
+  FakePromo({
+    required this.id,
+    required this.venueId,
+    required this.code,
+    required this.kind,
+    required this.value,
+    this.maxUses,
+    this.uses = 0,
+    this.expiresAt,
+    this.active = true,
+    required this.createdAt,
+  });
+
+  final String id;
+  final String venueId;
+
+  /// Stored upper-cased; matched case-insensitively.
+  final String code;
+
+  /// 'percent' | 'amount'. A percentage as-is; an amount in centavos.
+  final String kind;
+  final int value;
+  final int? maxUses;
+  int uses;
+  final DateTime? expiresAt;
+  bool active;
+  final DateTime createdAt;
+}
+
+class FakeWebhook {
+  FakeWebhook({
+    required this.id,
+    required this.venueId,
+    required this.url,
+    required this.secret,
+    required this.events,
+    required this.createdAt,
+  });
+
+  final String id;
+  final String venueId;
+  final String url;
+  final String secret;
+  final List<String> events;
+  final DateTime createdAt;
+}
+
+class FakeApiKey {
+  FakeApiKey({
+    required this.id,
+    required this.venueId,
+    required this.name,
+    required this.prefix,
+    required this.createdAt,
+  });
+
+  final String id;
+  final String venueId;
+  final String name;
+  final String prefix;
+  DateTime? lastUsedAt;
+  DateTime? revokedAt;
+  final DateTime createdAt;
 }
 
 class FakeMembership {
@@ -403,6 +531,11 @@ class FakeStore {
   final waitlist = <FakeWaitlistEntry>[];
   final subscriptions = <FakeSubscription>[];
   final billingPayments = <FakeBillingPayment>[];
+  final plans = <FakePlan>[];
+  final holdings = <FakeHolding>[];
+  final promos = <FakePromo>[];
+  final webhooks = <FakeWebhook>[];
+  final apiKeys = <FakeApiKey>[];
 
   /// Email → 6-digit code the fake server "sent" (verification / reset).
   final emailCodes = <String, String>{};

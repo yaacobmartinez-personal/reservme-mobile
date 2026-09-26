@@ -416,6 +416,49 @@ void seedFakeStore(FakeStore store, DateTime now) {
     ));
   }
 
+  // --- growth: plans, a holding, a promo, a review link (Katipunan) ---------
+  // Seeded last, so every id minted above stays what it always was.
+  katipunan.reviewUrl = 'https://g.page/katipunan-courts/review';
+  final tenPack = FakePlan(
+    id: store.nextId('plan'),
+    venueId: katipunan.id,
+    name: '10-game pass',
+    kind: 'pass',
+    priceCents: 450000,
+    credits: 10,
+    validDays: 90,
+    createdAt: t0,
+  );
+  final club = FakePlan(
+    id: store.nextId('plan'),
+    venueId: katipunan.id,
+    name: 'Club membership',
+    kind: 'membership',
+    priceCents: 99900,
+    discountPct: 15,
+    createdAt: t0,
+  );
+  store.plans.addAll([tenPack, club]);
+  store.holdings.add(FakeHolding(
+    id: store.nextId('hold'),
+    venueId: katipunan.id,
+    customerId: customers[3].id, // the one tagged 'Membership'
+    planId: tenPack.id,
+    creditsRemaining: 7,
+    expiresAt: now.add(const Duration(days: 40)),
+    createdAt: now.subtract(const Duration(days: 50)),
+  ));
+  store.promos.add(FakePromo(
+    id: store.nextId('promo'),
+    venueId: katipunan.id,
+    code: 'WELCOME10',
+    kind: 'percent',
+    value: 10,
+    maxUses: 100,
+    uses: 12,
+    createdAt: t0,
+  ));
+
   // Keep the "Due now" booking's token stable for the canvas reference.
   assert(maria.customerId == customers[0].id);
 }

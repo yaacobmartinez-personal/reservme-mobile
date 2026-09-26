@@ -2,6 +2,8 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../../../core/model/enums.dart';
 
+import '../../growth/domain/growth.dart';
+
 part 'customer.freezed.dart';
 part 'customer.g.dart';
 
@@ -26,6 +28,13 @@ abstract class CustomerSummary with _$CustomerSummary {
     /// Whole days since the last confirmed past booking; null if never.
     int? lastVisitDays,
     required DateTime createdAt,
+
+    /// One point per ₱100 of a confirmed booking, accrued by a background
+    /// job (#43). Read, never edited.
+    @Default(0) int loyaltyPoints,
+
+    /// Whether they agreed to marketing email — win-backs go only to them.
+    @Default(false) bool marketingOptIn,
   }) = _CustomerSummary;
 
   factory CustomerSummary.fromJson(Map<String, dynamic> json) =>
@@ -86,6 +95,9 @@ abstract class CustomerProfile with _$CustomerProfile {
     @Default([]) List<CustomerBooking> past,
     @Default([]) List<CustomerNote> notes,
     DateTime? lastVisit,
+
+    /// Passes and memberships they hold (#43), active first.
+    @Default(<Holding>[]) List<Holding> holdings,
   }) = _CustomerProfile;
 
   factory CustomerProfile.fromJson(Map<String, dynamic> json) =>

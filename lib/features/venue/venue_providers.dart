@@ -17,6 +17,9 @@ import 'calendar/domain/calendar_repository.dart';
 import 'customers/data/fake_customers_repository.dart';
 import 'customers/data/real_customers_repository.dart';
 import 'customers/domain/customers_repository.dart';
+import 'growth/data/fake_growth_repository.dart';
+import 'growth/data/real_growth_repository.dart';
+import 'growth/domain/growth.dart';
 import 'insights/data/fake_insights_repository.dart';
 import 'insights/data/real_insights_repository.dart';
 import 'insights/domain/insights.dart';
@@ -162,4 +165,16 @@ InsightsRepository insightsRepository(Ref ref) =>
         ref.watch(clockProvider),
         () => !ref.mounted || !ref.read(isOnlineProvider),
       ),
+    };
+
+@Riverpod(keepAlive: true)
+GrowthRepository growthRepository(Ref ref) => switch (ref.watch(apiModeProvider)) {
+      ApiMode.real => RealGrowthRepository(ref.watch(apiClientProvider), ApiMode.real),
+      ApiMode.fake => FakeGrowthRepository(
+          ref.watch(fakeStoreProvider),
+          ref.watch(fakeLatencyProvider),
+          ref.watch(clockProvider),
+          () => !ref.mounted || !ref.read(isOnlineProvider),
+          _roleLookup(ref),
+        ),
     };

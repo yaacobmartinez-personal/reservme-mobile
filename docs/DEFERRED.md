@@ -74,4 +74,4 @@ pick it up. Reviewed at the start of each phase, and again before release.
 
 - **Turnstile replacement** for public booking abuse: the contract proposes IP + venue + device rate limits and idempotency keys; confirm with the backend plan.
 - **Payments** are out of scope for v1 (pay-at-venue), so the `payment` table stays unused and the booking form says "Pay at the venue".
-- Memberships, promo codes, loyalty, integrations and CSV export exist on the web but are not in the app — confirm they stay out for v1 given the web dashboard is being parked.
+- Memberships, promo codes, loyalty, integrations and CSV export — **decided 2026-09-27: all in the app for v1** (contract #42–#47). Loyalty is automatic on the server; the app shows points and explains the rules rather than editing them.

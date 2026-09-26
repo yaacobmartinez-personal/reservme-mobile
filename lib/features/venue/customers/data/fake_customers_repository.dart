@@ -4,6 +4,7 @@ import '../../../../core/model/enums.dart';
 import '../../../../core/network/api_error.dart';
 import '../../../../core/time/app_time.dart';
 import '../../../../core/time/clock.dart';
+import '../../growth/data/fake_growth_repository.dart';
 import '../domain/customer.dart';
 import '../domain/customers_repository.dart';
 
@@ -114,6 +115,7 @@ class FakeCustomersRepository implements CustomersRepository {
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
     return CustomerProfile(
+      holdings: fakeHoldings(_store, venue.id, c.id),
       customer: _summary(venue, c, now),
       // Newest-first from the sort; flip so the next booking reads top-down.
       upcoming: upcoming.reversed.map(map).toList(),
@@ -239,6 +241,8 @@ class FakeCustomersRepository implements CustomersRepository {
       noShowCount: c.noShowCount,
       lastVisitDays: lastVisit == null ? null : now.difference(lastVisit).inDays,
       createdAt: c.createdAt,
+      loyaltyPoints: c.loyaltyPoints,
+      marketingOptIn: c.marketingOptIn,
     );
   }
 }
