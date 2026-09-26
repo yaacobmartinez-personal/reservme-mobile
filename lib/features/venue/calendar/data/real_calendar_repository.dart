@@ -84,7 +84,9 @@ class RealCalendarRepository implements CalendarRepository {
       '/mobile/venues/$venueSlug/customers',
       query: {'q': query},
     );
-    final rows = (json['customers'] as List?) ?? const [];
+    // Same endpoint as the Customers screen (#20), so the same page shape:
+    // `rows` plus a `total` the typeahead has no use for.
+    final rows = (json['rows'] as List?) ?? const [];
     return [
       for (final row in rows.whereType<Map<String, dynamic>>())
         CustomerHit(

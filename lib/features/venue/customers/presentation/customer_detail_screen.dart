@@ -100,6 +100,11 @@ class _Body extends ConsumerWidget {
                   ],
                 ),
               ),
+              IconButton(
+                onPressed: () => _editContact(context, notifier, c),
+                icon: const Icon(Icons.edit_outlined),
+                tooltip: 'Edit contact',
+              ),
             ],
           ),
           const SizedBox(height: Spacing.x3),
@@ -209,40 +214,97 @@ class _Body extends ConsumerWidget {
   }
 
   Future<void> _addNote(BuildContext context, CustomerDetail notifier) async {
-    final controller = TextEditingController();
+    // The refusal is shown *inside* the dialog and the dialog stays open:
+    // closing first and complaining afterwards throws away what was typed.
     final body = await showDialog<String>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add a note'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          maxLines: 4,
-          maxLength: 2000,
-          decoration: const InputDecoration(
-            hintText: 'Prefers Court 3 — says the lighting is better.',
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(controller.text),
-            child: const Text('Save'),
-          ),
-        ],
+      builder: (context) => _TextPrompt(
+        title: 'Add a note',
+        hint: 'Prefers Court 3 — says the lighting is better.',
+        maxLength: 2000,
+        maxLines: 4,
+        confirm: 'Save',
+        validate: NoteRules.validate,
       ),
     );
     if (body == null || !context.mounted) return;
-
-    final message = NoteRules.validate(body);
-    if (message != null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
-      return;
-    }
     await _guarded(context, () => notifier.addNote(body));
+  }
+
+  /// The name and phone the desk can correct (#22). Email is not editable — it
+  /// is the `(venue, email)` key the booking engine matches returning
+  /// customers on, so changing it would split one person into two.
+  Future<void> _editContact(
+    BuildContext context,
+    CustomerDetail notifier,
+    CustomerSummary customer,
+  ) async {
+    final name = TextEditingController(text: customer.name);
+    final phone = TextEditingController(text: customer.phone ?? '');
+    // Declared out here on purpose: a local inside the builder is recreated on
+    // every rebuild, so the refusal would be set and immediately forgotten.
+    String? error;
+    final saved = await showDialog<bool>(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          void submit() {
+            final message = ContactRules.validate(
+              name: name.text,
+              phone: phone.text,
+            );
+            if (message != null) {
+              setState(() => error = message);
+              return;
+            }
+            Navigator.of(context).pop(true);
+          }
+
+          return AlertDialog(
+            title: const Text('Edit contact'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: name,
+                  autofocus: true,
+                  maxLength: 120,
+                  decoration: InputDecoration(
+                    labelText: 'Name',
+                    errorText: error,
+                  ),
+                ),
+                TextField(
+                  controller: phone,
+                  keyboardType: TextInputType.phone,
+                  maxLength: 40,
+                  decoration: const InputDecoration(labelText: 'Phone'),
+                ),
+                const SizedBox(height: Spacing.x2),
+                Text(
+                  '${customer.email} — the address bookings are matched on, '
+                  'and not editable.',
+                  style: AppType.caption,
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Cancel'),
+              ),
+              FilledButton(onPressed: submit, child: const Text('Save')),
+            ],
+          );
+        },
+      ),
+    );
+    if (saved != true || !context.mounted) return;
+
+    await _guarded(
+      context,
+      () => notifier.updateContact(name: name.text, phone: phone.text),
+    );
   }
 
   /// Runs a write and shows the server's message if it refuses.
@@ -332,6 +394,73 @@ class _BookingRow extends StatelessWidget {
           StatusChip.status(booking.status, checkedInAt: booking.checkedInAt),
         ],
       ),
+    );
+  }
+}
+
+/// A one-field dialog that refuses without closing, so a rejected value can be
+/// corrected rather than retyped.
+class _TextPrompt extends StatefulWidget {
+  const _TextPrompt({
+    required this.title,
+    required this.hint,
+    required this.confirm,
+    required this.validate,
+    this.maxLength,
+    this.maxLines = 1,
+  });
+
+  final String title;
+  final String hint;
+  final String confirm;
+  final String? Function(String value) validate;
+  final int? maxLength;
+  final int maxLines;
+
+  @override
+  State<_TextPrompt> createState() => _TextPromptState();
+}
+
+class _TextPromptState extends State<_TextPrompt> {
+  final _controller = TextEditingController();
+  String? _error;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final message = widget.validate(_controller.text);
+    if (message != null) {
+      setState(() => _error = message);
+      return;
+    }
+    Navigator.of(context).pop(_controller.text);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(widget.title),
+      content: TextField(
+        controller: _controller,
+        autofocus: true,
+        maxLines: widget.maxLines,
+        maxLength: widget.maxLength,
+        decoration: InputDecoration(hintText: widget.hint, errorText: _error),
+        onChanged: (_) {
+          if (_error != null) setState(() => _error = null);
+        },
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        FilledButton(onPressed: _submit, child: Text(widget.confirm)),
+      ],
     );
   }
 }

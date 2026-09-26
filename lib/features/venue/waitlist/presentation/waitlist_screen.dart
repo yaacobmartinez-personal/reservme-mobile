@@ -44,7 +44,7 @@ class WaitlistScreen extends ConsumerWidget {
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: Spacing.x2),
                   child: Text(
-                    '$waiting waiting · oldest first',
+                    '$waiting waiting · soonest slot first',
                     style: AppType.caption.copyWith(
                       color: context.palette.ink3,
                     ),
@@ -77,8 +77,9 @@ class WaitlistScreen extends ConsumerWidget {
                     const AppBanner(
                       kind: BannerKind.info,
                       title: 'Auto-fills on cancellation',
-                      body: 'When a slot frees, the oldest match gets a '
-                          '30-minute claim link by email.',
+                      body: 'When a slot frees, the earliest match for it '
+                          'gets an email with a booking link. First to book '
+                          'keeps it.',
                     ),
                     const SizedBox(height: Spacing.x3),
                     for (final entry in rows) ...[
@@ -132,8 +133,14 @@ class _EntryCard extends ConsumerWidget {
             ),
           ),
           const SizedBox(width: Spacing.x2),
-          if (entry.isNotified && left != null)
-            StatusChip('Notified · $left min left', tone: ChipTone.pine)
+          // A notified entry says so whether or not there is a deadline on it.
+          // Reading "Waiting" next to someone who has already been emailed
+          // tells the desk the opposite of what is true.
+          if (entry.isNotified)
+            StatusChip(
+              left == null ? 'Notified' : 'Notified · $left min left',
+              tone: ChipTone.pine,
+            )
           else
             const StatusChip('Waiting', tone: ChipTone.warn),
         ],

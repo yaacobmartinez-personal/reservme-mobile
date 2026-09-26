@@ -87,8 +87,8 @@ const Map<Feature, bool> _shippedOnRealServer = {
   Feature.venueLogin: true, // #10–#13 — live
   Feature.today: true, // #14, #15 — live
   Feature.calendar: true, // #16–#19 — live
-  Feature.customers: false, // #20–#22
-  Feature.venueWaitlist: false, // #23
+  Feature.customers: true, // #20–#22 — live
+  Feature.venueWaitlist: true, // #23 — live
   Feature.spaces: false, // #24
   Feature.signup: true, // #25, #26 — live
   Feature.onboarding: true, // #27, #28 — live (#29 is not, see below)
