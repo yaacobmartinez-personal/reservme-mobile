@@ -2,7 +2,6 @@ import 'dart:io' show Platform;
 
 import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:uuid/uuid.dart';
 
 import '../config/app_config.dart';
 import '../storage/boot_data.dart';
@@ -18,8 +17,12 @@ part 'api_client.g.dart';
 ///
 /// - Adds the bearer token (read lazily per request, so the client is not
 ///   rebuilt on every auth change). Public `/public/*` calls carry none.
-/// - Sends an `Idempotency-Key` on every POST that creates something, so a
-///   retried booking never books twice (docs/API-CONTRACT.md conventions).
+/// - Sends the caller's `Idempotency-Key` on a POST that creates something,
+///   so a retried booking never books twice. The key comes from the caller
+///   and *not* from here: minting one per call would give every retry a fresh
+///   key, which is the one thing idempotency must not do.
+/// - Sends `X-Device-Id` on every request, which the server uses as one of
+///   the buckets it rate-limits public writes on.
 /// - Maps every failure to [ApiError]; `status == 0` is "could not reach".
 /// - Emits on [UnauthorizedEvents] for any 401 except the login call itself
 ///   (a 401 there just means wrong password).
@@ -28,14 +31,15 @@ class ApiClient {
     required Dio dio,
     required String? Function() token,
     required UnauthorizedEvents unauthorized,
-  })  : this._(dio, token, unauthorized);
+    String? deviceId,
+  }) : this._(dio, token, unauthorized, deviceId);
 
-  ApiClient._(this._dio, this._token, this._unauthorized);
+  ApiClient._(this._dio, this._token, this._unauthorized, this._deviceId);
 
   final Dio _dio;
   final String? Function() _token;
   final UnauthorizedEvents _unauthorized;
-  static const _uuid = Uuid();
+  final String? _deviceId;
 
   /// Paths whose 401 is a business outcome, not an expired session.
   static const _loginPaths = {'/mobile/auth/login'};
@@ -43,8 +47,12 @@ class ApiClient {
   Future<Map<String, dynamic>> get(String path, {Map<String, dynamic>? query}) =>
       _json(path, method: 'GET', query: query);
 
-  Future<Map<String, dynamic>> post(String path, {Object? body, bool idempotent = false}) =>
-      _json(path, method: 'POST', body: body, idempotent: idempotent);
+  Future<Map<String, dynamic>> post(
+    String path, {
+    Object? body,
+    String? idempotencyKey,
+  }) =>
+      _json(path, method: 'POST', body: body, idempotencyKey: idempotencyKey);
 
   Future<Map<String, dynamic>> patch(String path, {Object? body}) =>
       _json(path, method: 'PATCH', body: body);
@@ -64,7 +72,7 @@ class ApiClient {
     required String method,
     Map<String, dynamic>? query,
     Object? body,
-    bool idempotent = false,
+    String? idempotencyKey,
   }) async {
     final token = _token();
     try {
@@ -77,7 +85,8 @@ class ApiClient {
           responseType: ResponseType.json,
           headers: {
             if (token != null) 'Authorization': 'Bearer $token',
-            if (idempotent) 'Idempotency-Key': _uuid.v4(),
+            'Idempotency-Key': ?idempotencyKey,
+            'X-Device-Id': ?_deviceId,
           },
         ),
       );
@@ -122,6 +131,7 @@ ApiClient apiClient(Ref ref) {
     dio: dio,
     token: () => ref.read(currentTokenProvider),
     unauthorized: ref.watch(unauthorizedEventsProvider),
+    deviceId: ref.watch(bootDataProvider).deviceId,
   );
 }
 

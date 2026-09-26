@@ -64,38 +64,34 @@ enum Feature {
 /// Flip an entry to `true` when the corresponding contract items land on the
 /// real server. Kept as a plain map so the change is a one-line diff.
 ///
-/// Auth shipped on 2026-09-25 (Better Auth bearer + email OTP, walked against
-/// the real database by `npm run test:mobile-auth` in the web repo). Everything
-/// else is still a separate plan.
+/// **Every row of the contract is live as of 2026-09-26** — the venue side
+/// first (auth, onboarding, the desk, the calendar, customers, the waitlist,
+/// the space editor, settings, team, billing, insights), then the public
+/// booking loop. Each row shipped the same way: endpoints, then the flag, then
+/// a walk on a device against the real database.
 ///
-/// Two that look like they should have moved and have not:
-///
-/// - `spaces` gates every method on `RealSpacesRepository`, including pricing
-///   rules and closures — which are #29 and do not exist. Turning it on would
-///   open the space editor with two buttons that refuse, which is the same
-///   wall the sign-up flow used to walk into.
-/// - `today` is the screen O7 hands the new owner to. It is #14 and still to
-///   come, so finishing onboarding on a real server lands on a run sheet that
-///   says it is not available yet. That is legible rather than broken, and it
-///   is the next thing to fix.
+/// The map is kept rather than deleted. It is what the next unshipped endpoint
+/// gets added to, and every `Real*` repository still asks it before it calls,
+/// so a row that is postponed or pulled refuses in one place with a 501 the UI
+/// can explain — instead of 404ing on somebody's phone.
 const Map<Feature, bool> _shippedOnRealServer = {
-  Feature.customerBrowse: false, // #1, #2
-  Feature.customerBooking: false, // #3, #4
-  Feature.manageBooking: false, // #5, #6
-  Feature.reschedule: false, // #7, #8
-  Feature.waitlist: false, // #9
+  Feature.customerBrowse: true, // #1, #2 — live
+  Feature.customerBooking: true, // #3, #4 — live
+  Feature.manageBooking: true, // #5, #6 — live
+  Feature.reschedule: true, // #7, #8 — live
+  Feature.waitlist: true, // #9 — live
   Feature.venueLogin: true, // #10–#13 — live
   Feature.today: true, // #14, #15 — live
   Feature.calendar: true, // #16–#19 — live
   Feature.customers: true, // #20–#22 — live
   Feature.venueWaitlist: true, // #23 — live
-  Feature.spaces: false, // #24
+  Feature.spaces: true, // #24, #28, #29 — live
   Feature.signup: true, // #25, #26 — live
-  Feature.onboarding: true, // #27, #28 — live (#29 is not, see below)
+  Feature.onboarding: true, // #27, #28 — live
   Feature.venueSettings: true, // #30 — live
-  Feature.team: false, // #31
-  Feature.billing: false, // #32
-  Feature.insights: false, // #33
+  Feature.team: true, // #31 — live
+  Feature.billing: true, // #32 — live
+  Feature.insights: true, // #33 — live
   Feature.deleteAccount: true, // #34 — live
 };
 

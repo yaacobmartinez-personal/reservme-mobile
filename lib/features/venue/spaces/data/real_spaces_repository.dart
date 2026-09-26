@@ -166,9 +166,10 @@ class RealSpacesRepository implements SpacesRepository {
     String closureId,
   ) async {
     _guard();
+    // The space to answer with rides in the query, not a body: a DELETE body
+    // is legal and quietly dropped by enough proxies not to depend on.
     return _detail(await _api.delete(
-      '/mobile/venues/$venueSlug/closures/$closureId',
-      body: {'forSpaceId': spaceId},
+      '/mobile/venues/$venueSlug/closures/$closureId?forSpaceId=$spaceId',
     ));
   }
 }

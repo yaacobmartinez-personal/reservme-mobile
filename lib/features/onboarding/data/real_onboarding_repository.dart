@@ -67,7 +67,7 @@ class RealOnboardingRepository implements OnboardingRepository {
       'timezone': input.timezone,
       'currency': input.currency.toUpperCase(),
       if ((input.address ?? '').trim().isNotEmpty) 'address': input.address!.trim(),
-    }, idempotent: true);
+    });
     return VenueMembership.fromJson(json['venue'] as Map<String, dynamic>);
   }
 
@@ -80,7 +80,7 @@ class RealOnboardingRepository implements OnboardingRepository {
       'slotMinutes': input.slotMinutes,
       'priceCents': input.priceCents,
       'capacity': input.capacity,
-    }, idempotent: true);
+    });
     final space = json['space'] as Map<String, dynamic>;
     return space['id'] as String;
   }

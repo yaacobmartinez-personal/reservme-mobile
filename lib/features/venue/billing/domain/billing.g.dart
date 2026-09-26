@@ -82,6 +82,7 @@ _BillingPayment _$BillingPaymentFromJson(Map<String, dynamic> json) =>
           $enumDecodeNullable(_$PaymentStatusEnumMap, json['status']) ??
           PaymentStatus.submitted,
       note: json['note'] as String?,
+      receiptUrl: json['receiptUrl'] as String?,
       createdAt: DateTime.parse(json['createdAt'] as String),
     );
 
@@ -93,6 +94,7 @@ Map<String, dynamic> _$BillingPaymentToJson(_BillingPayment instance) =>
       'paidAt': instance.paidAt,
       'status': _$PaymentStatusEnumMap[instance.status]!,
       'note': instance.note,
+      'receiptUrl': instance.receiptUrl,
       'createdAt': instance.createdAt.toIso8601String(),
     };
 

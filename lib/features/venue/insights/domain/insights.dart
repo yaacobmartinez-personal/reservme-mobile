@@ -103,6 +103,18 @@ abstract class Kpi with _$Kpi {
 
   bool get isUp => (deltaPct ?? 0) > 0;
   bool get isDown => (deltaPct ?? 0) < 0;
+
+  /// Whether the change is good news, bad news, or neither.
+  ///
+  /// Null covers both cases where a verdict would be wrong: no baseline to
+  /// compare against, and **no change at all**. A flat month is not a fall,
+  /// and colouring it as one tells an owner their takings dropped when they
+  /// did not move.
+  bool? isGood({bool lowerIsBetter = false}) {
+    final delta = deltaPct;
+    if (delta == null || delta == 0) return null;
+    return lowerIsBetter ? delta < 0 : delta > 0;
+  }
 }
 
 @freezed

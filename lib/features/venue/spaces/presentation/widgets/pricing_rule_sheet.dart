@@ -5,6 +5,7 @@ import '../../../../../core/money/money.dart';
 import '../../../../../core/theme/palette.dart';
 import '../../../../../core/theme/spacing.dart';
 import '../../../../../core/theme/typography.dart';
+import '../../../../../core/widgets/app_choice_chip.dart';
 import '../../../../../core/widgets/sheet_shell.dart';
 import '../../../../../core/widgets/wall_clock_field.dart';
 import '../../domain/space_input.dart';
@@ -145,9 +146,9 @@ class _DayChip extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => FilterChip(
-        label: Text(DayHours.names[weekday]),
+  Widget build(BuildContext context) => AppChoiceChip(
+        label: DayHours.names[weekday],
         selected: selected,
-        onSelected: (_) => onTap(),
+        onSelected: onTap,
       );
 }

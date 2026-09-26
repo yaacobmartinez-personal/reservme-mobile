@@ -15,22 +15,12 @@ void main() {
       }
     });
 
-    test('exactly the endpoints that exist are live', () {
-      // Auth shipped 2026-09-25; the rest of the backend is still to come.
-      // This list is the tripwire: flipping a flag without an endpoint behind
-      // it fails here rather than on somebody's phone.
-      const live = {
-        Feature.venueLogin,
-        Feature.deleteAccount,
-        Feature.signup,
-        Feature.onboarding,
-        Feature.venueSettings,
-        Feature.today,
-        Feature.calendar,
-        Feature.customers,
-        Feature.venueWaitlist,
-      };
-
+    test('every row of the contract is live', () {
+      // The tripwire this file was written to be: it used to name the handful
+      // of endpoints that existed, and failed when a flag moved without one
+      // behind it. Everything has shipped, so it now asserts the whole map —
+      // and the *next* unshipped row has to be taken out of this set
+      // deliberately rather than by forgetting.
       final shipped = {
         for (final feature in Feature.values)
           if (isAvailable(feature, ApiMode.real)) feature,
@@ -38,36 +28,10 @@ void main() {
 
       expect(
         shipped,
-        live,
-        reason: 'A flag moved. Anything claiming to be live needs its '
-            'endpoints deployed and its Real* repository working against them.',
+        Feature.values.toSet(),
+        reason: 'Anything claiming to be live needs its endpoints deployed '
+            'and its Real* repository working against them.',
       );
-    });
-
-    test('the space editor stays shut while #29 is missing', () {
-      // `Feature.spaces` gates every method on RealSpacesRepository, pricing
-      // rules and closures included. Those are #29. Opening the editor would
-      // put two refusing buttons on it — the same wall sign-up used to be.
-      expect(isAvailable(Feature.spaces, ApiMode.real), isFalse);
-    });
-
-    test('onboarding now hands over to a working run sheet', () {
-      // O7 sends the new owner to Today. Both ends of that handover are live.
-      expect(isAvailable(Feature.onboarding, ApiMode.real), isTrue);
-      expect(isAvailable(Feature.today, ApiMode.real), isTrue);
-    });
-
-    test('all four venue tabs are open', () {
-      // Today, Calendar, Customers and the waitlist behind More: a venue can
-      // run a whole day on the app without a web dashboard anywhere.
-      for (final feature in [
-        Feature.today,
-        Feature.calendar,
-        Feature.customers,
-        Feature.venueWaitlist,
-      ]) {
-        expect(isAvailable(feature, ApiMode.real), isTrue, reason: feature.name);
-      }
     });
 
     test('every feature has an explicit entry, not a default', () {

@@ -90,6 +90,22 @@ void main() {
       expect(at('20:00', '18:00').validate(), 'Please give a valid start and end.');
       expect(at('18:00', '18:00').validate(), 'Please give a valid start and end.');
     });
+
+    test('a window that has already passed is refused', () {
+      // A closure stops *new* bookings inside its window, so one that has
+      // ended stops nothing: the editor filed it and then showed "Nothing
+      // coming up", which reads as the save having failed. Found on a device,
+      // in the evening, against the sheet's own 09:00-18:00 default.
+      expect(
+        at('09:00', '18:00').validate(nowLocal: '2026-10-01 22:30'),
+        'That window has already passed.',
+      );
+      // Still running counts as ahead: closing the rest of the evening is a
+      // real thing to do at 19:00.
+      expect(at('09:00', '22:00').validate(nowLocal: '2026-10-01 19:00'), isNull);
+      // And with no clock given, the rule does not apply at all.
+      expect(at('09:00', '18:00').validate(), isNull);
+    });
   });
 
   group('the editor', () {

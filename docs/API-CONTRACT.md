@@ -69,7 +69,7 @@ CustomerSummary { id, name, email, phone?, visits, noShowCount, tags[], lastVisi
 |---|---|---|---|---|---|
 | 1 | `GET /public/venues/{slug}` | none | → `{venue: Venue}` | 404 | `getVenueBySlug`, `getVenueSpaces` |
 | 2 | `GET /public/venues/{slug}/availability?space={id}&date=YYYY-MM-DD` | none | → `{date, slots: [Slot], sessions: [SessionSummary]}` | 400 outside horizon, 404 | `getDayAvailability`, `getDaySessions` |
-| 3 | `POST /public/venues/{slug}/bookings` | none | `{spaceId, startsAt, endsAt, name, email, phone?, promo?}` → `201 {booking}` (with `manageToken`) | 400 fieldErrors, 403 suspended, 409 `slot_taken`, 429 | `bookSlot` pipeline |
+| 3 | `POST /public/venues/{slug}/bookings` | none | `{spaceId, startsAt, endsAt, name, email, phone?, promo?, partySize?}` → `201 {booking}` with `manageToken`; a replayed `Idempotency-Key` answers `200` with the first one | 400, 403 suspended, 409 `slot_taken`, 429 | `reserveSpace` + the shared discount/announce tail |
 | 4 | `POST /public/venues/{slug}/sessions/{id}/bookings` | none | `{spots, name, email, phone?}` → `201 {booking}` | 409 `session_full`, 429 | `reserveSessionSeats` |
 | 5 | `GET /public/venues/{slug}/bookings/{token}` | none | → `{booking}` (works while suspended) | 404 | `getManageableBooking` |
 | 6 | `POST /public/venues/{slug}/bookings/{token}/cancel` | none | → `{outcome: cancelled\|refused, reason?, booking}` | 404, 429 | `cancelBooking` (policy re-derived server-side) |
@@ -95,11 +95,11 @@ CustomerSummary { id, name, email, phone?, visits, noShowCount, tags[], lastVisi
 | 26 | `POST /mobile/auth/reset-password` | none | `{email, code, password}` → `{token, user}` | 400 bad code | Better Auth reset |
 | 27 | `POST /mobile/venues` · `GET /mobile/venues/slug-available?slug=` | bearer | `{name, slug, timezone, address?, currency?}` → `201 {venue: VenueMembership}` (trialing subscription) | 400, 409 slug taken | `/api/venue/init`, slug rules |
 | 28 | `POST /mobile/venues/{slug}/spaces` · `PATCH …/spaces/{id}` · `DELETE …/spaces/{id}` · `PUT …/spaces/{id}/hours` `[{weekday, opensAt, closesAt}]` · `POST …/spaces/{id}/image` (multipart `image`, ≤2 MB) · `DELETE …/spaces/{id}/image` | admin | space editor; the photo is optional and every surface shows the kind placeholder without one | 400, 404, 413 | `createSpace`, `updateSpace`, `setOpeningHours`, `updateSpaceImage`, `/api/upload` |
-| 29 | `POST …/spaces/{id}/pricing-rules` · `DELETE …/pricing-rules/{id}` · `POST /mobile/venues/{slug}/closures` · `DELETE …/closures/{id}` · `POST …/sessions` · `POST …/sessions/{id}/cancel` | admin | pricing, closures, open-play sessions | 400, 409 | `addPricingRule`, `addClosure`, `session-actions.ts` |
+| 29 | `POST …/spaces/{id}/pricing-rules` · `DELETE …/spaces/{id}/pricing-rules/{ruleId}` · `POST …/closures` · `DELETE …/closures/{closureId}?forSpaceId=` | admin | each answers `{space}` — the whole space, so the editor redraws in one round trip | 400 `fieldErrors`, 404 | `addPricingRule`, `addClosure` |
 | 30 | `PATCH /mobile/venues/{slug}` · `POST …/branding/{logo\|cover}` (multipart) | admin | settings: tagline, address, theme, cancellation, notice/horizon, refund terms, gcash name, timezone | 400 | `updateVenueSettings`, `branding-actions.ts` |
-| 31 | `GET …/team` · `POST …/team/invitations` `{email, role}` · `DELETE …/team/invitations/{id}` · `PATCH …/team/members/{id}` `{role}` · `DELETE …/team/members/{id}` | admin (owner for owner role) | → `{members: [{id, userId, name, email, role, isSelf, joinedAt}], invitations: [{id, email, role, expiresAt}]}` | 403, 409 `last_owner` | Better Auth org plugin + last-owner guard |
-| 32 | `GET …/billing` · `POST …/billing/proof` (multipart: `reference`, `paidAt`, `image`) | owner/admin | → `{band, activeSpaces, status, trialEndsAt, paidUntil?, daysLeftInTrial, dueNow, suspended, instapay, pendingPayment?, history: []}`. The amount is **not** an input — the server derives it from the band, so a venue cannot declare what it owes; and the band itself is derived from the **active** space count at read time, never stored | 400 | `src/lib/billing.ts`, `billing-actions.ts` |
-| 33 | `GET …/insights?period=today\|7d\|30d\|90d` | member | → `{range, bookedValueCents, bookings, utilisationPct, noShowRatePct` (each `{value, previous, deltaPct, series}`)`, bookedByDay, peakHours` (7×24)`, mix, bySpace, customers, needsYou}`. Every bucket is a **venue-local** date and hour. `rental`+`session_seat` drive counts and value; `rental`+`session_block` drive utilisation — counting seats as occupancy would show a full court as over-booked. `deltaPct` is null against a zero baseline. An unknown `period` falls back to 30d. No `awaitingPayments` tile: v1 is pay-at-venue, so the app has no payment records to count. | 403 | `src/lib/analytics.ts` |
+| 31 | `GET …/team` · `POST …/team/invitations` · `DELETE …/team/invitations/{id}` · `PATCH …/team/members/{id}` · `DELETE …/team/members/{id}` | read: member, write: admin | each answers the whole team | 400, 403, 404, 409 `last_owner` | `listMembers` + Better Auth org plugin |
+| 32 | `GET …/billing` · `POST …/billing/proof` (multipart: reference, paidAt, optional image) | owner/admin | → `{billing}` | 400, 409 `quoted` \| `already_pending`, 413 | `getBillingState`, `listOrgPayments`, `instapayConfig` |
+| 33 | `GET …/insights?period=today\|7d\|30d\|90d` | member | → `{insights}` — an unknown period is 30 days, not a 400 | 403 | `getDashboard` |
 | 34 | `DELETE /mobile/me` | bearer | → `{ok: true}` | 409 `sole_owner` `{venues: [slug]}` | account deletion with the sole-owner guard |
 
 ## What is live
@@ -179,18 +179,87 @@ restating:
   email)` key the booking engine matches returning customers on, so changing it
   would either collide or split one person into two.
 
-`Feature.signup`, `onboarding`, `venueSettings`, `today`, `calendar`,
-`customers` and `venueWaitlist` are now `true`. One that looks like it should
-have moved and has not:
+**Every venue-side flag is now `true`**: `venueLogin`, `signup`, `onboarding`,
+`venueSettings`, `today`, `calendar`, `customers`, `venueWaitlist`, `spaces`
+and `deleteAccount`. What is still false is the customer half (#1–#9) and the
+three owner screens behind More — team (#31), billing (#32), insights (#33).
 
-- **`spaces`** gates every method on `RealSpacesRepository`, pricing rules and
-  closures included — those are **#29**. Turning it on would open the space
-  editor with two buttons that refuse.
+**Row 29 shipped last on the venue side**, which is what let `Feature.spaces`
+move: one flag gates every method on `RealSpacesRepository`, so the editor
+could not open at all until peak pricing and closures existed. Three notes:
+
+- **A pricing rule's times have no zone**, and must not. They are `time`
+  columns: 18:00 is the venue's evening wherever the server runs, and an
+  instant would move it when a clock somewhere else changed. A **closure** is
+  the opposite — a real instant, built with `make_timestamptz(..., timezone)`
+  in Postgres for exactly the reason `calendar-json.ts` documents.
+- **A closure from the editor is not a block from the calendar (#19)**, though
+  both write `closure`. A block shuts a window of *today* and any staff member
+  can put one in; a closure here can run across days and is owner-or-admin,
+  because a venue-wide one takes every space off sale. Neither cancels what is
+  already booked.
+- **Sessions are not in #29.** The row proposed create/cancel, and the app
+  treats sessions as read-only in v1 (D17) — `RealSpacesRepository` never calls
+  them. Building endpoints nothing calls is how a contract starts lying, so
+  they are deferred with the feature.
 
 **`claimExpiresAt` is always null** and the app must not draw a countdown from
 nothing. There is no claim window on the server: `promoteWaitlist` emails the
 earliest match a booking link, and whoever books first keeps the slot. Tracked
 as D19.
+
+**Rows 31–33 finished the venue side.** Every flag except the customer half is
+now true. Four things worth restating:
+
+- **The last-owner guard is ours, not Better Auth's.** Demoting or removing the
+  only owner leaves a venue nobody can hand over, invite into or bill, and it
+  is not recoverable from inside the app. Both writes check it and answer
+  409 `last_owner`. Changing your *own* role is allowed: an owner handing the
+  venue on and stepping down is a real thing, and since only an owner can
+  demote an owner, forbidding it would make the guard unreachable.
+- **Invitations go through the organization plugin**, not a direct `invitation`
+  insert, so the email, the 48-hour expiry and the accept page keep working.
+  The invitation is checked against *this* venue before it is cancelled — the
+  id alone would let an admin of one venue revoke another's invite.
+- **The billing amount is never in the request.** It comes from the band,
+  which is itself derived from the *active* space count at read time: pausing a
+  court drops a band with no write anywhere. A quoted plan and an
+  already-pending payment are 409s, not validation errors.
+- **Insights differs from the web dashboard twice, on purpose.** Value and
+  utilisation arrive as one row per day rather than two series, and there is no
+  "awaiting payments" tile — v1 is pay-at-venue, so it would be a permanent
+  zero.
+
+**Rows 1–9 finished it: the public booking loop.** Every row of the contract
+is live. The things worth restating are all about this being the one surface a
+stranger can write to:
+
+- **There is no Turnstile, and no equivalent.** It is a browser challenge; an
+  app cannot run one without embedding a webview in a booking form. Public
+  writes are rate-limited instead, on three buckets — by IP, by venue and by
+  device (`X-Device-Id`, the app's installation id). The first two are *the
+  same buckets the web form uses*, so a venue has one budget however the
+  attempt arrives, not two. Be clear about what this does not buy: an attacker
+  with many IPs and a scripted client is not stopped by any of it, and the
+  device id is self-reported. It stops floods, not a motivated adversary. Play
+  Integrity and App Attest are the real answer and are not in v1 (**D24**).
+- **`Idempotency-Key` is honoured**, per venue, on both booking endpoints. The
+  key is the *caller's* and must be identical across retries of one attempt —
+  the client used to mint one per request, which gave every retry a fresh key
+  and made the header decorative. The controller now holds the key across a
+  failure and clears it only when the server has answered.
+- **The organisation comes from the slug, never the body.** A space id selects
+  among that venue's spaces; it does not name one. The same is true of a
+  session id, a manage token and a waitlist space.
+- **The manage token is the capability.** It comes back exactly twice — when
+  the booking is made, and when the holder reads it back — and never anywhere
+  else. `getManageableBooking` matches it against the slug, so a token cannot
+  be read under another venue.
+- **Suspension refuses writes, not reads.** A suspended venue's page still
+  answers so it can explain itself, and an existing booking can still be
+  opened and cancelled. Only new bookings are refused.
+- **Availability is a prediction.** The exclusion constraint decides, so
+  `slot_taken` is a normal answer on a slot the grid showed as open.
 
 ## Backend follow-ups outside the contract
 

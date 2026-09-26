@@ -58,6 +58,7 @@ class FakeBookingRepository implements BookingRepository {
   Future<BookOutcome> book({
     required String venueSlug,
     required BookingInput input,
+    String? idempotencyKey,
   }) async {
     await _tick();
     final venue = _store.venueBySlug(venueSlug);
@@ -147,6 +148,7 @@ class FakeBookingRepository implements BookingRepository {
     required String name,
     required String email,
     String? phone,
+    String? idempotencyKey,
   }) async {
     await _tick();
     final venue = _store.venueBySlug(venueSlug);
@@ -198,6 +200,7 @@ class FakeBookingRepository implements BookingRepository {
     required String name,
     required String email,
     String? phone,
+    String? idempotencyKey,
   }) async {
     await _tick();
     final venue = _store.venueBySlug(venueSlug);

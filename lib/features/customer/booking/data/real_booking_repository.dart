@@ -35,6 +35,7 @@ class RealBookingRepository implements BookingRepository {
   Future<BookOutcome> book({
     required String venueSlug,
     required BookingInput input,
+    String? idempotencyKey,
   }) async {
     if (!isAvailable(Feature.customerBooking, _mode)) throw ApiError.notAvailable();
     return _attempt(() async {
@@ -52,7 +53,7 @@ class RealBookingRepository implements BookingRepository {
             'promo': input.promo!.trim(),
           'partySize': input.partySize,
         },
-        idempotent: true,
+        idempotencyKey: idempotencyKey,
       );
       return Booked(Booking.fromJson(json['booking'] as Map<String, dynamic>));
     });
@@ -66,6 +67,7 @@ class RealBookingRepository implements BookingRepository {
     required String name,
     required String email,
     String? phone,
+    String? idempotencyKey,
   }) async {
     if (!isAvailable(Feature.customerBooking, _mode)) throw ApiError.notAvailable();
     return _attempt(() async {
@@ -77,7 +79,7 @@ class RealBookingRepository implements BookingRepository {
           'email': email.trim(),
           if (phone != null && phone.trim().isNotEmpty) 'phone': phone.trim(),
         },
-        idempotent: true,
+        idempotencyKey: idempotencyKey,
       );
       return Booked(Booking.fromJson(json['booking'] as Map<String, dynamic>));
     });

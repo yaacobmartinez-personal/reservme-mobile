@@ -9,6 +9,7 @@ import '../../../../core/theme/spacing.dart';
 import '../../../../core/theme/status_chip.dart';
 import '../../../../core/theme/typography.dart';
 import '../../../../core/ui/primitives.dart';
+import '../../../../core/widgets/app_choice_chip.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../venues/application/selected_venue_controller.dart';
@@ -52,7 +53,6 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final p = context.palette;
     final venue = ref.watch(selectedVenueProvider);
     if (venue == null) {
       return const Scaffold(
@@ -103,15 +103,10 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
                   for (final segment in CustomerSegment.values)
                     Padding(
                       padding: const EdgeInsets.only(right: Spacing.x2),
-                      child: ChoiceChip(
-                        label: Text(segment.label),
+                      child: AppChoiceChip(
+                        label: segment.label,
                         selected: _segment == segment,
-                        onSelected: (_) => setState(() => _segment = segment),
-                        showCheckmark: false,
-                        selectedColor: p.ink,
-                        labelStyle: AppType.buttonS.copyWith(
-                          color: _segment == segment ? p.paper : p.ink2,
-                        ),
+                        onSelected: () => setState(() => _segment = segment),
                       ),
                     ),
                 ],
