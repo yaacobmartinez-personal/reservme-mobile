@@ -29,6 +29,7 @@ void main() {
         Feature.calendar,
         Feature.customers,
         Feature.venueWaitlist,
+        Feature.spaces,
       };
 
       final shipped = {
@@ -44,11 +45,23 @@ void main() {
       );
     });
 
-    test('the space editor stays shut while #29 is missing', () {
+    test('the space editor opens now that #29 exists', () {
       // `Feature.spaces` gates every method on RealSpacesRepository, pricing
-      // rules and closures included. Those are #29. Opening the editor would
-      // put two refusing buttons on it — the same wall sign-up used to be.
-      expect(isAvailable(Feature.spaces, ApiMode.real), isFalse);
+      // rules and closures included — so it could not move until #29 shipped,
+      // or the editor would have opened with two refusing buttons.
+      expect(isAvailable(Feature.spaces, ApiMode.real), isTrue);
+    });
+
+    test('the customer half is still shut, all nine rows of it', () {
+      for (final feature in [
+        Feature.customerBrowse,
+        Feature.customerBooking,
+        Feature.manageBooking,
+        Feature.reschedule,
+        Feature.waitlist,
+      ]) {
+        expect(isAvailable(feature, ApiMode.real), isFalse, reason: feature.name);
+      }
     });
 
     test('onboarding now hands over to a working run sheet', () {

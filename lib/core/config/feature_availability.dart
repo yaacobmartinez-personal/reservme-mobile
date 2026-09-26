@@ -68,16 +68,14 @@ enum Feature {
 /// the real database by `npm run test:mobile-auth` in the web repo). Everything
 /// else is still a separate plan.
 ///
-/// Two that look like they should have moved and have not:
+/// The whole venue side is live as of 2026-09-25: the four tabs, onboarding,
+/// settings, and the space editor. `spaces` was the last to move, because one
+/// flag gates every method on `RealSpacesRepository` — turning it on before
+/// #29 existed would have opened the editor with two buttons that refuse,
+/// which is the same wall the sign-up flow used to walk into.
 ///
-/// - `spaces` gates every method on `RealSpacesRepository`, including pricing
-///   rules and closures — which are #29 and do not exist. Turning it on would
-///   open the space editor with two buttons that refuse, which is the same
-///   wall the sign-up flow used to walk into.
-/// - `today` is the screen O7 hands the new owner to. It is #14 and still to
-///   come, so finishing onboarding on a real server lands on a run sheet that
-///   says it is not available yet. That is legible rather than broken, and it
-///   is the next thing to fix.
+/// What is still false is the customer half (#1–#9) and the three owner
+/// screens behind More: team (#31), billing (#32) and insights (#33).
 const Map<Feature, bool> _shippedOnRealServer = {
   Feature.customerBrowse: false, // #1, #2
   Feature.customerBooking: false, // #3, #4
@@ -89,7 +87,7 @@ const Map<Feature, bool> _shippedOnRealServer = {
   Feature.calendar: true, // #16–#19 — live
   Feature.customers: true, // #20–#22 — live
   Feature.venueWaitlist: true, // #23 — live
-  Feature.spaces: false, // #24
+  Feature.spaces: true, // #24, #28, #29 — live
   Feature.signup: true, // #25, #26 — live
   Feature.onboarding: true, // #27, #28 — live (#29 is not, see below)
   Feature.venueSettings: true, // #30 — live

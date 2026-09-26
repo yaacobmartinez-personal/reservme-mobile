@@ -160,9 +160,19 @@ class ClosureInput {
   String get from => '$fromDate $fromTime';
   String get to => '$toDate $toTime';
 
-  String? validate() {
+  /// [nowLocal] is the venue's own "YYYY-MM-DD HH:MM", so the comparison is
+  /// the same string compare the rest of this class uses — and, more to the
+  /// point, it is the *venue's* clock. A phone in another zone would otherwise
+  /// decide for itself whether a window had passed.
+  String? validate({String? nowLocal}) {
     if (to.compareTo(from) <= 0) return 'Please give a valid start and end.';
     if (reason.trim().length > 200) return 'Keep the reason short.';
+    // A closure stops *new* bookings inside its window. One that has already
+    // ended can stop nothing, and the editor would file it and then show
+    // "Nothing coming up" — which reads as the save having failed.
+    if (nowLocal != null && to.compareTo(nowLocal) <= 0) {
+      return 'That window has already passed.';
+    }
     return null;
   }
 

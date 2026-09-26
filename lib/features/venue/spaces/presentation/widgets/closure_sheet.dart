@@ -55,15 +55,30 @@ class _ClosureSheetState extends State<_ClosureSheet> {
   bool _wholeVenue = false;
   String? _error;
 
+  /// The venue's own "YYYY-MM-DD HH:MM" — the only clock that decides whether
+  /// a window has passed. A phone in another zone does not get a vote.
+  late final String _nowLocal;
+
   @override
   void initState() {
     super.initState();
-    final today = AppTime.today(DateTime.now().toUtc(), widget.timezone);
+    final now = DateTime.now().toUtc();
+    final today = AppTime.today(now, widget.timezone);
+    _nowLocal = '$today ${AppTime.formatTime(now, widget.timezone)}';
+
+    // Opening the sheet in the evening used to offer 09:00–18:00 *today* —
+    // a window already over, which the server files and the editor then does
+    // not list, because it only shows closures still ahead.
+    final startsToday = '$today 18:00'.compareTo(_nowLocal) > 0;
+    final day = startsToday
+        ? today
+        : AppTime.today(now.add(const Duration(days: 1)), widget.timezone);
+
     _input = ClosureInput(
       spaceId: widget.spaceId,
-      fromDate: today,
+      fromDate: day,
       fromTime: '09:00',
-      toDate: today,
+      toDate: day,
       toTime: '18:00',
     );
   }
@@ -80,7 +95,7 @@ class _ClosureSheetState extends State<_ClosureSheet> {
       spaceId: _wholeVenue ? null : widget.spaceId,
       clearSpace: _wholeVenue,
     );
-    final message = input.validate();
+    final message = input.validate(nowLocal: _nowLocal);
     if (message != null) {
       setState(() => _error = message);
       return;
