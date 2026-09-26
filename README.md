@@ -41,7 +41,9 @@ password `password123`. In fake mode the sign-in screen offers both as
 one-tap chips.
 
 Optional defines: `SERVER_URL` (default `https://app.reservme.pro`),
-`PUBLIC_ORIGIN` (`https://reservme.pro`), `APP_ORIGIN`.
+`PUBLIC_ORIGIN` (`https://reservme.pro`), `APP_ORIGIN`, `SENTRY_DSN` (crash
+reporting; off when empty). Store builds use `release.json`, which points at
+the Render server until the domain exists.
 
 ## Check
 

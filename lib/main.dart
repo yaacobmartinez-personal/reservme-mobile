@@ -4,6 +4,7 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 
 import 'app.dart';
 import 'core/network/retry_policy.dart';
+import 'core/observability/crash_reporting.dart';
 import 'core/storage/boot_data.dart';
 import 'core/storage/prefs.dart';
 import 'core/storage/secure_store.dart';
@@ -12,11 +13,13 @@ import 'core/time/app_time.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final boot = await _bootstrap();
-  runApp(
-    ProviderScope(
-      retry: appRetryPolicy,
-      overrides: [bootDataProvider.overrideWithValue(boot)],
-      child: const ReservMeApp(),
+  await CrashReporting.run(
+    () => runApp(
+      ProviderScope(
+        retry: appRetryPolicy,
+        overrides: [bootDataProvider.overrideWithValue(boot)],
+        child: const ReservMeApp(),
+      ),
     ),
   );
 }

@@ -28,6 +28,7 @@ dependencies:
   mobile_scanner: ^7.4.2
   qr_flutter: ^4.1.0
   riverpod_annotation: ^4.0.7
+  sentry_flutter: ^9.30.1
   share_plus: ^13.3.0
   shared_preferences: ^2.5.5
   timezone: ^0.11.1

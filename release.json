@@ -1,6 +1,7 @@
 {
   "API_MODE": "real",
-  "SERVER_URL": "https://app.reservme.pro",
-  "PUBLIC_ORIGIN": "https://reservme.pro",
-  "APP_ORIGIN": "https://app.reservme.pro"
+  "SERVER_URL": "https://reservme-web.onrender.com",
+  "PUBLIC_ORIGIN": "https://reservme-web.onrender.com",
+  "APP_ORIGIN": "https://reservme-web.onrender.com",
+  "SENTRY_DSN": ""
 }
