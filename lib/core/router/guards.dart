@@ -50,6 +50,11 @@ String? computeRedirect({
     return deliberate ? AppMode.customer.home : loginFor(uri);
   }
 
+  if (isAdminPath(path) && !auth.isPlatformAdmin) {
+    // Not an admin (or not confirmed as one yet): somewhere they belong.
+    return auth.hasVenueAccess ? AppMode.venue.home : AppMode.customer.home;
+  }
+
   if (isVenuePath(path)) {
     if (!auth.hasVenueAccess) {
       // Signed in but no venue yet: finish setting one up, when this server
@@ -68,13 +73,17 @@ String? computeRedirect({
 /// `/v` and everything under it.
 bool isVenuePath(String path) => path == '/v' || path.startsWith('/v/');
 
+/// The platform-admin console.
+bool isAdminPath(String path) => path == Routes.admin || path.startsWith('${Routes.admin}/');
+
 /// Onboarding steps that come after the account exists.
 bool isPostSignupOnboarding(String path) =>
     path.startsWith('/onboarding/') &&
     path != Routes.signup &&
     path != Routes.verify;
 
-bool requiresSession(String path) => isVenuePath(path) || isPostSignupOnboarding(path);
+bool requiresSession(String path) =>
+    isVenuePath(path) || isAdminPath(path) || isPostSignupOnboarding(path);
 
 /// The login route that returns to [uri] afterwards.
 String loginFor(Uri uri) => '${Routes.login}?from=${Uri.encodeComponent(uri.toString())}';
@@ -87,10 +96,14 @@ String afterSignInTarget({
   required AuthState auth,
   required bool canOnboard,
 }) {
+  final safe = safeFrom(from);
+  if (safe != null && isAdminPath(safe) && auth.isPlatformAdmin) return safe;
   if (!auth.hasVenueAccess) {
+    // A platform admin with no venue of their own is here to run the
+    // platform, not to set up a court.
+    if (auth.isPlatformAdmin) return Routes.admin;
     return canOnboard ? Routes.createVenue : Routes.venuePicker;
   }
-  final safe = safeFrom(from);
   if (safe != null && (isVenuePath(safe) || safe.startsWith('/onboarding/'))) return safe;
   return AppMode.venue.home;
 }

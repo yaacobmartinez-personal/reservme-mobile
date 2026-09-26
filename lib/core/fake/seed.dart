@@ -79,6 +79,15 @@ void seedFakeStore(FakeStore store, DateTime now) {
   );
   store.users.addAll([owner, staff, admin]);
 
+  // The demo owner doubles as the platform admin, so fake mode can show the
+  // console without a fourth account to remember.
+  store.platformAdmins.add(owner.id);
+  store.platformSettings.addAll({
+    'instapay_qr_url': 'fake://platform/instapay.png',
+    'instapay_payee': 'ReservMe Technologies Inc.',
+    'instapay_account': '0917 000 0000',
+  });
+
   // --- venues --------------------------------------------------------------
   final katipunan = FakeVenue(
     id: store.nextId('v'),

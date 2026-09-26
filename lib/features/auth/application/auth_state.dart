@@ -25,6 +25,10 @@ sealed class AuthState with _$AuthState {
     /// False until `/mobile/me` has confirmed the cached venue list this
     /// session.
     @Default(false) bool venuesFresh,
+
+    /// From `/mobile/me`, never cached: a revoked grant must not outlive the
+    /// next refresh, and until one lands the console's entry is simply hidden.
+    @Default(false) bool platformAdmin,
   }) = SignedIn;
 
   bool get isSignedIn => this is SignedIn;
@@ -32,6 +36,12 @@ sealed class AuthState with _$AuthState {
   /// Whether the venue shell may be opened: at least one membership.
   bool get hasVenueAccess => switch (this) {
         SignedIn(:final venues) => venues.isNotEmpty,
+        SignedOut() => false,
+      };
+
+  /// Whether the platform-admin console may be opened.
+  bool get isPlatformAdmin => switch (this) {
+        SignedIn(:final platformAdmin) => platformAdmin,
         SignedOut() => false,
       };
 

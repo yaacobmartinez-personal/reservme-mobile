@@ -13,10 +13,14 @@ class AuthResult {
 
 /// The signed-in user and every venue they belong to (API-CONTRACT #13).
 class Me {
-  const Me({required this.user, required this.venues});
+  const Me({required this.user, required this.venues, this.platformAdmin = false});
 
   final User user;
   final List<VenueMembership> venues;
+
+  /// A current `platform_admin` grant. Shows the console's entry points; every
+  /// admin endpoint still checks for itself.
+  final bool platformAdmin;
 }
 
 /// Staff authentication. Customers never sign in, so this is the whole of it:
