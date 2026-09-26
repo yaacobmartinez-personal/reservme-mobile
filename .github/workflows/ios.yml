@@ -1,0 +1,42 @@
+name: iOS build
+
+# Builds the iOS app on a macOS runner without signing, so an iOS-only break —
+# a plugin's pod, the Xcode project, Info.plist, Swift — shows up on the PR
+# rather than on the day someone first opens it on a Mac. Signing, TestFlight
+# and the App Store stay manual (docs/MAC-SETUP.md): they need the Apple
+# account, which CI does not have.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: flutter build ios (no codesign)
+    runs-on: macos-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.4
+          cache: true
+
+      - run: flutter pub get
+
+      # The release configuration, with the same defines a store build uses.
+      - name: Build (release, unsigned)
+        run: flutter build ios --release --no-codesign --dart-define-from-file=release.json
+
+      - name: Check the privacy manifest made it into the app
+        run: |
+          test -f build/ios/iphoneos/Runner.app/PrivacyInfo.xcprivacy \
+            || { echo '::error::PrivacyInfo.xcprivacy is not in the built app — add it to the Runner target.'; exit 1; }

@@ -91,6 +91,16 @@
 		<string>tel</string>
 		<string>mailto</string>
 	</array>
+	<!-- iOS terminates the app the moment it asks for either permission
+	     without these. Shown in the system prompt, so written for a person. -->
+	<key>NSCameraUsageDescription</key>
+	<string>ReservMe uses the camera to scan a venue's QR code and to take photos of your spaces and payment receipts.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>ReservMe lets you pick photos of your spaces, your payment receipts and your InstaPay QR from your library.</string>
+	<!-- HTTPS only, through the system's own TLS: exempt from export
+	     paperwork, so App Store Connect stops asking on every upload. -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>UIStatusBarHidden</key>
 		<false/>
 	</dict>

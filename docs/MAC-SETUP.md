@@ -2,14 +2,31 @@
 
 The Android side is developed on Windows; iOS needs a Mac with Xcode. This is
 the one-time setup plus the per-session routine. Nothing here changes the
-code — the iOS project is already configured (bundle id `pro.reservme.app`,
-iOS 15.0 minimum, the `reservme://` URL scheme, and an associated-domains
-entitlements file).
+code — the iOS project is already configured: bundle id `pro.reservme.app`,
+iOS 15.0 minimum, **iPhone only** (it runs on iPads in compatibility mode;
+there are no tablet layouts), the `reservme://` URL scheme, camera and photo
+permission strings, `ITSAppUsesNonExemptEncryption = NO`, the app's privacy
+manifest (`Runner/PrivacyInfo.xcprivacy`), and an associated-domains
+entitlements file.
 
-> **There is no backend.** Every `Feature` flag is `false`, so a `real` build
-> signs in nowhere and browses nothing. Use `--dart-define=API_MODE=fake` for
-> everything here: it is a complete offline world with two venues, four
-> courts, a studio on Madrid time, sixty-odd bookings and demo staff accounts.
+**CI already builds iOS.** `.github/workflows/ios.yml` runs
+`flutter build ios --release --no-codesign` on a macOS runner for every PR, so
+the project is known to compile before the Mac is ever opened. What the Mac is
+for is what CI cannot do: run it, sign it, and ship it.
+
+Quick start — after §1 and §2, one script checks the tools and does the
+first build:
+
+```bash
+./scripts/mac-setup.sh
+```
+
+> **Two modes.** `--dart-define-from-file=release.json` talks to the live
+> server (`https://reservme-web.onrender.com` until the domain exists — its
+> first request after a quiet spell takes up to a minute while it wakes).
+> `--dart-define=API_MODE=fake` is a complete offline world — three venues, a
+> studio on Madrid time, sixty-odd bookings, demo staff accounts — and is the
+> better choice for poking at screens.
 
 ## 1. One-time: tools
 
@@ -116,10 +133,11 @@ developer is untrusted: Settings → General → VPN & Device Management → tru
 your Apple ID. Personal Team builds stop launching after 7 days;
 `flutter run` again re-signs.
 
-**A real device is what D18 needs.** The Android emulator on the Windows
-machine cannot render any Flutter app under that host's memory pressure, so
-nothing has been walked on hardware yet. If you have an iPhone here, walking
-O0 → O7 and the venue desk on it closes the oldest open item in the project.
+**Walk it once on an iPhone before the first TestFlight.** Android has been
+walked on an emulator and a Huawei; iOS never has. The things worth a look:
+the camera prompt and QR scanner, picking a photo (space, receipt, InstaPay
+QR), the share sheet from Export, a `reservme://` link opening the app, and
+the keyboard not covering fields in the bottom sheets.
 
 ## 6. Per session
 
@@ -147,12 +165,15 @@ upload:
 - Associated Domains attached (§4).
 - Store copy and screenshots: docs/STORE-LISTING.md.
 
-Note `release.json` sets `API_MODE=real`, which today is an app that can do
-nothing. There is no point submitting until the backend exists (D13).
+`release.json` points at the live server and carries `SENTRY_DSN` (empty
+means crash reporting is off). Review on App Store Connect asks for a demo
+account: create a venue owner on production for the reviewer and put its
+login in the review notes — the app is useless to a reviewer who cannot sign
+in. The privacy answers must match `Runner/PrivacyInfo.xcprivacy`.
 
 ## Remote
 
-`https://github.com/yaacobmartinez-personal/reservme-mobile` (private).
+`https://github.com/yaacobmartinez-personal/reservme-mobile` (public).
 Developed on Windows, pushed to `main`; the Mac pulls from there. Cloning over
 HTTPS needs a GitHub personal access token or `gh auth login` on the Mac; SSH
 works if the Mac's key is on the account.
@@ -170,4 +191,6 @@ works if the Mac's key is on the account.
 | A `https://reservme.pro/…` link opens Safari instead of the app | The AASA file is not hosted yet; `reservme://…` links work |
 | Build error mentioning `Flutter.h` not found | You opened `Runner.xcodeproj`; open `Runner.xcworkspace` |
 | Stale pods after upgrading plugins | `cd ios && pod deintegrate && pod install` |
-| Signed in, but every venue screen is empty | You built with `API_MODE=real`; there is no backend yet |
+| Real mode sits on "waking up" for a minute | The free server was asleep; it answers once it wakes |
+| App crashes the moment it asks for the camera or photos | A permission string is missing from `Info.plist` — both are there; check nothing removed them |
+| Upload rejected over a "required reason" API | `PrivacyInfo.xcprivacy` must be in the Runner target's Resources (CI checks this) |
