@@ -42,6 +42,10 @@ import '../../features/venue/billing/presentation/billing_screen.dart';
 import '../../features/venue/calendar/presentation/calendar_screen.dart';
 import '../../features/venue/customers/presentation/customer_detail_screen.dart';
 import '../../features/venue/customers/presentation/customers_screen.dart';
+import '../../features/venue/growth/presentation/export_screen.dart';
+import '../../features/venue/growth/presentation/integrations_screen.dart';
+import '../../features/venue/growth/presentation/marketing_screen.dart';
+import '../../features/venue/growth/presentation/memberships_screen.dart';
 import '../../features/venue/insights/presentation/insights_screen.dart';
 import '../../features/venue/more/presentation/more_screen.dart';
 import '../../features/venue/settings/presentation/venue_settings_screen.dart';
@@ -351,6 +355,10 @@ GoRouter appRouter(Ref ref) {
                     path: 'account',
                     builder: (context, state) => const OwnerAccountScreen(),
                   ),
+                  GoRoute(path: 'memberships', builder: (context, state) => const MembershipsScreen()),
+                  GoRoute(path: 'marketing', builder: (context, state) => const MarketingScreen()),
+                  GoRoute(path: 'integrations', builder: (context, state) => const IntegrationsScreen()),
+                  GoRoute(path: 'export', builder: (context, state) => const ExportScreen()),
                   GoRoute(
                     path: 'spaces',
                     builder: (context, state) => const SpacesScreen(),

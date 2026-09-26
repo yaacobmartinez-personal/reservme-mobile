@@ -109,6 +109,22 @@ CustomerSummary { id, name, email, phone?, visits, noShowCount, tags[], lastVisi
 | 40 | `GET` · `PUT /mobile/admin/billing-config` `{qrUrl, payee, account}` | platform admin | → `{qrUrl, payee, account, configured}` | 400 | the platform's InstaPay details |
 | 41 | `GET /mobile/admin/audit?limit=` · `GET /mobile/admin/admins` · `POST …/admins/{userId}/revoke` | platform admin | → `{entries}` · `{admins}` · `{ok: true}` | 404, 409 `last_admin` | the audit trail; admins |
 
+### Rows 42–47 — what only the web dashboard did
+
+| # | Method & path | Auth | Request → Response | Errors | Notes |
+|---|---|---|---|---|---|
+| 42 | `GET` · `POST /mobile/venues/{slug}/membership-plans` · `PATCH …/membership-plans/{id}` `{active}` | member reads; owner/admin writes | `{name, kind: pass\|membership, price (pesos), credits?, discountPct?, validDays?}` → `{plans}` · `{plan}` | 400 (needs credits or a discount; duplicate name), 403, 404 | the kind decides the period: a pass is one-time, a membership monthly |
+| 43 | `POST …/customers/{id}/memberships` `{planId}` · profile (#21) gains `loyaltyPoints`, `marketingOptIn`, `holdings` | owner/admin | → `{holdings}` | 404, 409 `plan_unavailable` | records a plan sold at the desk; seeds credits and expiry |
+| 44 | `GET` · `POST …/promo-codes` · `PATCH …/promo-codes/{id}` `{active}` | member reads; owner/admin writes | `{code, kind: percent\|amount, value, maxUses?, expiresAt? YYYY-MM-DD}` → `{codes}` · `{code}` | 400 | code upper-cased; `amountCents` for a peso amount; expiry is end of that day in the **venue's** zone |
+| 45 | `GET` · `PUT …/marketing` `{reviewUrl \| null}` | member reads; owner/admin writes | → `{reviewUrl, loyalty: {pesosPerPoint, winbackAfterDays}}` | 400 | loyalty is shown, not edited — the same for every venue |
+| 46 | `GET …/integrations` · `POST …/integrations/ical` · `POST …/integrations/webhooks` `{url, events}` · `DELETE …/webhooks/{id}` · `POST …/integrations/api-keys` `{name}` · `DELETE …/api-keys/{id}` | owner/admin | → `{icalUrl, webhookEvents, webhooks, apiKeys}`; key creation adds `key` | 400 (https only), 403 | an API key is whole in its creation response only; webhook secrets are listed |
+| 47 | `GET …/export/{bookings\|customers\|transactions}` | member | → `text/csv` (CRLF) | 404 | the web's CSVs; the app hands them to the share sheet |
+
+The promo code a customer types already travelled with #3; it is validated
+before anything is written and refused in `validatePromo`'s words. The
+discount order is the server's: the promo first, then a pass credit or a
+membership discount on what is left.
+
 ## What is live
 
 **Auth shipped on 2026-09-25** — rows 10–13, 25, 26 and 34, on the app host,

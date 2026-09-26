@@ -63,6 +63,30 @@ class ApiClient {
   Future<Map<String, dynamic>> delete(String path, {Object? body}) =>
       _json(path, method: 'DELETE', body: body);
 
+  /// A body that is not JSON — the CSV exports. Errors still arrive as JSON
+  /// and are mapped exactly as [get]'s are.
+  Future<String> getText(String path) async {
+    final token = _token();
+    try {
+      final response = await _dio.request<String>(
+        path,
+        options: Options(
+          method: 'GET',
+          responseType: ResponseType.plain,
+          headers: {
+            if (token != null) 'Authorization': 'Bearer $token',
+            'X-Device-Id': ?_deviceId,
+          },
+        ),
+      );
+      return response.data ?? '';
+    } on DioException catch (e) {
+      final error = ApiError.fromDio(e);
+      if (error.isUnauthorized) _unauthorized.emit();
+      throw error;
+    }
+  }
+
   /// Multipart upload (space photo, cover, billing proof).
   Future<Map<String, dynamic>> upload(String path, FormData form) =>
       _json(path, method: 'POST', body: form);

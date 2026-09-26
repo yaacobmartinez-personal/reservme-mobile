@@ -59,6 +59,10 @@ abstract final class Routes {
   static const venueBilling = '/v/more/billing';
   static const venueInsights = '/v/more/insights';
   static const ownerAccount = '/v/more/account';
+  static const venueMemberships = '/v/more/memberships';
+  static const venueMarketing = '/v/more/marketing';
+  static const venueIntegrations = '/v/more/integrations';
+  static const venueExport = '/v/more/export';
 
   // ---- platform admin (outside both shells) -------------------------------
   /// Its own stack rather than a venue tab: a platform admin need not belong
