@@ -97,9 +97,9 @@ CustomerSummary { id, name, email, phone?, visits, noShowCount, tags[], lastVisi
 | 28 | `POST /mobile/venues/{slug}/spaces` · `PATCH …/spaces/{id}` · `DELETE …/spaces/{id}` · `PUT …/spaces/{id}/hours` `[{weekday, opensAt, closesAt}]` · `POST …/spaces/{id}/image` (multipart `image`, ≤2 MB) · `DELETE …/spaces/{id}/image` | admin | space editor; the photo is optional and every surface shows the kind placeholder without one | 400, 404, 413 | `createSpace`, `updateSpace`, `setOpeningHours`, `updateSpaceImage`, `/api/upload` |
 | 29 | `POST …/spaces/{id}/pricing-rules` · `DELETE …/spaces/{id}/pricing-rules/{ruleId}` · `POST …/closures` · `DELETE …/closures/{closureId}?forSpaceId=` | admin | each answers `{space}` — the whole space, so the editor redraws in one round trip | 400 `fieldErrors`, 404 | `addPricingRule`, `addClosure` |
 | 30 | `PATCH /mobile/venues/{slug}` · `POST …/branding/{logo\|cover}` (multipart) | admin | settings: tagline, address, theme, cancellation, notice/horizon, refund terms, gcash name, timezone | 400 | `updateVenueSettings`, `branding-actions.ts` |
-| 31 | `GET …/team` · `POST …/team/invitations` `{email, role}` · `DELETE …/team/invitations/{id}` · `PATCH …/team/members/{id}` `{role}` · `DELETE …/team/members/{id}` | admin (owner for owner role) | → `{members: [{id, userId, name, email, role, isSelf, joinedAt}], invitations: [{id, email, role, expiresAt}]}` | 403, 409 `last_owner` | Better Auth org plugin + last-owner guard |
-| 32 | `GET …/billing` · `POST …/billing/proof` (multipart: `reference`, `paidAt`, `image`) | owner/admin | → `{band, activeSpaces, status, trialEndsAt, paidUntil?, daysLeftInTrial, dueNow, suspended, instapay, pendingPayment?, history: []}`. The amount is **not** an input — the server derives it from the band, so a venue cannot declare what it owes; and the band itself is derived from the **active** space count at read time, never stored | 400 | `src/lib/billing.ts`, `billing-actions.ts` |
-| 33 | `GET …/insights?period=today\|7d\|30d\|90d` | member | → `{range, bookedValueCents, bookings, utilisationPct, noShowRatePct` (each `{value, previous, deltaPct, series}`)`, bookedByDay, peakHours` (7×24)`, mix, bySpace, customers, needsYou}`. Every bucket is a **venue-local** date and hour. `rental`+`session_seat` drive counts and value; `rental`+`session_block` drive utilisation — counting seats as occupancy would show a full court as over-booked. `deltaPct` is null against a zero baseline. An unknown `period` falls back to 30d. No `awaitingPayments` tile: v1 is pay-at-venue, so the app has no payment records to count. | 403 | `src/lib/analytics.ts` |
+| 31 | `GET …/team` · `POST …/team/invitations` · `DELETE …/team/invitations/{id}` · `PATCH …/team/members/{id}` · `DELETE …/team/members/{id}` | read: member, write: admin | each answers the whole team | 400, 403, 404, 409 `last_owner` | `listMembers` + Better Auth org plugin |
+| 32 | `GET …/billing` · `POST …/billing/proof` (multipart: reference, paidAt, optional image) | owner/admin | → `{billing}` | 400, 409 `quoted` \| `already_pending`, 413 | `getBillingState`, `listOrgPayments`, `instapayConfig` |
+| 33 | `GET …/insights?period=today\|7d\|30d\|90d` | member | → `{insights}` — an unknown period is 30 days, not a 400 | 403 | `getDashboard` |
 | 34 | `DELETE /mobile/me` | bearer | → `{ok: true}` | 409 `sole_owner` `{venues: [slug]}` | account deletion with the sole-owner guard |
 
 ## What is live
@@ -207,6 +207,28 @@ could not open at all until peak pricing and closures existed. Three notes:
 nothing. There is no claim window on the server: `promoteWaitlist` emails the
 earliest match a booking link, and whoever books first keeps the slot. Tracked
 as D19.
+
+**Rows 31–33 finished the venue side.** Every flag except the customer half is
+now true. Four things worth restating:
+
+- **The last-owner guard is ours, not Better Auth's.** Demoting or removing the
+  only owner leaves a venue nobody can hand over, invite into or bill, and it
+  is not recoverable from inside the app. Both writes check it and answer
+  409 `last_owner`. Changing your *own* role is allowed: an owner handing the
+  venue on and stepping down is a real thing, and since only an owner can
+  demote an owner, forbidding it would make the guard unreachable.
+- **Invitations go through the organization plugin**, not a direct `invitation`
+  insert, so the email, the 48-hour expiry and the accept page keep working.
+  The invitation is checked against *this* venue before it is cancelled — the
+  id alone would let an admin of one venue revoke another's invite.
+- **The billing amount is never in the request.** It comes from the band,
+  which is itself derived from the *active* space count at read time: pausing a
+  court drops a band with no write anywhere. A quoted plan and an
+  already-pending payment are 409s, not validation errors.
+- **Insights differs from the web dashboard twice, on purpose.** Value and
+  utilisation arrive as one row per day rather than two series, and there is no
+  "awaiting payments" tile — v1 is pay-at-venue, so it would be a permanent
+  zero.
 
 ## Backend follow-ups outside the contract
 

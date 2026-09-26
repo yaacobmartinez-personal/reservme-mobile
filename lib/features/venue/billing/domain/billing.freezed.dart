@@ -682,7 +682,10 @@ as String,
 mixin _$BillingPayment {
 
  String get id; int get amountCents; String get reference;/// Venue-local date, "YYYY-MM-DD" — what the owner says they transferred.
- String get paidAt; PaymentStatus get status; String? get note; DateTime get createdAt;
+ String get paidAt; PaymentStatus get status; String? get note;/// The screenshot of the transfer, when one was attached. Whoever
+/// approves the payment is matching a reference against a statement by
+/// hand, and this is what settles it.
+ String? get receiptUrl; DateTime get createdAt;
 /// Create a copy of BillingPayment
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -696,20 +699,20 @@ $BillingPaymentCopyWith<BillingPayment> get copyWith => _$BillingPaymentCopyWith
 @override
 bool operator ==(Object other) {
   final _this = this as BillingPayment;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is BillingPayment&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.amountCents, _this.amountCents) || other.amountCents == _this.amountCents)&&(identical(other.reference, _this.reference) || other.reference == _this.reference)&&(identical(other.paidAt, _this.paidAt) || other.paidAt == _this.paidAt)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.note, _this.note) || other.note == _this.note)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is BillingPayment&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.amountCents, _this.amountCents) || other.amountCents == _this.amountCents)&&(identical(other.reference, _this.reference) || other.reference == _this.reference)&&(identical(other.paidAt, _this.paidAt) || other.paidAt == _this.paidAt)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.note, _this.note) || other.note == _this.note)&&(identical(other.receiptUrl, _this.receiptUrl) || other.receiptUrl == _this.receiptUrl)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as BillingPayment;
-  return Object.hash(runtimeType,_this.id,_this.amountCents,_this.reference,_this.paidAt,_this.status,_this.note,_this.createdAt);
+  return Object.hash(runtimeType,_this.id,_this.amountCents,_this.reference,_this.paidAt,_this.status,_this.note,_this.receiptUrl,_this.createdAt);
 }
 
 @override
 String toString() {
   final _this = this as BillingPayment;
-  return 'BillingPayment(id: ${_this.id}, amountCents: ${_this.amountCents}, reference: ${_this.reference}, paidAt: ${_this.paidAt}, status: ${_this.status}, note: ${_this.note}, createdAt: ${_this.createdAt})';
+  return 'BillingPayment(id: ${_this.id}, amountCents: ${_this.amountCents}, reference: ${_this.reference}, paidAt: ${_this.paidAt}, status: ${_this.status}, note: ${_this.note}, receiptUrl: ${_this.receiptUrl}, createdAt: ${_this.createdAt})';
 }
 
 
@@ -720,7 +723,7 @@ abstract mixin class $BillingPaymentCopyWith<$Res>  {
   factory $BillingPaymentCopyWith(BillingPayment value, $Res Function(BillingPayment) _then) = _$BillingPaymentCopyWithImpl;
 @useResult
 $Res call({
- String id, int amountCents, String reference, String paidAt, PaymentStatus status, String? note, DateTime createdAt
+ String id, int amountCents, String reference, String paidAt, PaymentStatus status, String? note, String? receiptUrl, DateTime createdAt
 });
 
 
@@ -737,7 +740,7 @@ class _$BillingPaymentCopyWithImpl<$Res>
 
 /// Create a copy of BillingPayment
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? amountCents = null,Object? reference = null,Object? paidAt = null,Object? status = null,Object? note = freezed,Object? createdAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? amountCents = null,Object? reference = null,Object? paidAt = null,Object? status = null,Object? note = freezed,Object? receiptUrl = freezed,Object? createdAt = null,}) {
   return _then(BillingPayment(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,amountCents: null == amountCents ? _self.amountCents : amountCents // ignore: cast_nullable_to_non_nullable
@@ -745,6 +748,7 @@ as int,reference: null == reference ? _self.reference : reference // ignore: cas
 as String,paidAt: null == paidAt ? _self.paidAt : paidAt // ignore: cast_nullable_to_non_nullable
 as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as PaymentStatus,note: freezed == note ? _self.note : note // ignore: cast_nullable_to_non_nullable
+as String?,receiptUrl: freezed == receiptUrl ? _self.receiptUrl : receiptUrl // ignore: cast_nullable_to_non_nullable
 as String?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,
   ));
@@ -831,10 +835,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  int amountCents,  String reference,  String paidAt,  PaymentStatus status,  String? note,  DateTime createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  int amountCents,  String reference,  String paidAt,  PaymentStatus status,  String? note,  String? receiptUrl,  DateTime createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _BillingPayment() when $default != null:
-return $default(_that.id,_that.amountCents,_that.reference,_that.paidAt,_that.status,_that.note,_that.createdAt);case _:
+return $default(_that.id,_that.amountCents,_that.reference,_that.paidAt,_that.status,_that.note,_that.receiptUrl,_that.createdAt);case _:
   return orElse();
 
 }
@@ -852,10 +856,10 @@ return $default(_that.id,_that.amountCents,_that.reference,_that.paidAt,_that.st
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  int amountCents,  String reference,  String paidAt,  PaymentStatus status,  String? note,  DateTime createdAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  int amountCents,  String reference,  String paidAt,  PaymentStatus status,  String? note,  String? receiptUrl,  DateTime createdAt)  $default,) {final _that = this;
 switch (_that) {
 case _BillingPayment():
-return $default(_that.id,_that.amountCents,_that.reference,_that.paidAt,_that.status,_that.note,_that.createdAt);case _:
+return $default(_that.id,_that.amountCents,_that.reference,_that.paidAt,_that.status,_that.note,_that.receiptUrl,_that.createdAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -872,10 +876,10 @@ return $default(_that.id,_that.amountCents,_that.reference,_that.paidAt,_that.st
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  int amountCents,  String reference,  String paidAt,  PaymentStatus status,  String? note,  DateTime createdAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  int amountCents,  String reference,  String paidAt,  PaymentStatus status,  String? note,  String? receiptUrl,  DateTime createdAt)?  $default,) {final _that = this;
 switch (_that) {
 case _BillingPayment() when $default != null:
-return $default(_that.id,_that.amountCents,_that.reference,_that.paidAt,_that.status,_that.note,_that.createdAt);case _:
+return $default(_that.id,_that.amountCents,_that.reference,_that.paidAt,_that.status,_that.note,_that.receiptUrl,_that.createdAt);case _:
   return null;
 
 }
@@ -887,7 +891,7 @@ return $default(_that.id,_that.amountCents,_that.reference,_that.paidAt,_that.st
 @JsonSerializable()
 
 class _BillingPayment extends BillingPayment {
-  const _BillingPayment({required this.id, this.amountCents = 0, required this.reference, required this.paidAt, this.status = PaymentStatus.submitted, this.note, required this.createdAt}): super._();
+  const _BillingPayment({required this.id, this.amountCents = 0, required this.reference, required this.paidAt, this.status = PaymentStatus.submitted, this.note, this.receiptUrl, required this.createdAt}): super._();
   factory _BillingPayment.fromJson(Map<String, dynamic> json) => _$BillingPaymentFromJson(json);
 
 @override final  String id;
@@ -897,6 +901,10 @@ class _BillingPayment extends BillingPayment {
 @override final  String paidAt;
 @override@JsonKey() final  PaymentStatus status;
 @override final  String? note;
+/// The screenshot of the transfer, when one was attached. Whoever
+/// approves the payment is matching a reference against a statement by
+/// hand, and this is what settles it.
+@override final  String? receiptUrl;
 @override final  DateTime createdAt;
 
 /// Create a copy of BillingPayment
@@ -912,18 +920,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _BillingPayment&&(identical(other.id, id) || other.id == id)&&(identical(other.amountCents, amountCents) || other.amountCents == amountCents)&&(identical(other.reference, reference) || other.reference == reference)&&(identical(other.paidAt, paidAt) || other.paidAt == paidAt)&&(identical(other.status, status) || other.status == status)&&(identical(other.note, note) || other.note == note)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _BillingPayment&&(identical(other.id, id) || other.id == id)&&(identical(other.amountCents, amountCents) || other.amountCents == amountCents)&&(identical(other.reference, reference) || other.reference == reference)&&(identical(other.paidAt, paidAt) || other.paidAt == paidAt)&&(identical(other.status, status) || other.status == status)&&(identical(other.note, note) || other.note == note)&&(identical(other.receiptUrl, receiptUrl) || other.receiptUrl == receiptUrl)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,amountCents,reference,paidAt,status,note,createdAt);
+    return Object.hash(runtimeType,id,amountCents,reference,paidAt,status,note,receiptUrl,createdAt);
 }
 
 @override
 String toString() {
-    return 'BillingPayment(id: $id, amountCents: $amountCents, reference: $reference, paidAt: $paidAt, status: $status, note: $note, createdAt: $createdAt)';
+    return 'BillingPayment(id: $id, amountCents: $amountCents, reference: $reference, paidAt: $paidAt, status: $status, note: $note, receiptUrl: $receiptUrl, createdAt: $createdAt)';
 }
 
 
@@ -934,7 +942,7 @@ abstract mixin class _$BillingPaymentCopyWith<$Res> implements $BillingPaymentCo
   factory _$BillingPaymentCopyWith(_BillingPayment value, $Res Function(_BillingPayment) _then) = __$BillingPaymentCopyWithImpl;
 @override @useResult
 $Res call({
- String id, int amountCents, String reference, String paidAt, PaymentStatus status, String? note, DateTime createdAt
+ String id, int amountCents, String reference, String paidAt, PaymentStatus status, String? note, String? receiptUrl, DateTime createdAt
 });
 
 
@@ -951,7 +959,7 @@ class __$BillingPaymentCopyWithImpl<$Res>
 
 /// Create a copy of BillingPayment
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? amountCents = null,Object? reference = null,Object? paidAt = null,Object? status = null,Object? note = freezed,Object? createdAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? amountCents = null,Object? reference = null,Object? paidAt = null,Object? status = null,Object? note = freezed,Object? receiptUrl = freezed,Object? createdAt = null,}) {
   return _then(_BillingPayment(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,amountCents: null == amountCents ? _self.amountCents : amountCents // ignore: cast_nullable_to_non_nullable
@@ -959,6 +967,7 @@ as int,reference: null == reference ? _self.reference : reference // ignore: cas
 as String,paidAt: null == paidAt ? _self.paidAt : paidAt // ignore: cast_nullable_to_non_nullable
 as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as PaymentStatus,note: freezed == note ? _self.note : note // ignore: cast_nullable_to_non_nullable
+as String?,receiptUrl: freezed == receiptUrl ? _self.receiptUrl : receiptUrl // ignore: cast_nullable_to_non_nullable
 as String?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,
   ));

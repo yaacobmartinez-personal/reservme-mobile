@@ -281,18 +281,18 @@ class _Pay extends ConsumerWidget {
   }
 
   Future<void> _submit(BuildContext context, WidgetRef ref) async {
-    final input = await showPaymentProofSheet(
+    final submission = await showPaymentProofSheet(
       context,
       amountCents: billing.amountDueCents!,
       timezone: venue,
     );
-    if (input == null || !context.mounted) return;
+    if (submission == null || !context.mounted) return;
 
     final messenger = ScaffoldMessenger.of(context);
     try {
       await ref
           .read(billingControllerProvider(venueSlug).notifier)
-          .submitProof(input);
+          .submitProof(submission.input, receipt: submission.receipt);
       messenger.showSnackBar(
         const SnackBar(
           content: Text('Thanks — we will confirm within a working day.'),

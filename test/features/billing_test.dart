@@ -158,6 +158,41 @@ void main() {
       expect(after.history, hasLength(1));
     });
 
+    test('an attached screenshot reaches the payment', () async {
+      // The repository and the controller took a receipt from the start, and
+      // no screen ever passed one — the same shape as #22's PATCH. Whoever
+      // approves a payment is matching a reference against a statement by
+      // hand, so the picture is the part that settles it.
+      final world = TestWorld();
+      final container = world.container();
+      await signIn(container, FakeAccounts.ownerEmail);
+      final notifier = container.read(billingControllerProvider(slug).notifier);
+      await container.read(billingControllerProvider(slug).future);
+
+      await notifier.submitProof(
+        const PaymentProofInput(reference: 'INSTA-WITH-PIC', paidAt: '2026-09-24'),
+        receipt: List<int>.filled(1024, 7),
+      );
+
+      final after = container.read(billingControllerProvider(slug)).value!;
+      expect(after.pendingPayment!.receiptUrl, isNotNull);
+    });
+
+    test('a payment sent without one says so, rather than pretending', () async {
+      final world = TestWorld();
+      final container = world.container();
+      await signIn(container, FakeAccounts.ownerEmail);
+      final notifier = container.read(billingControllerProvider(slug).notifier);
+      await container.read(billingControllerProvider(slug).future);
+
+      await notifier.submitProof(
+        const PaymentProofInput(reference: 'INSTA-NO-PIC', paidAt: '2026-09-24'),
+      );
+
+      final after = container.read(billingControllerProvider(slug)).value!;
+      expect(after.pendingPayment!.receiptUrl, isNull);
+    });
+
     test('a second payment is refused while one is under review', () async {
       final world = TestWorld();
       final container = world.container();

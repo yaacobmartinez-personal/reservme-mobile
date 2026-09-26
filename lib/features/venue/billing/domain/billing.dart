@@ -138,6 +138,11 @@ abstract class BillingPayment with _$BillingPayment {
     required String paidAt,
     @Default(PaymentStatus.submitted) PaymentStatus status,
     String? note,
+
+    /// The screenshot of the transfer, when one was attached. Whoever
+    /// approves the payment is matching a reference against a statement by
+    /// hand, and this is what settles it.
+    String? receiptUrl,
     required DateTime createdAt,
   }) = _BillingPayment;
 

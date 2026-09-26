@@ -400,9 +400,10 @@ void main() {
     test('a gated feature refuses before it reaches the network', () async {
       final (:client, :stub) = stubbedClient([const Reply.ok({})]);
 
-      // Team (#31) is the gate that is still shut; spaces opened with #29.
+      // The customer half is what is still shut — the whole venue side is
+      // live, so the gate has to be tested from the other side of the app.
       await expectLater(
-        RealTeamRepository(client, ApiMode.real).get('katipunan'),
+        RealVenuesRepository(client, ApiMode.real).bySlug('katipunan'),
         throwsA(isA<ApiError>().having((e) => e.status, 'status', 501)),
       );
       // Nothing was sent: the point of the gate is not to call a 404.

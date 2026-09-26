@@ -30,6 +30,9 @@ void main() {
         Feature.customers,
         Feature.venueWaitlist,
         Feature.spaces,
+        Feature.team,
+        Feature.billing,
+        Feature.insights,
       };
 
       final shipped = {
@@ -43,6 +46,25 @@ void main() {
         reason: 'A flag moved. Anything claiming to be live needs its '
             'endpoints deployed and its Real* repository working against them.',
       );
+    });
+
+    test('the venue side is entirely live', () {
+      // Everything a member of staff touches. What is left is the half a
+      // member of the public touches.
+      for (final feature in Feature.values) {
+        final isCustomerSide = {
+          Feature.customerBrowse,
+          Feature.customerBooking,
+          Feature.manageBooking,
+          Feature.reschedule,
+          Feature.waitlist,
+        }.contains(feature);
+        expect(
+          isAvailable(feature, ApiMode.real),
+          !isCustomerSide,
+          reason: feature.name,
+        );
+      }
     });
 
     test('the space editor opens now that #29 exists', () {
