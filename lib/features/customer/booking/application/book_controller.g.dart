@@ -106,7 +106,7 @@ final class BookControllerProvider
   BookController create() => BookController();
 }
 
-String _$bookControllerHash() => r'70c1516545f34b62f13c9a885b76b4a92883f202';
+String _$bookControllerHash() => r'e461036ed8c729dd75b6b036c3164eb8aff2132e';
 
 /// Makes a booking and, on success, saves it to the device wallet and
 /// remembers the contact details. The outcome is returned rather than

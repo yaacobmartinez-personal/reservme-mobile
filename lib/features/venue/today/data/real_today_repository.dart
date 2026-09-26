@@ -50,7 +50,6 @@ class RealTodayRepository implements TodayRepository {
     final json = await _api.post(
       '/mobile/venues/$venueSlug/bookings/$bookingId/$action',
       body: body,
-      idempotent: true,
     );
     return RunSheetEntry.fromJson(json['booking'] as Map<String, dynamic>);
   }

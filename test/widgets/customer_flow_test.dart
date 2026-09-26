@@ -6,9 +6,13 @@ import 'package:reservme/core/fake/seed.dart';
 import 'package:reservme/core/network/retry_policy.dart';
 import 'package:reservme/core/router/app_router.dart';
 import 'package:reservme/features/customer/booking/application/book_controller.dart';
+import 'package:reservme/features/customer/booking/domain/booking.dart';
+import 'package:reservme/features/customer/customer_providers.dart';
 import 'package:reservme/features/customer/wallet/application/wallet_controller.dart';
+import 'package:reservme/features/customer/wallet/presentation/booking_detail_screen.dart';
 
 import '../helpers/fakes.dart';
+import '../helpers/pump_app.dart';
 
 /// The whole customer loop through the real screens: find → venue → slot →
 /// details → booked → wallet.
@@ -125,6 +129,71 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text("That email doesn't look right."), findsOneWidget);
+  });
+
+  testWidgets('a booking the policy freezes offers neither button',
+      (tester) async {
+    // Cancel was gated on the policy and Reschedule was not, so a booking
+    // inside its grace window let the customer pick through seven days of
+    // slots and meet the refusal at the very end. Both are the same rule.
+    final world = TestWorld();
+    final container = world.container();
+
+    final venue = await container.read(venuesRepositoryProvider).bySlug(
+          FakeVenues.katipunan,
+        );
+    final space = venue.spaces.first;
+
+    // A booking starting inside the venue's cancellation grace window.
+    final soon = world.now.add(const Duration(hours: 2));
+    final outcome = await container.read(bookingRepositoryProvider).book(
+          venueSlug: FakeVenues.katipunan,
+          input: BookingInput(
+            spaceId: space.id,
+            startsAt: soon,
+            endsAt: soon.add(const Duration(hours: 1)),
+            name: 'Rafael',
+            email: 'rafael@example.com',
+          ),
+        );
+
+    // Asserted rather than skipped: an early return here would let this test
+    // pass by finding nothing, which is how the last two regression tests in
+    // this repo went wrong.
+    expect(outcome, isA<Booked>(), reason: 'the slot two hours out was free');
+    final booking = (outcome as Booked).booking;
+    expect(
+      booking.cancellation.canCancel,
+      isFalse,
+      reason: 'two hours out is inside the venue 24-hour grace window',
+    );
+
+    await pumpApp(
+      tester,
+      BookingDetailScreen(slug: FakeVenues.katipunan, token: booking.manageToken!),
+      world: world,
+    );
+    await tester.pumpAndSettle();
+
+    final reschedule = tester.widget<OutlinedButton>(
+      find.ancestor(
+        of: find.text('Reschedule'),
+        matching: find.byType(OutlinedButton),
+      ),
+    );
+    final cancel = tester.widget<OutlinedButton>(
+      find.ancestor(
+        of: find.text('Cancel'),
+        matching: find.byType(OutlinedButton),
+      ),
+    );
+
+    expect(cancel.onPressed, isNull, reason: 'the policy forbids cancelling');
+    expect(
+      reschedule.onPressed,
+      isNull,
+      reason: 'the same policy forbids moving it',
+    );
   });
 
   testWidgets('the wallet is empty until something is booked', (tester) async {

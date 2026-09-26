@@ -69,7 +69,7 @@ CustomerSummary { id, name, email, phone?, visits, noShowCount, tags[], lastVisi
 |---|---|---|---|---|---|
 | 1 | `GET /public/venues/{slug}` | none | → `{venue: Venue}` | 404 | `getVenueBySlug`, `getVenueSpaces` |
 | 2 | `GET /public/venues/{slug}/availability?space={id}&date=YYYY-MM-DD` | none | → `{date, slots: [Slot], sessions: [SessionSummary]}` | 400 outside horizon, 404 | `getDayAvailability`, `getDaySessions` |
-| 3 | `POST /public/venues/{slug}/bookings` | none | `{spaceId, startsAt, endsAt, name, email, phone?, promo?}` → `201 {booking}` (with `manageToken`) | 400 fieldErrors, 403 suspended, 409 `slot_taken`, 429 | `bookSlot` pipeline |
+| 3 | `POST /public/venues/{slug}/bookings` | none | `{spaceId, startsAt, endsAt, name, email, phone?, promo?, partySize?}` → `201 {booking}` with `manageToken`; a replayed `Idempotency-Key` answers `200` with the first one | 400, 403 suspended, 409 `slot_taken`, 429 | `reserveSpace` + the shared discount/announce tail |
 | 4 | `POST /public/venues/{slug}/sessions/{id}/bookings` | none | `{spots, name, email, phone?}` → `201 {booking}` | 409 `session_full`, 429 | `reserveSessionSeats` |
 | 5 | `GET /public/venues/{slug}/bookings/{token}` | none | → `{booking}` (works while suspended) | 404 | `getManageableBooking` |
 | 6 | `POST /public/venues/{slug}/bookings/{token}/cancel` | none | → `{outcome: cancelled\|refused, reason?, booking}` | 404, 429 | `cancelBooking` (policy re-derived server-side) |
@@ -229,6 +229,37 @@ now true. Four things worth restating:
   utilisation arrive as one row per day rather than two series, and there is no
   "awaiting payments" tile — v1 is pay-at-venue, so it would be a permanent
   zero.
+
+**Rows 1–9 finished it: the public booking loop.** Every row of the contract
+is live. The things worth restating are all about this being the one surface a
+stranger can write to:
+
+- **There is no Turnstile, and no equivalent.** It is a browser challenge; an
+  app cannot run one without embedding a webview in a booking form. Public
+  writes are rate-limited instead, on three buckets — by IP, by venue and by
+  device (`X-Device-Id`, the app's installation id). The first two are *the
+  same buckets the web form uses*, so a venue has one budget however the
+  attempt arrives, not two. Be clear about what this does not buy: an attacker
+  with many IPs and a scripted client is not stopped by any of it, and the
+  device id is self-reported. It stops floods, not a motivated adversary. Play
+  Integrity and App Attest are the real answer and are not in v1 (**D24**).
+- **`Idempotency-Key` is honoured**, per venue, on both booking endpoints. The
+  key is the *caller's* and must be identical across retries of one attempt —
+  the client used to mint one per request, which gave every retry a fresh key
+  and made the header decorative. The controller now holds the key across a
+  failure and clears it only when the server has answered.
+- **The organisation comes from the slug, never the body.** A space id selects
+  among that venue's spaces; it does not name one. The same is true of a
+  session id, a manage token and a waitlist space.
+- **The manage token is the capability.** It comes back exactly twice — when
+  the booking is made, and when the holder reads it back — and never anywhere
+  else. `getManageableBooking` matches it against the slug, so a token cannot
+  be read under another venue.
+- **Suspension refuses writes, not reads.** A suspended venue's page still
+  answers so it can explain itself, and an existing booking can still be
+  opened and cancelled. Only new bookings are refused.
+- **Availability is a prediction.** The exclusion constraint decides, so
+  `slot_taken` is a normal answer on a slot the grid showed as open.
 
 ## Backend follow-ups outside the contract
 

@@ -1,4 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../features/auth/domain/user.dart';
 import '../../features/venue/venues/domain/venue_membership.dart';
@@ -19,6 +20,7 @@ class BootData {
     this.selectedVenueSlug,
     this.appearance,
     this.welcomeSeen = false,
+    this.deviceId,
   });
 
   static const empty = BootData();
@@ -34,6 +36,11 @@ class BootData {
 
   /// The venue-owner welcome screen has been dismissed once.
   final bool welcomeSeen;
+
+  /// This installation's id, minted on first run. The server uses it as one
+  /// of the buckets it rate-limits public writes on — it is not an identity,
+  /// is not tied to a person, and is thrown away with the app.
+  final String? deviceId;
 
   static Future<BootData> load(SecureStore secure, Prefs prefs) async {
     final token = await secure.read(SecureStore.keyToken);
@@ -67,7 +74,17 @@ class BootData {
       selectedVenueSlug: await prefs.getString(Prefs.keySelectedVenue),
       appearance: await prefs.getString(Prefs.keyAppearance),
       welcomeSeen: (await prefs.getString(Prefs.keyWelcomeSeen)) == 'true',
+      deviceId: await _deviceId(prefs),
     );
+  }
+
+  /// Reads this installation's id, minting one the first time.
+  static Future<String> _deviceId(Prefs prefs) async {
+    final existing = await prefs.getString(Prefs.keyDeviceId);
+    if (existing != null && existing.isNotEmpty) return existing;
+    final minted = const Uuid().v4();
+    await prefs.setString(Prefs.keyDeviceId, minted);
+    return minted;
   }
 }
 

@@ -93,6 +93,7 @@ void main() {
           email: '  rafael@example.com ',
           partySize: 2,
         ),
+        idempotencyKey: 'attempt-abc-123',
       );
 
       final request = stub.requests.single;
@@ -103,8 +104,30 @@ void main() {
       // differently.
       expect(request.body.containsKey('phone'), isFalse);
       expect(request.body.containsKey('promo'), isFalse);
-      // A retried booking must never book twice.
-      expect(request.header('Idempotency-Key'), isNotNull);
+      // A retried booking must never book twice — so the key is the *caller's*
+      // and travels unchanged. The client used to mint one per call, which
+      // gave every retry a fresh key and made the header decorative.
+      expect(request.header('Idempotency-Key'), 'attempt-abc-123');
+    });
+
+    test('a booking with no key sends no key, rather than a made-up one',
+        () async {
+      final (:client, :stub) = stubbedClient([
+        const Reply.ok({'booking': _booking}),
+      ]);
+
+      await RealBookingRepository(client, mode).book(
+        venueSlug: 'katipunan',
+        input: BookingInput(
+          spaceId: 's1',
+          startsAt: DateTime.utc(2026, 10, 1, 10),
+          endsAt: DateTime.utc(2026, 10, 1, 11),
+          name: 'Rafael',
+          email: 'rafael@example.com',
+        ),
+      );
+
+      expect(stub.requests.single.header('Idempotency-Key'), isNull);
     });
 
     test('opening hours send only the days that are open', () async {
@@ -397,17 +420,23 @@ void main() {
   });
 
   group('gating', () {
-    test('a gated feature refuses before it reaches the network', () async {
-      final (:client, :stub) = stubbedClient([const Reply.ok({})]);
+    test('every repository still asks before it calls', () async {
+      // There is nothing gated left to test *through*: every row of the
+      // contract shipped, so `isAvailable` answers true for all of them and
+      // the guard never trips. What can still be pinned is that the guard is
+      // in the path at all — a repository that reached the network first
+      // would 404 on a phone instead of refusing in one legible place.
+      //
+      // So: with the feature live, the call goes out. When the next unshipped
+      // row is added to the map as `false`, this is where its refusal gets
+      // asserted — see docs/DEFERRED.md D23.
+      final (:client, :stub) = stubbedClient([
+        const Reply.ok({'venue': {'id': 'v1', 'slug': 'katipunan', 'name': 'Katipunan'}}),
+      ]);
 
-      // The customer half is what is still shut — the whole venue side is
-      // live, so the gate has to be tested from the other side of the app.
-      await expectLater(
-        RealVenuesRepository(client, ApiMode.real).bySlug('katipunan'),
-        throwsA(isA<ApiError>().having((e) => e.status, 'status', 501)),
-      );
-      // Nothing was sent: the point of the gate is not to call a 404.
-      expect(stub.requests, isEmpty);
+      await RealVenuesRepository(client, ApiMode.real).bySlug('katipunan');
+      expect(stub.requests, hasLength(1));
+      expect(stub.requests.single.path, '/public/venues/katipunan');
     });
   });
 }
