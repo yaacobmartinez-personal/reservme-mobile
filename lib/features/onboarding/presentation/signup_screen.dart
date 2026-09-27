@@ -1,7 +1,9 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/config/legal.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/theme/palette.dart';
 import '../../../core/theme/spacing.dart';
@@ -30,6 +32,18 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   bool _busy = false;
   String? _error;
 
+  /// Tapping a link opens the page; it does not tick the box around it.
+  late final _legalTaps = {
+    for (final page in [LegalPage.terms, LegalPage.privacy])
+      page: TapGestureRecognizer()..onTap = () => openLegal(page),
+  };
+
+  TextSpan _link(String text, LegalPage page, Color colour) => TextSpan(
+        text: text,
+        style: TextStyle(color: colour, decoration: TextDecoration.underline),
+        recognizer: _legalTaps[page],
+      );
+
   @override
   void initState() {
     super.initState();
@@ -53,6 +67,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     _name.dispose();
     _email.dispose();
     _password.dispose();
+    for (final tap in _legalTaps.values) {
+      tap.dispose();
+    }
     super.dispose();
   }
 
@@ -178,9 +195,16 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(top: 12),
-                  child: Text(
-                    'I agree to the Terms and Privacy Policy',
-                    style: AppType.bodyS.copyWith(color: p.ink2),
+                  child: Text.rich(
+                    TextSpan(
+                      style: AppType.bodyS.copyWith(color: p.ink2),
+                      children: [
+                        const TextSpan(text: 'I agree to the '),
+                        _link('Terms', LegalPage.terms, p.pineInk),
+                        const TextSpan(text: ' and '),
+                        _link('Privacy Policy', LegalPage.privacy, p.pineInk),
+                      ],
+                    ),
                   ),
                 ),
               ),
