@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/config/api_mode.dart';
 import '../../../../core/config/app_config.dart';
+import '../../../../core/config/legal.dart';
 import '../../../../core/router/routes.dart';
 import '../../../../core/storage/local_store.dart';
 import '../../../../core/theme/palette.dart';
@@ -180,6 +181,22 @@ class AccountScreen extends ConsumerWidget {
                       subtitle: const Text('Bookings, contact details, recent venues'),
                       onTap: () => _wipe(context, ref),
                     ),
+                  ]),
+                  const SizedBox(height: Spacing.x5),
+                  const Eyebrow('Legal'),
+                  const SizedBox(height: Spacing.x2),
+                  group([
+                    for (final page in [LegalPage.privacy, LegalPage.terms])
+                      ListTile(
+                        leading: Icon(
+                          page == LegalPage.privacy
+                              ? Icons.privacy_tip_outlined
+                              : Icons.gavel_rounded,
+                        ),
+                        title: Text(page.label),
+                        trailing: const Icon(Icons.open_in_new_rounded, size: 18),
+                        onTap: () => openLegal(page),
+                      ),
                   ]),
                   const SizedBox(height: Spacing.x8),
                   Center(

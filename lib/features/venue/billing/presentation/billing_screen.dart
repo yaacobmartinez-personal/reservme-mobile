@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/config/legal.dart';
 import '../../../../core/model/enums.dart';
 import '../../../../core/money/money.dart';
 import '../../../../core/theme/palette.dart';
@@ -58,8 +59,10 @@ class BillingScreen extends ConsumerWidget {
               _Status(billing: data, timezone: venue.timezone),
               const SizedBox(height: Spacing.x3),
               _Band(billing: data, currency: venue.currency),
-              const SizedBox(height: Spacing.x3),
-              _Pay(billing: data, venueSlug: venue.slug, venue: venue.timezone),
+              if (paymentsInApp) ...[
+                const SizedBox(height: Spacing.x3),
+                _Pay(billing: data, venueSlug: venue.slug, venue: venue.timezone),
+              ],
               if (data.history.isNotEmpty) ...[
                 const SizedBox(height: Spacing.x3),
                 _History(
@@ -85,11 +88,14 @@ class _Status extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (billing.suspended) {
-      return const AppBanner(
+      return AppBanner(
         kind: BannerKind.error,
         title: 'Your booking page is switched off',
-        body: 'Nobody can book until a payment is approved. Existing bookings '
-            'are untouched.',
+        body: paymentsInApp
+            ? 'Nobody can book until a payment is approved. Existing bookings '
+                'are untouched.'
+            : 'Nobody can book until the subscription is settled. Existing '
+                'bookings are untouched.',
       );
     }
     if (billing.pendingPayment != null) {
@@ -103,8 +109,11 @@ class _Status extends StatelessWidget {
       return AppBanner(
         kind: BannerKind.warn,
         title: 'Payment is due',
-        body: 'Your booking page stays live for ${Billing.graceDays} days, '
-            'then it is switched off until you pay.',
+        body: paymentsInApp
+            ? 'Your booking page stays live for ${Billing.graceDays} days, '
+                'then it is switched off until you pay.'
+            : 'Your booking page stays live for ${Billing.graceDays} more '
+                'days.',
       );
     }
     if (billing.status == BillingStatus.comped) {

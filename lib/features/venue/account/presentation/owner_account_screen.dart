@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/config/app_config.dart';
+import '../../../../core/config/legal.dart';
 import '../../../../core/model/enums.dart';
 import '../../../../core/router/routes.dart';
 import '../../../../core/theme/palette.dart';
@@ -137,6 +138,19 @@ class OwnerAccountScreen extends ConsumerWidget {
                   subtitle: const Text('We email you a code'),
                   onTap: () => _changePassword(context, ref, user.email),
                 ),
+                for (final page in [LegalPage.privacy, LegalPage.terms]) ...[
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: Icon(
+                      page == LegalPage.privacy
+                          ? Icons.privacy_tip_outlined
+                          : Icons.gavel_rounded,
+                    ),
+                    title: Text(page.label),
+                    trailing: const Icon(Icons.open_in_new_rounded, size: 18),
+                    onTap: () => openLegal(page),
+                  ),
+                ],
                 const Divider(height: 1),
                 ListTile(
                   leading: const Icon(Icons.logout_rounded),
