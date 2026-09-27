@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import '../../../../core/config/app_config.dart';
 import '../../../../core/router/deep_link_parser.dart';
 import '../../../../core/router/routes.dart';
 import '../../../../core/theme/palette.dart';
@@ -113,7 +114,7 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Links that start with reservme.pro/ open here',
+                  'Links that start with ${AppConfig.publicHost}/ open here',
                   textAlign: TextAlign.center,
                   style: AppType.caption.copyWith(color: p.bandMuted),
                 ),

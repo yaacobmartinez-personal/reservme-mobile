@@ -36,17 +36,16 @@
             </intent-filter>
 
             <!-- App Links for the public booking host. autoVerify means
-                 Android checks /.well-known/assetlinks.json on reservme.pro
-                 and opens these links in the app with no chooser. The
-                 marketing site owns the apex, so it has to serve that file
-                 (see docs/API-CONTRACT.md). Until it does, the links still
-                 work - they just show a chooser. -->
+                 Android checks /.well-known/assetlinks.json on
+                 book.reservme.pro and opens these links in the app with no
+                 chooser. The server builds that file from ANDROID_CERT_SHA256
+                 (web repo, src/lib/app-links.ts); until it is set the links
+                 still work - they just show a chooser. -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="https" android:host="reservme.pro"/>
-                <data android:scheme="https" android:host="www.reservme.pro"/>
+                <data android:scheme="https" android:host="book.reservme.pro"/>
             </intent-filter>
 
             <!-- Our own scheme, for links we mint ourselves (QR codes,

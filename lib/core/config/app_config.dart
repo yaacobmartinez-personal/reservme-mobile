@@ -27,18 +27,31 @@ abstract final class AppConfig {
 
   static final ApiMode apiMode = ApiMode.parse(_apiModeRaw);
 
-  /// The API host. The app host serves `/api/*`; the apex (`reservme.pro`)
-  /// 404s it. `--dart-define=SERVER_URL=http://10.0.2.2:3000` for a laptop
+  /// The API host. The app host serves `/api/*`; the booking host
+  /// (`book.reservme.pro`) 404s it. `--dart-define=SERVER_URL=http://10.0.2.2:3000` for a laptop
   /// backend from the Android emulator.
   static const String defaultServerUrl = String.fromEnvironment(
     'SERVER_URL',
     defaultValue: 'https://app.reservme.pro',
   );
 
-  /// Where public booking pages live: `https://reservme.pro/<venue>`. Also the
-  /// host of manage links (`/<venue>/manage/<token>`) and the QR posters.
+  /// Where public booking pages live: `https://book.reservme.pro/<venue>`.
+  /// Also the host of manage links (`/<venue>/manage/<token>`) and the QR
+  /// posters.
   static const String publicOrigin = String.fromEnvironment(
     'PUBLIC_ORIGIN',
+    defaultValue: 'https://book.reservme.pro',
+  );
+
+  /// The booking host on its own, for the places that show an address to a
+  /// person: `book.reservme.pro`.
+  static String get publicHost => Uri.parse(publicOrigin).host;
+
+  /// The marketing site (static, on Vercel). It serves no booking pages, but
+  /// people will type `reservme.pro/<venue>` anyway, and the site forwards
+  /// those to the booking host — so the app reads them as venue links too.
+  static const String marketingOrigin = String.fromEnvironment(
+    'MARKETING_ORIGIN',
     defaultValue: 'https://reservme.pro',
   );
 

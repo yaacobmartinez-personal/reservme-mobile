@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/config/app_config.dart';
 import '../../../core/model/enums.dart';
 import '../../../core/money/money.dart';
 import '../../../core/theme/palette.dart';
@@ -176,7 +177,7 @@ class _AdminTenantScreenState extends ConsumerState<AdminTenantScreen> {
           children: [
             Expanded(
               child: Text(
-                'reservme.pro/${t.slug}',
+                '${AppConfig.publicHost}/${t.slug}',
                 style: AppType.bodyS.copyWith(color: p.ink3),
               ),
             ),

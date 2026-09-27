@@ -21,7 +21,7 @@ class LiveVenue {
 
   final VenueMembership membership;
 
-  /// `https://reservme.pro/<slug>` — the page to share and put on the poster.
+  /// `https://book.reservme.pro/<slug>` — the page to share and put on the poster.
   final String bookingUrl;
   final String spaceName;
 }

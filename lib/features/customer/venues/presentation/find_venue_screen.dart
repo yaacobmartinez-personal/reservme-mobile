@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/config/app_config.dart';
 import '../../../../core/router/routes.dart';
 import '../../../../core/theme/palette.dart';
 import '../../../../core/theme/spacing.dart';
@@ -83,7 +84,7 @@ class _FindVenueScreenState extends ConsumerState<FindVenueScreen> {
                     textInputAction: TextInputAction.go,
                     onSubmitted: (_) => _open(),
                     decoration: InputDecoration(
-                      prefixText: 'reservme.pro/',
+                      prefixText: '${AppConfig.publicHost}/',
                       hintText: 'your-venue',
                       errorText: _error,
                     ),

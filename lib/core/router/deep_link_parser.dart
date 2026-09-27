@@ -45,12 +45,14 @@ class UnknownLink extends DeepLinkTarget {
 }
 
 /// Translates a URL into a [DeepLinkTarget]. Scheme-agnostic: `https://`,
-/// the custom `reservme://` scheme and bare `reservme.pro/...` all resolve
-/// the same way.
+/// the custom `reservme://` scheme, the booking host (`book.reservme.pro`)
+/// and the marketing host (`reservme.pro`, which forwards venue paths to the
+/// booking host) all resolve the same way.
 abstract final class DeepLinkParser {
   /// First path segments the web reserves; never a venue slug.
   static const reservedSegments = {
     '', 'api', 'app', 'admin', 'login', 'signup', 'contact', 'privacy', 'terms',
+    'delete-account',
     'pricing', 'about', 'help', 'www', '_next', 'favicon.ico',
   };
 
@@ -58,10 +60,13 @@ abstract final class DeepLinkParser {
 
   static DeepLinkTarget parse(Uri uri) {
     final public = Uri.parse(AppConfig.publicOrigin);
+    final marketing = Uri.parse(AppConfig.marketingOrigin);
     final app = Uri.parse(AppConfig.appOrigin);
     final host = uri.host.toLowerCase();
 
-    final isPublicHost = host == public.host || host == 'www.${public.host}';
+    final isPublicHost = host == public.host ||
+        host == marketing.host ||
+        host == 'www.${marketing.host}';
     final isAppHost = host == app.host;
     final isCustom = uri.scheme == AppConfig.customScheme;
 

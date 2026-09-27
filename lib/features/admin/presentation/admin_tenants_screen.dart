@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/config/app_config.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/theme/spacing.dart';
 import '../../../core/widgets/async_view.dart';
@@ -69,7 +70,7 @@ class _AdminTenantsScreenState extends ConsumerState<AdminTenantsScreen> {
                       title: _query.isEmpty ? 'No venues yet' : 'No venue matches that',
                       hint: _query.isEmpty
                           ? 'Venues appear here as owners sign up.'
-                          : 'Try part of the name, or the address after reservme.pro/.',
+                          : 'Try part of the name, or the address after ${AppConfig.publicHost}/.',
                     )
                   : RefreshIndicator(
                       onRefresh: () async => ref.refresh(provider.future),

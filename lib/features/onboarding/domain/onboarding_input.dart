@@ -53,7 +53,7 @@ class VenueInput {
 
   final String name;
 
-  /// The `reservme.pro/<slug>` address.
+  /// The `book.reservme.pro/<slug>` address.
   final String slug;
   final String timezone;
   final String currency;

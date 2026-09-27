@@ -36,7 +36,7 @@ Stream<List<RecentVenue>> recentVenues(Ref ref) =>
 abstract final class VenueCode {
   static final _slug = RegExp(r'^[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?$');
 
-  /// Accepts a bare code, or a pasted `reservme.pro/<slug>` URL.
+  /// Accepts a bare code, or a pasted `book.reservme.pro/<slug>` URL.
   static String? normalize(String input) {
     var value = input.trim().toLowerCase();
     if (value.isEmpty) return null;

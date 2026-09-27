@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import '../../../../core/config/app_config.dart';
 import '../../../../core/fake/fake_latency.dart';
 import '../../../../core/fake/fake_store.dart';
 import '../../../../core/model/enums.dart';
@@ -161,7 +162,7 @@ class FakeBookingRepository implements BookingRepository {
       to: customer.email,
       kind: FakeEmailKind.confirmation,
       body: 'Your booking at ${venue.name} is confirmed. '
-          'Manage it: reservme.pro/${venue.slug}/manage/${reservation.manageToken}',
+          'Manage it: ${AppConfig.publicHost}/${venue.slug}/manage/${reservation.manageToken}',
       sentAt: now,
     ));
 
